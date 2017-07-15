@@ -185,7 +185,7 @@ void pollingRF_Rx()
     uint16 i,x,y,contEscape;  
     uint8 buffer_rfTMP;
     
-    vTaskDelay( 55 / portTICK_PERIOD_MS );            
+    vTaskDelay( 100 / portTICK_PERIOD_MS );            
     
     // RF command received
     if(RF_Connection_GetRxBufferSize() >= 1)
@@ -721,11 +721,53 @@ void pollingRF_Rx()
                     for (x = 0; x < 10; x++){
                         RF_Connection_PutChar(buffer_tx[x]);
                     }
-                    for(x = 8; x < 12; x++){
-                        GradesHose[x-8] = buffer_rf[x];
+                    if(buffer_rf[5] == side.a.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.a.GradesHose[x-8] = buffer_rf[x];
+                        }
+                    }
+                    if(buffer_rf[5] == side.b.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.b.GradesHose[x-8] = buffer_rf[x];
+                        }
+                    }
+                    if(buffer_rf[5] == side.c.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.c.GradesHose[x-8] = buffer_rf[x];
+                        }
+                    }
+                    if(buffer_rf[5] == side.d.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.c.GradesHose[x-8] = buffer_rf[x];
+                        }
                     }
                     lockTurn = buffer_rf[12];
                     EEPROM_1_WriteByte(lockTurn,7);
+//                    y = 60;
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
+//                        y++;
+//                    }
                 break;
                 
                 case 0xE4:               //Turno                                                 
@@ -758,7 +800,7 @@ void pollingRF_Rx()
 
 
 void pollingRFA_Tx(){   
-    uint16 x,y,z;         
+    uint16 x,y;         
     /////////////// TICKET COPY //////////////////
 //    if(side.a.rfState == RF_COPY_RECEIPT && side.a.RFstateReport == 1){        
 //        buffer_txDisplay[5] = side.a.dir;
@@ -1033,7 +1075,7 @@ void pollingRFA_Tx(){
 }
 
 void pollingRFB_Tx(){   
-    uint16 x,y,z;      
+    uint16 x,y;      
     /////////////// COPIA DE RECIBO //////////////////
 //    if(side.b.rfState == RF_COPY_RECEIPT && side.b.RFstateReport == 1){        
 //        buffer_txDisplay[5] = side.b.dir;

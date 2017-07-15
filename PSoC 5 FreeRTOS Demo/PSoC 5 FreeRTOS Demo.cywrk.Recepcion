@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\LCD.h">
 <ExpandedNodeIds>
 <v>PSoC 5 FreeRTOS Demo</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo</v>
@@ -73,6 +73,8 @@
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 4 Driver Layer</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - Misc\os_resource.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - Misc\retarget.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump\Clock_Pump.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump\Clock_Pump.h</v>

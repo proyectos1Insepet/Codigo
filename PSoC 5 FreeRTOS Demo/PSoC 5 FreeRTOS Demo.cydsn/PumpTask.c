@@ -46,7 +46,8 @@ uint8 passwordPump[5] = "00204";
 *
 *********************************************************************************************************
 */
-void InitDisplay1(){      
+void InitDisplay1(){ 
+    uint8 x;
     uint8_t iniText[10]        = "Iniciando"; 
     uint8_t Unit[10]           = "S/D/Dupla ";
     uint8_t Unit2[10]          = "Quadrupla";
@@ -56,6 +57,26 @@ void InitDisplay1(){
     uint8_t DisplayMode[10]    = "6-6-4     ";
     uint8_t DisplayMode2[10]   = "7-7-5     ";
     uint8_t DisplayMode3[10]   = "8-7-5     ";
+    uint8 producto1[13] = "CORRIENTE    ";
+    uint8 producto2[13] = "ACPM         ";
+    uint8 producto3[13] = "EXTRA        ";
+    uint8 producto4[13] = "             ";
+    for(x=0; x<13;x++)
+    {
+        producto[0][x] = producto1[x];
+    }
+    for(x=0; x<13;x++)
+    {
+        producto[1][x] = producto2[x];
+    }
+    for(x=0; x<13;x++)
+    {
+        producto[2][x] = producto3[x];
+    }
+    for(x=0; x<13;x++)
+    {
+        producto[3][x] = producto4[x];
+    }
     
     if(NumPositions == 2)
     {
@@ -417,6 +438,36 @@ void PollingDisplay1(void){
         break;
             
         case 5:
+            
+            if(side.a.GradesHose[0] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[0]-1][x],11,7+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.a.GradesHose[1] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[1]-1][x],17,8+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.a.GradesHose[2] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[2]-1][x],23,9+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.a.GradesHose[3] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[3]-1][x],29,10+x,2,0xFFFF,'Y');
+                } 
+            }
+            
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -569,7 +620,7 @@ void PollingDisplay1(void){
                     switch(bufferDisplay1.flagKeyboard)
                     {
                         case 1://Placa
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.licenceSale[x] = 0;
                             }
@@ -578,7 +629,7 @@ void PollingDisplay1(void){
                         break;
                         
                         case 2://Kilometraje
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.mileageSale[x] = 0;
                             }
@@ -587,13 +638,13 @@ void PollingDisplay1(void){
                         break;
                         
                         case 3://CC/NIT
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.identySale[x] = 0;
                             }
                         break;
                         case 4://ID
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.shiftId[x] = 0;
                             }
@@ -1416,6 +1467,34 @@ void PollingDisplay2(void){
         break;
             
         case 5:
+            if(side.b.GradesHose[0] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[0]-1][x],11,7+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.b.GradesHose[1] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[1]-1][x],17,8+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.b.GradesHose[2] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[2]-1][x],23,9+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.b.GradesHose[3] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[3]-1][x],29,10+x,2,0xFFFF,'Y');
+                } 
+            }
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -1562,7 +1641,7 @@ void PollingDisplay2(void){
                     switch(bufferDisplay2.flagKeyboard)
                     {
                         case 1://Placa
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.licenceSale[x] = 0;
                             }
@@ -1571,20 +1650,20 @@ void PollingDisplay2(void){
                         break;
                         
                         case 2://Kilometraje
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.mileageSale[x] = 0;
                             }
                         break;
                         
                         case 3://CC/NIT
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.identySale[x] = 0;
                             }
                         break;
                         case 4://ID
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.shiftId[x] = 0;
                             }
@@ -2416,7 +2495,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
     {
         flowDisplay1 = 0;
         flowDisplay2 = 0;
-        InitPump();
+        //InitPump();
     }
     
     // Zero Sale detect
