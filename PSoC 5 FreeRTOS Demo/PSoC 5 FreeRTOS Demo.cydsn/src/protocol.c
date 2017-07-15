@@ -221,11 +221,11 @@ uint8 getTotals(uint8 pos){
     
     x = Pump_GetRxBufferSize();
     
-    if((x==34)||(x==64)||(x==94)||(x==124))  // Version 5 ó 6 digitos
+    if((x == 34) || (x == 64) || (x == 94) || (x == 124))  // Version 5 ó 6 digitos
     {           
-        if((Pump_rxBuffer[0]==0xFF)&&(Pump_rxBuffer[1]==0xF6)&&(Pump_rxBuffer[3]==0xF9))
+        if((Pump_rxBuffer[0] == 0xFF) && (Pump_rxBuffer[1] == 0xF6) && (Pump_rxBuffer[3] == 0xF9))
         {
-            gradeHandle=(x/30)&0x07;                    //Identificando cantidad de mangueras en el surtidor
+            gradeHandle = (x / 30) & 0x07;                    //Identificando cantidad de mangueras en el surtidor
             if(pos == side.a.dir)
             {
                 for(x = 0; x < 4; x++)
@@ -320,16 +320,16 @@ uint8 getTotals(uint8 pos){
         }
     }else if((x == 46)||(x == 88)||(x == 130)||(x == 172))
     {     // Version 7 digitos
-        if((Pump_rxBuffer[0]==0xFF)&&(Pump_rxBuffer[1]==0xF6)&&(Pump_rxBuffer[3]==0xF9))
+        if((Pump_rxBuffer[0] == 0xFF) && (Pump_rxBuffer[1] == 0xF6) && (Pump_rxBuffer[3] == 0xF9))
         {
             gradeHandle = (x/40) & 0x07;                        // Identificando cantidad de mangueras en el surtidor
             if(pos == side.a.dir)
             {
                 for(x = 0; x < 4; x++)
                 {
-                    for(y=0;y<3;y++)
+                    for(y = 0; y < 3; y++)
                     {
-                        for(z=0;z<14;z++)
+                        for(z = 0; z < 14; z++)
                         {
                             side.a.totalsHandle[x][y][z] = 0;
                         }
@@ -342,7 +342,7 @@ uint8 getTotals(uint8 pos){
                     {
                         for(z = 1; z <= 12; z++)
                         {
-                            side.a.totalsHandle[x][y][13-z] = (Pump_rxBuffer[w+4]&0x0F) + 0x30;
+                            side.a.totalsHandle[x][y][13 - z] = (Pump_rxBuffer[w + 4] & 0x0F) + 0x30;
                             w++;
                             if((y == 2)&&(z == 6)){
                                 break;
@@ -353,7 +353,7 @@ uint8 getTotals(uint8 pos){
                     w = w + 9;
                     for(z = 6; z >= 1; z--)
                     {
-                        side.a.totalsHandle[x][2][z] = side.a.totalsHandle[x][2][z+6];
+                        side.a.totalsHandle[x][2][z] = side.a.totalsHandle[x][2][z + 6];
                     }
                     side.a.totalsHandle[x][0][0] = 12;
                     side.a.totalsHandle[x][1][0] = 12;
