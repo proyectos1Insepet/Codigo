@@ -177,7 +177,8 @@ uint8 verificar_check(uint8 *datos, uint16 size){
     233,183, 85, 11,136,214, 52,106, 43,117,151,201, 74, 20,246,168,
     116, 42,200,150, 21, 75,169,247,182,232, 10, 84,215,137,107, 53};	
 	checksum=0;
-	for(i=0;i<(size-1);i++){
+	for(i = 0; i < (size - 1);i++)
+    {
 		index = (uint8)(checksum ^ datos[i]);
 		checksum = table[index];				
 	}
@@ -192,19 +193,19 @@ void pollingRF_Rx()
     uint8 buffer_rfTMP;
     uint8 EEpromGradeAddress;
     
-    vTaskDelay( 100 / portTICK_PERIOD_MS );            
+    vTaskDelay( 55 / portTICK_PERIOD_MS );            
     
     // RF command received
     if(RF_Connection_GetRxBufferSize() >= 1)
     {
         ActiveRF = 1;
         counterRF = 0;
-        i=0;
+        i = 0;
         
         //Save command in buffer
         while(RF_Connection_GetRxBufferSize() > 0)  //&& (RF_Connection_RX_STS_FIFO_NOTEMPTY)
         {      
-            buffer_rf[i]=RF_Connection_ReadRxData(); 	
+            buffer_rf[i] = RF_Connection_ReadRxData(); 	
     	   i++;
 //            buffer_rfTMP = RF_Connection_ReadRxData();
 //            if (buffer_rfTMP == 0xBC)
@@ -237,7 +238,7 @@ void pollingRF_Rx()
         buffer_tx[y] = IDCast[1]; y++;
         
         // Query Command Action
-        if(((buffer_rf[0] == 0xBC) && (buffer_rf[1] == 0xBB) && (buffer_rf[2] == 0xB8) && (buffer_rf[3] == IDCast[0]) && (buffer_rf[4] == IDCast[1])))
+        if(((buffer_rf[0] == 0xBC) && (buffer_rf[1] == 0xBB) && (buffer_rf[2] == 0xB8) && (buffer_rf[3] == IDCast[0]) && (buffer_rf[4] == IDCast[1])) )
         {                  
             switch(buffer_rf[6])
             {
@@ -353,31 +354,7 @@ void pollingRF_Rx()
                     }           
                 }
                 
-//                // Tercera posicion
-//                if(buffer_rf[5] == side.c.dir)
-//                {
-//                    buffer_tx[5] = side.c.dir; y++;
-//                    buffer_tx[y] = 0xA1; y++;
-//                    buffer_tx[y] = side.c.rfState; y++;
-//                    buffer_tx[y] = verificar_check(buffer_tx,y+1);y++;
-//                    for (x = 0; x < y; x++)
-//                    {
-//                        RF_Connection_PutChar(buffer_tx[x]);
-//                    }
-//                }
-//                
-//                // Cuarta posicion
-//                if(buffer_rf[5] == side.d.dir)
-//                {
-//                    buffer_tx[5] = side.d.dir; y++;
-//                    buffer_tx[y] = 0xA1; y++;
-//                    buffer_tx[y] = side.d.rfState; y++;
-//                    buffer_tx[y] = verificar_check(buffer_tx,y+1);y++;
-//                    for (x = 0; x < y; x++)
-//                    {
-//                        RF_Connection_PutChar(buffer_tx[x]);
-//                    }
-//                }    
+
                 
                 RF_Connection_ClearRxBuffer(); 
                 break;
@@ -409,8 +386,6 @@ void pollingRF_Rx()
                                 RF_Connection_PutChar(buffer_B[x]);
                             }
                             
-                            //side.a.changePPU = true;
-                            //AckFlag = 1;
                             Credit_Auth_OK = 1;
                             bufferAready = 0; 
                             PresetFlag = 1;
@@ -467,8 +442,7 @@ void pollingRF_Rx()
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
                             }
-                            //side.b.changePPU = true;
-                            //AckFlag2 = 1;
+                           
                             Credit_Auth_OK2 = 1;
                             bufferAreadyB = 0;
                             PresetFlag2 = 1;
@@ -563,7 +537,7 @@ void pollingRF_Rx()
                                                 
                         for(x = 0; x < 5 ; x++ )
                         {
-                            EEPROM_1_WriteByte(side.a.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
+                           // EEPROM_1_WriteByte(side.a.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
                         }
                         
                         side.a.changePPU = true;
@@ -602,7 +576,7 @@ void pollingRF_Rx()
                         
                         for(x = 0; x < 5 ; x++ )
                         {
-                            EEPROM_1_WriteByte(side.b.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
+                            //EEPROM_1_WriteByte(side.b.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
                         }
                         
                         side.b.changePPU = true;
@@ -638,25 +612,19 @@ void pollingRF_Rx()
                         buffer_tx[y] = 0x03;y++;
                     }
                     
-                    buffer_tx[y] = verificar_check(buffer_tx, y + 1); y++;
-                    
-                    for (x = 0; x < y; x++)
+                    buffer_tx[8] = verificar_check(buffer_tx, y + 1); y++;
+
+                    //RF_Connection_ClearTxBuffer();
+                   
+                    for (x = 0; x < 9; x++)
                     {
-                        RF_Connection_PutChar(buffer_tx[x]);
+                        PPUAux =   buffer_tx[x];                   
+                        RF_Connection_PutChar(PPUAux);
                     }
+                    return;
+                                        
                     
-//                    if(buffer_rf[5] == side.a.dir)
-//                    {
-//                        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
-//                        priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.b.grade]);
-//                        xSemaphoreGive(g_pUARTSemaphore);
-//                    }
-//                    if(buffer_rf[5] == side.b.dir)
-//                    {
-//                        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
-//                        priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
-//                        xSemaphoreTake(g_pUARTSemaphore, portMAX_DELAY);
-//                    }
+
                
                 break;
                 
@@ -749,38 +717,38 @@ void pollingRF_Rx()
                     time[1]    = buffer_rf[12];
                     time[0]    = buffer_rf[13];
                     
-//                    for(x = 17; x < 47; x++){
-//                        Encabezado1[x-17] = buffer_rf[x];
-//                    }
-//                    for(x = 47; x < 77; x++){
-//                        Encabezado2[x-47] = buffer_rf[x];
-//                    }
-//                    for(x = 77; x < 107; x++){
-//                        Encabezado3[x-77] = buffer_rf[x];
-//                    }
-//                    for(x = 107; x < 137; x++){
-//                        Encabezado4[x-77] = buffer_rf[x];
-//                    }
+                    for(x = 17; x < 47; x++){
+                        Encabezado1[x-17] = buffer_rf[x];
+                    }
+                    for(x = 47; x < 77; x++){
+                        Encabezado2[x-47] = buffer_rf[x];
+                    }
+                    for(x = 77; x < 107; x++){
+                        Encabezado3[x-77] = buffer_rf[x];
+                    }
+                    for(x = 107; x < 137; x++){
+                        Encabezado4[x-77] = buffer_rf[x];
+                    }
                     CopiasCredito = buffer_rf[16];
                     write_hora();
                     write_fecha(); 
-//                    for(x =0 ; x <30; x++){
-//                       // EEPROM_1_WriteByte(Encabezado1[x],16+x);
-//                    }
-//                    for(x =30 ; x <60; x++){
-//                        EEPROM_1_WriteByte(Encabezado2[x-30],16+x);
-//                    }
-//                    for(x =60 ; x <90; x++){
-//                        EEPROM_1_WriteByte(Encabezado3[x-30],16+x);
-//                    }
-//                    for(x =90 ; x <120; x++){
-//                        //EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
-//                    }
+                    for(x =0 ; x <30; x++){
+                        EEPROM_1_WriteByte(Encabezado1[x],16+x);
+                    }
+                    for(x =30 ; x <60; x++){
+                        EEPROM_1_WriteByte(Encabezado2[x-30],16+x);
+                    }
+                    for(x =60 ; x <90; x++){
+                        EEPROM_1_WriteByte(Encabezado3[x-30],16+x);
+                    }
+                    for(x =90 ; x <120; x++){
+                        EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
+                    }
                     side.a.dir = EEPROM_1_ReadByte(12);
                     side.b.dir = EEPROM_1_ReadByte(13);
                     side.c.dir = EEPROM_1_ReadByte(14);
                     side.d.dir = EEPROM_1_ReadByte(15);
-                    //imprimir(printPortA,side.a.dir);
+                    imprimir(printPortA,side.a.dir);
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 
@@ -818,27 +786,27 @@ void pollingRF_Rx()
                     }
                     lockTurn = buffer_rf[12];
                     EEPROM_1_WriteByte(lockTurn,7);
-//                    y = 60;
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
-//                        y++;
-//                    }
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
-//                        y++;
-//                    }
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
-//                        y++;
-//                    }
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
-//                        y++;
-//                    }
+                    y = 60;
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
+                        y++;
+                    }
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
+                        y++;
+                    }
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
+                        y++;
+                    }
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
+                        y++;
+                    }
                 break;
                 
                 case 0xE4:               //Turno                                                 

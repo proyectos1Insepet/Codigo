@@ -2923,13 +2923,12 @@ void Pump_Task(void *arg)
         StatePosition[i] = 0x00;
     }
     
-    CheckInitState();
-    
+    CheckInitState();   
     ReadPPUFromEEprom();                       
     side.a.changePPU = true;
     side.b.changePPU = true;
     SetPPU();
-    
+        
     while(1) 
     {    
         
@@ -2937,8 +2936,7 @@ void Pump_Task(void *arg)
         for(i = 0; i < NumPositions; i++)
         {               
             if(i == 0)
-            {
-            
+            {      
                 StatePosition[0] = get_state(side.a.dir);
                 side.a.pumpState = StatePosition[0];
             }
@@ -2983,12 +2981,10 @@ void Pump_Task(void *arg)
             }      
         }else
         {
-            PumpAction(side.a.dir, 0);
-//           
+            PumpAction(side.a.dir, 0);           
         }
        
-        
-        
+     
         // Totals
         if(pollTotals == 1)
         {   
@@ -3008,7 +3004,6 @@ void Pump_Task(void *arg)
                 side.a.RFstateReport = 0;
                 FlagTotalB = 1;
             }
-        
         }
         
         if(side.a.changePPU || side.b.changePPU)
