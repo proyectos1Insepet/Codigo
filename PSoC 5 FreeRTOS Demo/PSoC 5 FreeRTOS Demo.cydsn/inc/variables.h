@@ -117,8 +117,7 @@
     uint8 Encabezado2[30];
     uint8 Encabezado3[30];
     uint8 Encabezado4[30];
-    uint8 CopiasCredito;
-    uint8 GradesHose[5];    
+    uint8 CopiasCredito;        
     uint8 FlagTotal;
     uint8 FlagTotalB;
     uint8 StatePosition[8];
@@ -139,6 +138,7 @@
     uint8 Credit_Auth_OK;
     uint8 Credit_Auth_OK2;
     uint8 Temp[20];
+    uint8 producto [4][13];    
     uint8 ppuiButtonA[5];
 
     
@@ -225,6 +225,7 @@ struct position{
     uint8 grade;
     uint8 RFstateReport;
     uint8 saleNumber[10];
+    uint8 GradesHose[5];
 };
 
 struct pump{
