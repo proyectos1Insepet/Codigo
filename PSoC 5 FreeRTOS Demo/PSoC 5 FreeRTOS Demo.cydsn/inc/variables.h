@@ -120,8 +120,8 @@
     uint8 CopiasCredito;        
     uint8 FlagTotal;
     uint8 FlagTotalB;
-    uint8 StatePosition[4];
-    uint8 ActualState[4];
+    uint8 StatePosition[8];
+    uint8 ActualState[20];
     uint8 InitState[4];
     uint8 PresetFlag;
     uint8 PresetFlag2;
@@ -139,6 +139,7 @@
     uint8 Credit_Auth_OK2;
     uint8 Temp[20];
     uint8 producto [4][13];    
+    uint8 ppuiButtonA[5];
 
     
 /*

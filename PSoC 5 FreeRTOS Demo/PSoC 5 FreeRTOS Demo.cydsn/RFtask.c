@@ -44,7 +44,7 @@ void RF_Task(void *arg)
         pollingRF_Rx();
         pollingRFA_Tx();
         pollingRFB_Tx();
-        //vTaskDelayUntil(&xLastWakeTime, xFrequency);    
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);    
 	}
 }
 
