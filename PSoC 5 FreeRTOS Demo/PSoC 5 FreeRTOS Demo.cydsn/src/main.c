@@ -197,6 +197,7 @@ CY_ISR(animacion2){
 }
 
 
+
 /*----------------------------------------------------------------------------
    Main: Initialize and start Kernel
 *---------------------------------------------------------------------------*/
@@ -227,9 +228,10 @@ int main()
 int osInit(void)
 {
     /*  tasks  */
+    xTaskCreate(RF_Task, "RFTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);            /* RF TASK         */
     xTaskCreate(Pump_Task, "PumpTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);        /* PUMP TASK       */
     xTaskCreate(Display_Task, "DisplayTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);  /* DISPLAY TASK    */
-    xTaskCreate(RF_Task, "RFTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);            /* RF TASK         */
+    
     return 1;// All went well
 }
 

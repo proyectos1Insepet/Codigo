@@ -1015,6 +1015,8 @@ void PollingDisplay1(void){
                             }
                             flowDisplay1 = 19;
                             SetPicture(1,DISPLAY_POR_FAVOR_ESPERE);
+                            side.a.RFstateReport = 1;
+                            ShiftState = 1;
                         break;
                         case 5://Pass
                             for(x = 0; x < hiddenKeys; x++)
@@ -1236,8 +1238,37 @@ void PollingDisplay1(void){
         break;
             
         case 19:            
-            side.a.RFstateReport = 1;
-            ShiftState =1;
+           
+            if(Display1_GetRxBufferSize() == 8)
+            {
+                if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
+                {
+                    switch(Display1_rxBuffer[3])
+                    {                        
+                        case 0x7E:  //Init Screen                                                        
+                            SetPicture(1, DISPLAY_INICIO0);
+                            flowDisplay1 = 0;
+                            bufferDisplay1.flagPrint =  0;
+                            PresetFlag = 0;
+                            iButtonFlag = 0;
+                            ShiftState = 0;
+                        break;
+                        
+                        case 0x94:  //Cancel Button                                                        
+                            SetPicture(1, DISPLAY_INICIO0);
+                            flowDisplay1 = 0;
+                            bufferDisplay1.flagPrint =  0;
+                            PresetFlag = 0;
+                            iButtonFlag = 0;
+                            ShiftState = 0;
+                        break;
+                    }                    
+                }
+                
+                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+            }
+            Display1_ClearRxBuffer();
+            
         break;
             
         case 20:
@@ -1263,6 +1294,7 @@ void PollingDisplay1(void){
                             bufferDisplay1.flagPrint =  0;
                             PresetFlag = 0;
                             iButtonFlag = 0;
+                            ShiftState = 0;
                         break;
                     }                    
                 }
@@ -2393,13 +2425,13 @@ void PresetAuthorize(void)
             iButtonFlag2 = 0;
         }
         
-        //iButton Authorized
+        //iButton Authorized Credit
             if(Credit_Auth_OK2 == 1 && AuthType2 == 1)
             {
-                priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
-                
+                              
                 if (side.b.activeHose == side.b.hose)
                 {   
+                    priceChange(side.b.dir, side.b.grade, ppuiButtonB[side.b.grade]);
                     
                     if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
                     {                    
@@ -2423,6 +2455,7 @@ void PresetAuthorize(void)
                         SetPicture(2, DISPLAY_INICIO0);
                         PresetFlag2 = 0;
                         AuthType2 = 0;
+                        Credit_Auth_OK2 = 0;
                         return;
                     }
                 }else
@@ -2435,50 +2468,52 @@ void PresetAuthorize(void)
                     flowDisplay2 = 7;
                     return;
                 }
+    }
+                // Cash Sale
+    if(AuthType2 == 0)
+    {
+                     
+        if (side.b.activeHose == side.b.hose)
+        {                
+            priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
             
-            if(AuthType2 == 0)
-            {
-                priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
-                
-                if (side.b.activeHose == side.b.hose)
-                {                
-                    if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
-                    {                    
-                        get_state(side.b.dir);
+            if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
+            {                    
+                get_state(side.b.dir);
 
-                        //Authorize
-                        Authorization(side.b.dir);
-                        side.b.RFstateReport = 1;                    
-                        count_protector2 = 0;   
-        				bufferDisplay2.flagActiveSale = true;					
-                        SetPicture(2, DISPLAY_DESPACHANDO);   
-                        ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
-                        PresetFlag2 = 0;
-                        AuthType2 = 0;
-                        return;
-                    }else
-                    {
-                        flowDisplay2 = 0;
-                        SetPicture(2, DISPLAY_ERROR);
-                        vTaskDelay(200 / portTICK_PERIOD_MS);
-                        SetPicture(2, DISPLAY_INICIO0);
-                        PresetFlag2 = 0;
-                        AuthType2 = 0;
-                        return;
-                    }
-                }else
-                {
-                    flowDisplay2 = 7;
-                    return;
-                }
+                //Authorize
+                Authorization(side.b.dir);
+                side.b.RFstateReport = 1;                    
+                count_protector2 = 0;   
+				bufferDisplay2.flagActiveSale = true;					
+                SetPicture(2, DISPLAY_DESPACHANDO);   
+                ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
+                PresetFlag2 = 0;
+                AuthType2 = 0;
+                return;
+            }else
+            {
+                flowDisplay2 = 0;
+                SetPicture(2, DISPLAY_ERROR);
+                vTaskDelay(200 / portTICK_PERIOD_MS);
+                SetPicture(2, DISPLAY_INICIO0);
+                PresetFlag2 = 0;
+                AuthType2 = 0;
+                return;
             }
+        }else
+        {
+            flowDisplay2 = 7;
+            return;
+        }
+    }
             
         PresetFlag2 = 0;
         AuthType2 = 0;
     }
 
     
-}
+
 
 /* Total Task */
 void Display_Task(void *arg)
@@ -2923,13 +2958,12 @@ void Pump_Task(void *arg)
         StatePosition[i] = 0x00;
     }
     
-    CheckInitState();
-    
+    CheckInitState();   
     ReadPPUFromEEprom();                       
     side.a.changePPU = true;
     side.b.changePPU = true;
     SetPPU();
-    
+        
     while(1) 
     {    
         
@@ -2937,8 +2971,7 @@ void Pump_Task(void *arg)
         for(i = 0; i < NumPositions; i++)
         {               
             if(i == 0)
-            {
-            
+            {      
                 StatePosition[0] = get_state(side.a.dir);
                 side.a.pumpState = StatePosition[0];
             }
@@ -2983,12 +3016,10 @@ void Pump_Task(void *arg)
             }      
         }else
         {
-            PumpAction(side.a.dir, 0);
-//           
+            PumpAction(side.a.dir, 0);           
         }
        
-        
-        
+     
         // Totals
         if(pollTotals == 1)
         {   
@@ -3008,7 +3039,6 @@ void Pump_Task(void *arg)
                 side.a.RFstateReport = 0;
                 FlagTotalB = 1;
             }
-        
         }
         
         if(side.a.changePPU || side.b.changePPU)
