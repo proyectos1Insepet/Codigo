@@ -61,19 +61,20 @@ void InitDisplay1(){
     uint8 producto2[13] = "ACPM         ";
     uint8 producto3[13] = "EXTRA        ";
     uint8 producto4[13] = "             ";
-    for(x=0; x<13;x++)
+    
+    for(x = 0; x < 13; x++)
     {
         producto[0][x] = producto1[x];
     }
-    for(x=0; x<13;x++)
+    for(x = 0; x < 13; x++)
     {
         producto[1][x] = producto2[x];
     }
-    for(x=0; x<13;x++)
+    for(x = 0; x < 13;x++)
     {
         producto[2][x] = producto3[x];
     }
-    for(x=0; x<13;x++)
+    for(x = 0; x < 13;x++)
     {
         producto[3][x] = producto4[x];
     }
@@ -476,27 +477,31 @@ void PollingDisplay1(void){
                     {
                         case 0x80:  //Grado 1 
                             
-                            flowDisplay1 = 7;
+                            flowDisplay1 = 6;
                             side.a.hose = 1;
-                            //SetPicture(1, DISPLAY_SUBA_MANIJA);
+                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                            
                         break;
                             
                         case 0x81:  //Grado 2 
-                            flowDisplay1 = 7;
+                            flowDisplay1 = 6;
                             side.a.hose = 2;
-                            //SetPicture(1, DISPLAY_SUBA_MANIJA);
+                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                            
                         break;
                             
                         case 0x7F:  //Grado 3
-                            flowDisplay1 = 7;
+                            flowDisplay1 = 6;
                             side.a.hose = 3;
-                            //SetPicture(1, DISPLAY_SUBA_MANIJA);
+                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                            
                         break;   
                         
                         case 0xB8:  //Grado 4 
-                            flowDisplay1 = 7;
+                            flowDisplay1 = 6;
                             side.a.hose = 4;
-                            //SetPicture(1, DISPLAY_SUBA_MANIJA);
+                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                            
                         break;
                             
                         case 0x94:  //Retroceso
@@ -572,19 +577,10 @@ void PollingDisplay1(void){
         case 7:
             
             PresetFlag = 1;
-            
-            if(AuthType == 1)
-            {
-                bufferDisplay1.flagKeyboard = 2;
-                flowDisplay1 = 9;
-                SetPicture(1,DISPLAY_INTRODUZCA_KILOMETRAJE);
-            }
-            else
-            {
-                SetPicture(1, DISPLAY_SUBA_MANIJA);
-                flowDisplay1 = 8;
-            }
-            
+            bufferDisplay1.flagKeyboard = 2;
+            flowDisplay1 = 9;
+            SetPicture(1,DISPLAY_INTRODUZCA_KILOMETRAJE);
+               
         break;
             
         // Wait to end of transaction   
@@ -620,7 +616,7 @@ void PollingDisplay1(void){
                     switch(bufferDisplay1.flagKeyboard)
                     {
                         case 1://Placa
-                            for(x = 0; x < 11; x++)
+                            for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.licenceSale[x] = 0;
                             }
@@ -629,22 +625,21 @@ void PollingDisplay1(void){
                         break;
                         
                         case 2://Kilometraje
-                            for(x = 0; x < 11; x++)
+                            for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.mileageSale[x] = 0;
-                            }
-                                                      
-                                                                                    
+                            }                                                                                                                                       
                         break;
                         
                         case 3://CC/NIT
-                            for(x = 0; x < 11; x++)
+                            for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.identySale[x] = 0;
                             }
                         break;
+                            
                         case 4://ID
-                            for(x = 0; x < 11; x++)
+                            for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.shiftId[x] = 0;
                             }
@@ -668,11 +663,11 @@ void PollingDisplay1(void){
                                 SetPicture(1, DISPLAY_INICIO0); 
                             }else{
                                 flowDisplay1 = 7;   //handle Up
-                                SetPicture(1, DISPLAY_SUBA_MANIJA);
-                            }
+                                                            }
                         break;
                         
-                        case 2://Kilometraje
+                        case 2:// Kilometraje
+                                                     
                             for(x = 0; x <= bufferDisplay1.valueKeys[0]; x++)
                             {
                                 bufferDisplay1.mileageSale[x] = bufferDisplay1.valueKeys[x];
@@ -686,7 +681,7 @@ void PollingDisplay1(void){
                             }
                             else
                             {                                
-                                flowDisplay1 = 7;       //Handle Up
+                                flowDisplay1 = 8;       //Handle Up
                                 SetPicture(1,DISPLAY_SUBA_MANIJA);
                             }                                               
                                                        
@@ -712,7 +707,8 @@ void PollingDisplay1(void){
                     }                    
                     Display1_ClearRxBuffer();
                 break;
-            }            
+            }  
+            Display1_ClearRxBuffer();
         break;    
     
     ////////////////// CASOS PARA CRÉDITO  /////////////////////
@@ -798,9 +794,7 @@ void PollingDisplay1(void){
                         vTaskDelay( 700 / portTICK_PERIOD_MS );                       
                         iButtonFlag = 1;
                         SetPicture(1, DISPLAY_SUBA_MANIJA);
-                        flowDisplay1 = 8;
-                        
-                        
+                        flowDisplay1 = 8;                                                
                                                 
 					}
 				}
@@ -1390,7 +1384,7 @@ void PollingDisplay2(void){
                         break;
                     }
                 }  
-                //CyDelay(10);
+               
                 vTaskDelay( 10 / portTICK_PERIOD_MS );
                 Display2_ClearRxBuffer();
             }
@@ -1472,7 +1466,7 @@ void PollingDisplay2(void){
                         break;
                     }
                 }  
-                //CyDelay(10);
+                
                 vTaskDelay( 10 / portTICK_PERIOD_MS );
                 Display2_ClearRxBuffer();
             }
@@ -1534,26 +1528,26 @@ void PollingDisplay2(void){
                     switch(Display2_rxBuffer[3])
                     {
                         case 0x80:  //Grado 1 
-                            flowDisplay2 = 7;
+                            flowDisplay2 = 6;
                             side.b.hose = 1;                            
-                            //SetPicture(2,DISPLAY_SUBA_MANIJA);
+                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
                         break;        
                         case 0x81:  //Grado 2 
-                            flowDisplay2 = 7;
+                            flowDisplay2 = 6;
                             side.b.hose = 2;                          
-                            //SetPicture(2,DISPLAY_SUBA_MANIJA);
+                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
                         break;
                             
                         case 0x7F:  //Grado 3
-                            flowDisplay2 = 7;
+                            flowDisplay2 = 6;
                             side.b.hose = 3;                            
-                            //SetPicture(2,DISPLAY_SUBA_MANIJA);
+                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
                         break;   
                         
                         case 0xB8:  //Grado 4 
-                            flowDisplay2 = 7;
+                            flowDisplay2 = 6;
                             side.b.hose = 4;                           
-                            //SetPicture(2,DISPLAY_SUBA_MANIJA);
+                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
                         break;
                             
                         case 0x94:  //Retroceso
@@ -1628,18 +1622,10 @@ void PollingDisplay2(void){
         case 7:
 
             PresetFlag2 = 1;
-            
-            if(AuthType2 == 1)
-            {
-                bufferDisplay2.flagKeyboard = 2;
-                flowDisplay2 = 9;  
-                SetPicture(2,DISPLAY_INTRODUZCA_KILOMETRAJE);
-            }
-            else
-            {
-                SetPicture(2, DISPLAY_SUBA_MANIJA);
-                flowDisplay2 = 8;
-            }
+            bufferDisplay2.flagKeyboard = 2;
+            flowDisplay2 = 9;  
+            SetPicture(2,DISPLAY_INTRODUZCA_KILOMETRAJE);
+           
                        
         break;
             
@@ -1682,7 +1668,7 @@ void PollingDisplay2(void){
                         break;
                         
                         case 2://Kilometraje
-                            for(x = 0; x < 11; x++)
+                            for(x = 0; x < 10; x++)
                             {
                                 bufferDisplay2.mileageSale[x] = 0;
                             }
@@ -1721,7 +1707,7 @@ void PollingDisplay2(void){
                             }else{
                                 flowDisplay2 = 7;   //Suba manija
 
-                                SetPicture(2,DISPLAY_SUBA_MANIJA);
+                                
                             }
                         break;
                         
@@ -1738,7 +1724,7 @@ void PollingDisplay2(void){
                             }
                             else
                             {
-                                flowDisplay2 = 7;       //Suba manija
+                                flowDisplay2 = 8;       //Suba manija
                                 SetPicture(2,DISPLAY_SUBA_MANIJA);
                             }
                             
@@ -2329,12 +2315,52 @@ void PresetAuthorize(void)
             iButtonFlag = 0;
         }
         
-            //iButton Authorized
-            if(Credit_Auth_OK == 1 && AuthType == 1)
-            {
-                if (side.a.activeHose == side.a.hose)
-                {   
-                    priceChange(side.a.dir, side.a.grade, ppuiButtonA[side.a.grade]);
+        //iButton Authorized
+        if(Credit_Auth_OK == 1 && AuthType == 1)
+        {
+            if (side.a.activeHose == side.a.hose)
+            {   
+                priceChange(side.a.dir, side.a.grade, ppuiButtonA[side.a.grade]);
+                
+                // PRESET
+                if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
+                {                    
+                    
+                    get_state(side.a.dir);
+              
+                    //Authorize
+                    Authorization(side.a.dir);                                                         
+                    side.a.RFstateReport = 1;
+                    count_protector = 0;                    
+                    bufferDisplay1.flagActiveSale = true;
+                    SetPicture(1, DISPLAY_DESPACHANDO);   
+                    ShowMessage(1, (bufferDisplay1.presetValue[1]), 18);
+                    PresetFlag = 0;
+                    AuthType = 0;
+                    Credit_Auth_OK = 0;
+                    return;
+                }else
+                {
+                    flowDisplay1 = 0;
+                    SetPicture(1, DISPLAY_ERROR);
+                    vTaskDelay( 200 / portTICK_PERIOD_MS );
+                    SetPicture(1, DISPLAY_INICIO0);
+                    PresetFlag = 0;
+                    AuthType = 0;
+                    Credit_Auth_OK = 0;
+                    return;
+                }
+            }
+            
+        }
+    
+       // Cash Sale
+        if(AuthType == 0)
+        {       
+            //Grade selected  =  Grade pump handle
+            if (side.a.activeHose == side.a.hose)
+            {   
+                    priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                     
                     // PRESET
                     if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
@@ -2348,10 +2374,9 @@ void PresetAuthorize(void)
                         count_protector = 0;                    
                         bufferDisplay1.flagActiveSale = true;
                         SetPicture(1, DISPLAY_DESPACHANDO);   
-                        ShowMessage(1, (bufferDisplay1.presetValue[1]), 18);
+                        ShowMessage(1,(bufferDisplay1.presetValue[1]),18);
                         PresetFlag = 0;
-                        AuthType = 0;
-                        Credit_Auth_OK = 0;
+                        
                         return;
                     }else
                     {
@@ -2360,57 +2385,12 @@ void PresetAuthorize(void)
                         vTaskDelay( 200 / portTICK_PERIOD_MS );
                         SetPicture(1, DISPLAY_INICIO0);
                         PresetFlag = 0;
-                        AuthType = 0;
-                        Credit_Auth_OK = 0;
+                        
                         return;
                     }
-                }else
-                {
-                    flowDisplay1 = 7;
-                    return;
-                }
-                
             }
-            if(AuthType == 0)
-            {       
-                //Grade selected  =  Grade pump handle
-                if (side.a.activeHose == side.a.hose)
-                {   
-                        priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
-                        
-                        // PRESET
-                        if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
-                        {                    
-                            
-                            get_state(side.a.dir);
-                      
-                            //Authorize
-                            Authorization(side.a.dir);                                                         
-                            side.a.RFstateReport = 1;
-                            count_protector = 0;                    
-                            bufferDisplay1.flagActiveSale = true;
-                            SetPicture(1, DISPLAY_DESPACHANDO);   
-                            ShowMessage(1,(bufferDisplay1.presetValue[1]),18);
-                            PresetFlag = 0;
-                            AuthType = 0;
-                            return;
-                        }else
-                        {
-                            flowDisplay1 = 0;
-                            SetPicture(1, DISPLAY_ERROR);
-                            vTaskDelay( 200 / portTICK_PERIOD_MS );
-                            SetPicture(1, DISPLAY_INICIO0);
-                            PresetFlag = 0;
-                            AuthType = 0;
-                            return;
-                        }
-                }else
-                {
-                    flowDisplay1 = 7;
-                    return;
-                }
-         PresetFlag = 0;
-         AuthType = 0;
+        PresetFlag = 0;
+        AuthType = 0;
         }
     }
         
@@ -2426,93 +2406,89 @@ void PresetAuthorize(void)
         }
         
         //iButton Authorized Credit
-            if(Credit_Auth_OK2 == 1 && AuthType2 == 1)
-            {
-                              
-                if (side.b.activeHose == side.b.hose)
-                {   
-                    priceChange(side.b.dir, side.b.grade, ppuiButtonB[side.b.grade]);
-                    
-                    if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
-                    {                    
-                        get_state(side.b.dir);
+        if(Credit_Auth_OK2 == 1 && AuthType2 == 1)
+        {
+                          
+            if (side.b.activeHose == side.b.hose)
+            {   
+                priceChange(side.b.dir, side.b.grade, ppuiButtonB[side.b.grade]);
+                
+                if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
+                {                    
+                    get_state(side.b.dir);
 
-                        //Authorize
-                        Authorization(side.b.dir);
-                        side.b.RFstateReport = 1;                    
-                        count_protector2 = 0;   
-        				bufferDisplay2.flagActiveSale = true;					
-                        SetPicture(2, DISPLAY_DESPACHANDO);   
-                        ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
-                        PresetFlag2 = 0;
-                        AuthType2 = 0;
-                        return;
-                    }else
-                    {
-                        flowDisplay2 = 0;
-                        SetPicture(2, DISPLAY_ERROR);
-                        vTaskDelay(200 / portTICK_PERIOD_MS);
-                        SetPicture(2, DISPLAY_INICIO0);
-                        PresetFlag2 = 0;
-                        AuthType2 = 0;
-                        Credit_Auth_OK2 = 0;
-                        return;
-                    }
+                    // Authorize
+                    Authorization(side.b.dir);
+                    side.b.RFstateReport = 1;                    
+                    count_protector2 = 0;   
+    				bufferDisplay2.flagActiveSale = true;					
+                    SetPicture(2, DISPLAY_DESPACHANDO);   
+                    ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
+                    PresetFlag2 = 0;
+                    AuthType2 = 0;
+                    return;
                 }else
                 {
-                    flowDisplay2 = 7;
+                    flowDisplay2 = 0;
+                    SetPicture(2, DISPLAY_ERROR);
+                    vTaskDelay(200 / portTICK_PERIOD_MS);
+                    SetPicture(2, DISPLAY_INICIO0);
+                    PresetFlag2 = 0;
+                    AuthType2 = 0;
+                    Credit_Auth_OK2 = 0;
                     return;
                 }
-            }else
-                {
-                    flowDisplay2 = 7;
-                    return;
-                }
-    }
-                // Cash Sale
-    if(AuthType2 == 0)
-    {
-                     
-        if (side.b.activeHose == side.b.hose)
-        {                
-            priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
-            
-            if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
-            {                    
-                get_state(side.b.dir);
-
-                //Authorize
-                Authorization(side.b.dir);
-                side.b.RFstateReport = 1;                    
-                count_protector2 = 0;   
-				bufferDisplay2.flagActiveSale = true;					
-                SetPicture(2, DISPLAY_DESPACHANDO);   
-                ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
-                PresetFlag2 = 0;
-                AuthType2 = 0;
-                return;
             }else
             {
-                flowDisplay2 = 0;
-                SetPicture(2, DISPLAY_ERROR);
-                vTaskDelay(200 / portTICK_PERIOD_MS);
-                SetPicture(2, DISPLAY_INICIO0);
-                PresetFlag2 = 0;
-                AuthType2 = 0;
+                flowDisplay2 = 8;
                 return;
             }
-        }else
+        }
+        
+         // Cash Sale
+        if(AuthType2 == 0)
         {
-            flowDisplay2 = 7;
-            return;
+                         
+            if (side.b.activeHose == side.b.hose)
+            {                
+                priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
+                
+                if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
+                {                    
+                    get_state(side.b.dir);
+
+                    //Authorize
+                    Authorization(side.b.dir);
+                    side.b.RFstateReport = 1;                    
+                    count_protector2 = 0;   
+    				bufferDisplay2.flagActiveSale = true;					
+                    SetPicture(2, DISPLAY_DESPACHANDO);   
+                    ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
+                    PresetFlag2 = 0;
+                   
+                    return;
+                }else
+                {
+                    flowDisplay2 = 0;
+                    SetPicture(2, DISPLAY_ERROR);
+                    vTaskDelay(200 / portTICK_PERIOD_MS);
+                    SetPicture(2, DISPLAY_INICIO0);
+                    PresetFlag2 = 0;
+                   
+                    return;
+                }
+            }else
+            {
+                flowDisplay2 = 8;
+                return;
+            }
+              
+            PresetFlag2 = 0;
+            AuthType2 = 0;
         }
     }
-            
-        PresetFlag2 = 0;
-        AuthType2 = 0;
-    }
 
-    
+}  
 
 
 /* Total Task */
@@ -2609,8 +2585,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
         case PUMP_AUTHORIZED:
 
         break;
-        case PUMP_BUSY:
-            
+        case PUMP_BUSY:          
                                  
             if(PositionPump == side.a.dir)
             {
@@ -2634,34 +2609,18 @@ void PumpAction(uint8 PositionPump, uint8 State)
             {
                 if(PositionPump == side.a.dir)
                 {
-                    if(bufferDisplay1.flagPrint == 1)
-                    {
-                        bufferDisplay1.flagEndSale = true;
-                        flowDisplay1 = 0;
-                        SetPicture(1, DISPLAY_INICIO0); 
-                    }else
-                    {
-                        flowDisplay1 = 6;
-                        bufferDisplay1.flagEndSale = true;
-                        SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO); 
-                    }
+                    
+                    flowDisplay1 = 0;
+                    SetPicture(1, DISPLAY_INICIO0);
                     bufferDisplay1.flagActiveSale = false;
                     side.a.RFstateReport = 1;  
                     priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                }
                if(PositionPump == side.b.dir)
                {
-                    if(bufferDisplay2.flagPrint == 1)
-                    {
-                        bufferDisplay2.flagEndSale = true;
-                        flowDisplay2 = 0;
-                        SetPicture(2,DISPLAY_INICIO0); 
-                    }else
-                    {
-                        flowDisplay2 = 6;
-                        bufferDisplay2.flagEndSale = true;
-                        SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
-                    }
+                    
+                    flowDisplay2 = 0;
+                    SetPicture(2,DISPLAY_INICIO0);
                     bufferDisplay2.flagActiveSale = false;
                     side.b.RFstateReport = 1;
                     priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
@@ -2677,34 +2636,17 @@ void PumpAction(uint8 PositionPump, uint8 State)
             {
                 if(PositionPump == side.a.dir)
                 {
-                    if(bufferDisplay1.flagPrint == 1)
-                    {
-                        bufferDisplay1.flagEndSale = true;
-                        flowDisplay1 = 0;
-                        SetPicture(1, DISPLAY_INICIO0); 
-                    }else
-                    {
-                        flowDisplay1 = 6;
-                        bufferDisplay1.flagEndSale = true;
-                        SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO); 
-                    }
+                   
+                    flowDisplay1 = 0;
+                    SetPicture(1,DISPLAY_INICIO0);
                     bufferDisplay1.flagActiveSale = false;
                     side.a.RFstateReport = 1;   
                     priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                }
                if(PositionPump == side.b.dir)
                {
-                    if(bufferDisplay2.flagPrint == 1)
-                    {
-                        bufferDisplay2.flagEndSale = true;
-                        flowDisplay2 = 0;
-                        SetPicture(2,DISPLAY_INICIO0); 
-                    }else
-                    {
-                        flowDisplay2 = 6;
-                        bufferDisplay2.flagEndSale = true;
-                        SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
-                    }
+                    flowDisplay2 = 0;
+                    SetPicture(2,DISPLAY_INICIO0);
                     bufferDisplay2.flagActiveSale = false;
                     side.b.RFstateReport = 1;
                     priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
