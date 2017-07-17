@@ -13,12 +13,14 @@
 #include <semphr.h>
 #include "os_resource.h"
 
+extern xSemaphoreHandle g_pUARTSemaphore;
+
 void RFTotalA(void)
 {
     uint16 x,y,z;
 
         pollTotals = 0;
-        y=0;
+        y = 0;
         buffer_txTotals[y] = 0xBC; y++;
         buffer_txTotals[y] = 0xCB; y++;
         buffer_txTotals[y] = 0xC8; y++;
@@ -28,22 +30,25 @@ void RFTotalA(void)
         buffer_txTotals[y] = 0xE8; y++;
         buffer_txTotals[y] = side.a.rfState; y++;
         buffer_txTotals[y] = 0x00; y++;
-        for(z=1;z <= side.a.hoseNumber; z++)
+        
+        for(z = 1;z <= side.a.hoseNumber; z++)
         {
             buffer_txTotals[y] = z; y++;                    
             if (digits == 6 || digits == 5)
             {                            
                 for(x = 8; x > 0; x--)
-                {  //Volumen
-                    buffer_txTotals[y] = (side.a.totalsHandle[z-1][0][x]) - 48; y++;
+                {  
+                    //Volumen
+                    buffer_txTotals[y] = (side.a.totalsHandle[z - 1][0][x]) - 48; y++;
                 }
                 for(x =0; x < 4; x++)
                 {
                     buffer_txTotals[y] = 0x00; y++;
                 }
                 for(x = 8; x > 0; x--)
-                {  //Dinero
-                    buffer_txTotals[y] = (side.a.totalsHandle[z-1][1][x]) - 48; y++;
+                {  
+                    //Dinero
+                    buffer_txTotals[y] = (side.a.totalsHandle[z - 1][1][x]) - 48; y++;
                 }
                 for(x =0; x < 4; x++)
                 {
@@ -51,24 +56,25 @@ void RFTotalA(void)
                 }
             }else{
                 for(x = 12; x > 0; x--)
-                { //Volumen
-                    buffer_txTotals[y] = (side.a.totalsHandle[z-1][0][x]) - 48; y++;
+                { 
+                    //Volumen              
+                    buffer_txTotals[y] = (side.a.totalsHandle[z - 1][0][x]) - 48; y++;
                 }                        
                 for(x = 12; x > 0; x--)
-                { //Dinero
-                    buffer_txTotals[y] = (side.a.totalsHandle[z-1][1][x]) - 48; y++;
+                { 
+                    //Dinero
+                    buffer_txTotals[y] = (side.a.totalsHandle[z - 1][1][x]) - 48; y++;
                 }                        
             } 
         }
-        buffer_txTotals[8] = y-9;
-        buffer_txTotals[y] = verificar_check(buffer_txTotals,y+1);y++;                 
+        buffer_txTotals[8] = y - 9;
+        buffer_txTotals[y] = verificar_check(buffer_txTotals,y + 1);y++;                 
         
         for (x = 0; x < y; x++)
         {
             RF_Connection_PutChar(buffer_txTotals[x]);
         }        
        
-
     bufferAready = 0; 
     FlagTotal = 0;
     return;
@@ -79,7 +85,7 @@ void RFTotalB(void)
     uint16 x,y,z;
     
         pollTotals = 0;
-        y=0;
+        y = 0;
         buffer_txTotals[y] = 0xBC; y++;
         buffer_txTotals[y] = 0xCB; y++;
         buffer_txTotals[y] = 0xC8; y++;
@@ -89,7 +95,7 @@ void RFTotalB(void)
         buffer_txTotals[y] = 0xE8; y++;
         buffer_txTotals[y] = side.b.rfState; y++;
         buffer_txTotals[y] = 0x00; y++;
-        for(z=1;z <= side.b.hoseNumber; z++)
+        for(z = 1; z <= side.b.hoseNumber; z++)
         {
             buffer_txTotals[y] = z; y++;                    
             if (digits == 6 || digits == 5)
@@ -97,17 +103,17 @@ void RFTotalB(void)
                 //Volumen
                 for(x = 8; x > 0; x--)
                 { 
-                    buffer_txTotals[y] = (side.b.totalsHandle[z-1][0][x]) - 48; y++;
+                    buffer_txTotals[y] = (side.b.totalsHandle[z - 1][0][x]) - 48; y++;
                 }
-                for(x =0; x < 4; x++)
+                for(x = 0; x < 4; x++)
                 {
                     buffer_txTotals[y] = 0x00; y++;
                 }
                 for(x = 8; x > 0; x--)
                 {//Dinero
-                    buffer_txTotals[y] = (side.b.totalsHandle[z-1][1][x]) - 48; y++;
+                    buffer_txTotals[y] = (side.b.totalsHandle[z - 1][1][x]) - 48; y++;
                 }
-                for(x =0; x < 4; x++)
+                for(x = 0; x < 4; x++)
                 {
                     buffer_txTotals[y] = 0x00; y++;
                 }
@@ -116,18 +122,18 @@ void RFTotalB(void)
                  //Volumen
                 for(x = 12; x > 0; x--)
                 {
-                    buffer_txTotals[y] = (side.b.totalsHandle[z-1][0][x]) - 48; y++;
+                    buffer_txTotals[y] = (side.b.totalsHandle[z - 1][0][x]) - 48; y++;
                 }     
                 
                 //Dinero
                 for(x = 12; x > 0; x--)
                 {
-                    buffer_txTotals[y] = (side.b.totalsHandle[z-1][1][x]) - 48; y++;
+                    buffer_txTotals[y] = (side.b.totalsHandle[z - 1][1][x]) - 48; y++;
                 }                        
             } 
         }
         buffer_txTotals[8] = y - 9;
-        buffer_txTotals[y] = verificar_check(buffer_txTotals,y+1);y++;                 
+        buffer_txTotals[y] = verificar_check(buffer_txTotals,y + 1);y++;                 
         
         for (x = 0; x < y; x++)
         {
@@ -171,7 +177,8 @@ uint8 verificar_check(uint8 *datos, uint16 size){
     233,183, 85, 11,136,214, 52,106, 43,117,151,201, 74, 20,246,168,
     116, 42,200,150, 21, 75,169,247,182,232, 10, 84,215,137,107, 53};	
 	checksum=0;
-	for(i=0;i<(size-1);i++){
+	for(i = 0; i < (size - 1);i++)
+    {
 		index = (uint8)(checksum ^ datos[i]);
 		checksum = table[index];				
 	}
@@ -184,6 +191,7 @@ void pollingRF_Rx()
 {
     uint16 i,x,y,contEscape;  
     uint8 buffer_rfTMP;
+    uint8 EEpromGradeAddress;
     
     vTaskDelay( 55 / portTICK_PERIOD_MS );            
     
@@ -192,12 +200,12 @@ void pollingRF_Rx()
     {
         ActiveRF = 1;
         counterRF = 0;
-        i=0;
+        i = 0;
         
         //Save command in buffer
         while(RF_Connection_GetRxBufferSize() > 0)  //&& (RF_Connection_RX_STS_FIFO_NOTEMPTY)
         {      
-            buffer_rf[i]=RF_Connection_ReadRxData(); 	
+            buffer_rf[i] = RF_Connection_ReadRxData(); 	
     	   i++;
 //            buffer_rfTMP = RF_Connection_ReadRxData();
 //            if (buffer_rfTMP == 0xBC)
@@ -230,7 +238,7 @@ void pollingRF_Rx()
         buffer_tx[y] = IDCast[1]; y++;
         
         // Query Command Action
-        if(((buffer_rf[0] == 0xBC) && (buffer_rf[1] == 0xBB) && (buffer_rf[2] == 0xB8) && (buffer_rf[3] == IDCast[0]) && (buffer_rf[4] == IDCast[1])))
+        if(((buffer_rf[0] == 0xBC) && (buffer_rf[1] == 0xBB) && (buffer_rf[2] == 0xB8) && (buffer_rf[3] == IDCast[0]) && (buffer_rf[4] == IDCast[1])) )
         {                  
             switch(buffer_rf[6])
             {
@@ -244,7 +252,7 @@ void pollingRF_Rx()
                         buffer_tx[5] = side.a.dir; y++;
                         buffer_tx[y] = 0xA1; y++;
                         buffer_tx[y] = side.a.rfState; y++;
-                        buffer_tx[y] = verificar_check(buffer_tx,y+1);y++;
+                        buffer_tx[y] = verificar_check(buffer_tx,y+1); y++;
                                                         
                         /*Send Data */
                         for (x = 0; x < y; x++)
@@ -293,6 +301,7 @@ void pollingRF_Rx()
                         RFTotalA();
                         bufferAready = 0;
                         FlagTotal = 0;
+                        pollTotals = 0;
                         
                     }      
                 }
@@ -333,9 +342,7 @@ void pollingRF_Rx()
                         bufferAreadyB = 0;
                         
                     }
-                    
-                   
-                    
+                                                          
                                       
                     // Totales
                     if(bufferAreadyB == 0 && FlagTotalB == 1)
@@ -343,34 +350,11 @@ void pollingRF_Rx()
                         RFTotalB(); 
                         bufferAreadyB = 0;
                         FlagTotalB = 0;
+                        pollTotals = 0;
                     }           
                 }
                 
-//                // Tercera posicion
-//                if(buffer_rf[5] == side.c.dir)
-//                {
-//                    buffer_tx[5] = side.c.dir; y++;
-//                    buffer_tx[y] = 0xA1; y++;
-//                    buffer_tx[y] = side.c.rfState; y++;
-//                    buffer_tx[y] = verificar_check(buffer_tx,y+1);y++;
-//                    for (x = 0; x < y; x++)
-//                    {
-//                        RF_Connection_PutChar(buffer_tx[x]);
-//                    }
-//                }
-//                
-//                // Cuarta posicion
-//                if(buffer_rf[5] == side.d.dir)
-//                {
-//                    buffer_tx[5] = side.d.dir; y++;
-//                    buffer_tx[y] = 0xA1; y++;
-//                    buffer_tx[y] = side.d.rfState; y++;
-//                    buffer_tx[y] = verificar_check(buffer_tx,y+1);y++;
-//                    for (x = 0; x < y; x++)
-//                    {
-//                        RF_Connection_PutChar(buffer_tx[x]);
-//                    }
-//                }    
+
                 
                 RF_Connection_ClearRxBuffer(); 
                 break;
@@ -379,12 +363,12 @@ void pollingRF_Rx()
                     if(buffer_rf[5] == side.a.dir)
                     {
                         if(buffer_rf[8] == 0x01)
-                        {                         
+                        {                                      
                             
                             // PPU
                             for(x = 19; x < 24 ; x++ )
                             {
-                                side.a.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
+                                ppuiButtonA[x] = buffer_rf[x];
                                 
                             }  
                             buffer_B[0]  = 0xBC;
@@ -402,12 +386,10 @@ void pollingRF_Rx()
                                 RF_Connection_PutChar(buffer_B[x]);
                             }
                             
-                            //side.a.changePPU = true;
-                            //AckFlag = 1;
                             Credit_Auth_OK = 1;
                             bufferAready = 0; 
                             PresetFlag = 1;
-                            PresetFlag2 = 0;
+                            
                         }
                         else
                         {
@@ -460,12 +442,11 @@ void pollingRF_Rx()
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
                             }
-                            //side.b.changePPU = true;
-                            //AckFlag2 = 1;
+                           
                             Credit_Auth_OK2 = 1;
                             bufferAreadyB = 0;
                             PresetFlag2 = 1;
-                            PresetFlag = 0;
+                        
                                                        
                         }
                         else
@@ -491,8 +472,7 @@ void pollingRF_Rx()
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
                             }
-                            
-                                                
+                                                                      
                         }
                     } 
                                
@@ -527,6 +507,7 @@ void pollingRF_Rx()
                 break;
                 
                 case 0xA6:               //PPU configure
+                    
                     if(buffer_rf[5] == side.a.dir)
                     {                        
                         for(x = 9; x < 14 ; x++ )
@@ -534,11 +515,36 @@ void pollingRF_Rx()
                             side.a.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
                         }
                         
+                        if(buffer_rf[8] == 0)
+                        {
+                            EEpromGradeAddress = 20; //Address 20 to 24
+                        }
+                        
+                        if(buffer_rf[8] == 1)
+                        {
+                            EEpromGradeAddress = 25; //Address 25 to 29
+                        }
+                        
+                        if(buffer_rf[8] == 2)
+                        {
+                            EEpromGradeAddress = 30; //Address 30 to 34
+                        }
+                        
+                        if(buffer_rf[8] == 3)
+                        {
+                            EEpromGradeAddress = 35; //Address 35 to 39
+                        }
+                                                
+                        for(x = 0; x < 5 ; x++ )
+                        {
+                           // EEPROM_1_WriteByte(side.a.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
+                        }
+                        
                         side.a.changePPU = true;
                         side.a.grade = buffer_rf[8];
                         buffer_tx[5] = side.a.dir; y++;
-                        buffer_tx[y] = 0xA6; y++;
-                        buffer_tx[y] = 0x03; y++;
+                        buffer_tx[6] = 0xA6; y++;
+                        buffer_tx[7] = 0x03; y++;
                  
                     }                   
                     if(buffer_rf[5] == side.b.dir)
@@ -547,11 +553,37 @@ void pollingRF_Rx()
                         {
                             side.b.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
                         }
+                        
+                         if(buffer_rf[8] == 0)
+                        {
+                            EEpromGradeAddress = 40; //Address 40 to 44
+                        }
+                        
+                        if(buffer_rf[8] == 1)
+                        {
+                            EEpromGradeAddress = 45; //Address 45 to 49
+                        }
+                        
+                        if(buffer_rf[8] == 2)
+                        {
+                            EEpromGradeAddress = 50; //Address 50 to 54
+                        }
+                        
+                        if(buffer_rf[8] == 3)
+                        {
+                            EEpromGradeAddress = 55; //Address 55 to 59
+                        }
+                        
+                        for(x = 0; x < 5 ; x++ )
+                        {
+                            //EEPROM_1_WriteByte(side.b.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
+                        }
+                        
                         side.b.changePPU = true;
                         side.b.grade = buffer_rf[8];
                         buffer_tx[5] = side.b.dir; y++;
-                        buffer_tx[y] = 0xA6; y++;
-                        buffer_tx[y] = 0x03; y++;
+                        buffer_tx[6] = 0xA6; y++;
+                        buffer_tx[7] = 0x03; y++;
                        
                     }                     
                     if(buffer_rf[5] == side.c.dir)
@@ -580,55 +612,61 @@ void pollingRF_Rx()
                         buffer_tx[y] = 0x03;y++;
                     }
                     
-                    buffer_tx[y] = verificar_check(buffer_tx, y + 1); y++;
-                    
-                    for (x = 0; x < y; x++)
+                    buffer_tx[8] = verificar_check(buffer_tx, y + 1); y++;
+
+                    //RF_Connection_ClearTxBuffer();
+                   
+                    for (x = 0; x < 9; x++)
                     {
-                        RF_Connection_PutChar(buffer_tx[x]);
+                        PPUAux =   buffer_tx[x];                   
+                        RF_Connection_PutChar(PPUAux);
                     }
+                    return;
+                                        
                     
+
                
                 break;
                 
                 case 0xA7:               //Impresion general
-//                    for(x = 9; x <= buffer_rf[8];x++)
-//                    {
-//                        //buffer_print[x-9] = buffer_rf[x];
-//                        write_psoc1(printPortA, buffer_rf[x]);
-//                    }
-//                    if(buffer_rf[5] == side.a.dir)
-//                    {
-//                        buffer_tx[5] = side.a.dir;
-//                        buffer_tx[6] = 0xA7;
-//                        buffer_tx[7] = side.a.rfState;
-//                        buffer_tx[8] = 0x03;
-//                    }  
-//                    if(buffer_rf[5] == side.b.dir)
-//                    {
-//                        buffer_tx[5] = side.b.dir;
-//                        buffer_tx[6] = 0xA7;
-//                        buffer_tx[7] = side.b.rfState;
-//                        buffer_tx[8] = 0x03;
-//                    }
-//                    if(buffer_rf[5] == side.c.dir)
-//                    {
-//                        buffer_tx[5] = side.c.dir;
-//                        buffer_tx[6] = 0xA7;
-//                        buffer_tx[7] = side.c.rfState;
-//                        buffer_tx[8] = 0x03;
-//                    }
-//                    if(buffer_rf[5] == side.d.dir)
-//                    {
-//                        buffer_tx[5] = side.d.dir;
-//                        buffer_tx[6] = 0xA7;
-//                        buffer_tx[7] = side.d.rfState;
-//                        buffer_tx[8] = 0x03;
-//                    }
-//                    buffer_tx[8] = verificar_check(buffer_tx,9);
-//                    for (x = 0; x < 9; x++)
-//                    {
-//                        RF_Connection_PutChar(buffer_tx[x]);
-//                    }
+                    for(x = 9; x <= buffer_rf[8];x++)
+                    {
+                        //buffer_print[x-9] = buffer_rf[x];
+                        write_psoc1(printPortA, buffer_rf[x]);
+                    }
+                    if(buffer_rf[5] == side.a.dir)
+                    {
+                        buffer_tx[5] = side.a.dir;
+                        buffer_tx[6] = 0xA7;
+                        buffer_tx[7] = side.a.rfState;
+                        buffer_tx[8] = 0x03;
+                    }  
+                    if(buffer_rf[5] == side.b.dir)
+                    {
+                        buffer_tx[5] = side.b.dir;
+                        buffer_tx[6] = 0xA7;
+                        buffer_tx[7] = side.b.rfState;
+                        buffer_tx[8] = 0x03;
+                    }
+                    if(buffer_rf[5] == side.c.dir)
+                    {
+                        buffer_tx[5] = side.c.dir;
+                        buffer_tx[6] = 0xA7;
+                        buffer_tx[7] = side.c.rfState;
+                        buffer_tx[8] = 0x03;
+                    }
+                    if(buffer_rf[5] == side.d.dir)
+                    {
+                        buffer_tx[5] = side.d.dir;
+                        buffer_tx[6] = 0xA7;
+                        buffer_tx[7] = side.d.rfState;
+                        buffer_tx[8] = 0x03;
+                    }
+                    buffer_tx[8] = verificar_check(buffer_tx,9);
+                    for (x = 0; x < 9; x++)
+                    {
+                        RF_Connection_PutChar(buffer_tx[x]);
+                    }
                               
                 break;
                 
@@ -678,38 +716,39 @@ void pollingRF_Rx()
                     date[2]    = buffer_rf[11];
                     time[1]    = buffer_rf[12];
                     time[0]    = buffer_rf[13];
-//                    for(x = 17; x < 47; x++){
-//                        Encabezado1[x-17] = buffer_rf[x];
-//                    }
-//                    for(x = 47; x < 77; x++){
-//                        Encabezado2[x-47] = buffer_rf[x];
-//                    }
-//                    for(x = 77; x < 107; x++){
-//                        Encabezado3[x-77] = buffer_rf[x];
-//                    }
-//                    for(x = 107; x < 137; x++){
-//                        Encabezado4[x-77] = buffer_rf[x];
-//                    }
+                    
+                    for(x = 17; x < 47; x++){
+                        Encabezado1[x-17] = buffer_rf[x];
+                    }
+                    for(x = 47; x < 77; x++){
+                        Encabezado2[x-47] = buffer_rf[x];
+                    }
+                    for(x = 77; x < 107; x++){
+                        Encabezado3[x-77] = buffer_rf[x];
+                    }
+                    for(x = 107; x < 137; x++){
+                        Encabezado4[x-77] = buffer_rf[x];
+                    }
                     CopiasCredito = buffer_rf[16];
                     write_hora();
                     write_fecha(); 
-//                    for(x =0 ; x <30; x++){
-//                       // EEPROM_1_WriteByte(Encabezado1[x],16+x);
-//                    }
-//                    for(x =30 ; x <60; x++){
-//                        EEPROM_1_WriteByte(Encabezado2[x-30],16+x);
-//                    }
-//                    for(x =60 ; x <90; x++){
-//                        EEPROM_1_WriteByte(Encabezado3[x-30],16+x);
-//                    }
-//                    for(x =90 ; x <120; x++){
-//                        //EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
-//                    }
+                    for(x =0 ; x <30; x++){
+                        EEPROM_1_WriteByte(Encabezado1[x],16+x);
+                    }
+                    for(x =30 ; x <60; x++){
+                        EEPROM_1_WriteByte(Encabezado2[x-30],16+x);
+                    }
+                    for(x =60 ; x <90; x++){
+                        EEPROM_1_WriteByte(Encabezado3[x-30],16+x);
+                    }
+                    for(x =90 ; x <120; x++){
+                        EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
+                    }
                     side.a.dir = EEPROM_1_ReadByte(12);
                     side.b.dir = EEPROM_1_ReadByte(13);
                     side.c.dir = EEPROM_1_ReadByte(14);
                     side.d.dir = EEPROM_1_ReadByte(15);
-                    //imprimir(printPortA,side.a.dir);
+                    imprimir(printPortA,side.a.dir);
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 
@@ -721,11 +760,53 @@ void pollingRF_Rx()
                     for (x = 0; x < 10; x++){
                         RF_Connection_PutChar(buffer_tx[x]);
                     }
-                    for(x = 8; x < 12; x++){
-                        GradesHose[x-8] = buffer_rf[x];
+                    if(buffer_rf[5] == side.a.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.a.GradesHose[x-8] = buffer_rf[x];
+                        }
+                    }
+                    if(buffer_rf[5] == side.b.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.b.GradesHose[x-8] = buffer_rf[x];
+                        }
+                    }
+                    if(buffer_rf[5] == side.c.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.c.GradesHose[x-8] = buffer_rf[x];
+                        }
+                    }
+                    if(buffer_rf[5] == side.d.dir)
+                    {
+                        for(x = 8; x < 12; x++){
+                            side.c.GradesHose[x-8] = buffer_rf[x];
+                        }
                     }
                     lockTurn = buffer_rf[12];
                     EEPROM_1_WriteByte(lockTurn,7);
+                    y = 60;
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
+                        y++;
+                    }
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
+                        y++;
+                    }
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
+                        y++;
+                    }
+                    for(x = y; x< y+5; x++)
+                    {
+                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
+                        y++;
+                    }
                 break;
                 
                 case 0xE4:               //Turno                                                 
@@ -758,7 +839,7 @@ void pollingRF_Rx()
 
 
 void pollingRFA_Tx(){   
-    uint16 x,y,z;         
+    uint16 x,y;         
     /////////////// TICKET COPY //////////////////
 //    if(side.a.rfState == RF_COPY_RECEIPT && side.a.RFstateReport == 1){        
 //        buffer_txDisplay[5] = side.a.dir;
@@ -1033,7 +1114,7 @@ void pollingRFA_Tx(){
 }
 
 void pollingRFB_Tx(){   
-    uint16 x,y,z;      
+    uint16 x,y;      
     /////////////// COPIA DE RECIBO //////////////////
 //    if(side.b.rfState == RF_COPY_RECEIPT && side.b.RFstateReport == 1){        
 //        buffer_txDisplay[5] = side.b.dir;

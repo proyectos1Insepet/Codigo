@@ -99,7 +99,6 @@ uint8 touch_present(uint8 ibutton){
 	    if(!IB2_Read()){
 	        return 0;
 	    }
-
 	    CyDelayUs(65);
         //vTaskDelay( 65 / portTICK_PERIOD_MS );
 	    present=!IB2_Read();

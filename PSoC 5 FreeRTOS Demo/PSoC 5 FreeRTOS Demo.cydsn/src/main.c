@@ -36,9 +36,7 @@
 #include "RFtask.h"
 #include "PumpTask.h"
 
-
 xSemaphoreHandle g_pUARTSemaphore;
-
       
 CY_ISR(animacion2);
 CY_ISR(animacion);
@@ -97,29 +95,29 @@ void loadConfiguration(){
 }
 void console(void)
 {
-    Pump_PutChar(0x10 | 0x01);
+    Pump_PutChar(0x10 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x01);
+    Pump_PutChar(0x30 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x10 | 0x01);
+    Pump_PutChar(0x10 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x01);
+    Pump_PutChar(0x30 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x10 | 0x01);
+    Pump_PutChar(0x10 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x01);
+    Pump_PutChar(0x30 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x10 | 0x01);
+    Pump_PutChar(0x10 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x01);
+    Pump_PutChar(0x30 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x10 | 0x01);
+    Pump_PutChar(0x10 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x01);
+    Pump_PutChar(0x30 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x10 | 0x01);
+    Pump_PutChar(0x10 | 0x03);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x01);
+    Pump_PutChar(0x30 | 0x03);
     CyDelay(100);
 }
 /*
@@ -160,7 +158,7 @@ void InitPump(){
             if(get_state(side.a.dir) == 0x06 && get_state(side.b.dir) == 0x06)
             {
                 PumpCompleteConfiguration(side.a.dir);
-                StoreConfiguration();            
+                StoreConfiguration();
             }else
             {
                 SetPicture(1,DISPLAY_BAJE_MANIJA);
@@ -198,13 +196,16 @@ CY_ISR(animacion2){
     count_protector2++;
 }
 
+CY_ISR(Interrupt)
+{
+    
+}
 
 /*----------------------------------------------------------------------------
    Main: Initialize and start Kernel
 *---------------------------------------------------------------------------*/
 int main()
-{	
-    
+{	  
 
     /* Drivers                                                                          */
     CySysTickStart();
@@ -233,6 +234,7 @@ int osInit(void)
     xTaskCreate(RF_Task, "RFTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);            /* RF TASK         */
     xTaskCreate(Pump_Task, "PumpTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);        /* PUMP TASK       */
     xTaskCreate(Display_Task, "DisplayTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);  /* DISPLAY TASK    */
+    
     return 1;// All went well
 }
 

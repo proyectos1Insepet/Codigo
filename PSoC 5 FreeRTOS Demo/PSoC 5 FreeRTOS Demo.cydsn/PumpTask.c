@@ -46,7 +46,8 @@ uint8 passwordPump[5] = "00204";
 *
 *********************************************************************************************************
 */
-void InitDisplay1(){      
+void InitDisplay1(){ 
+    uint8 x;
     uint8_t iniText[10]        = "Iniciando"; 
     uint8_t Unit[10]           = "S/D/Dupla ";
     uint8_t Unit2[10]          = "Quadrupla";
@@ -56,6 +57,26 @@ void InitDisplay1(){
     uint8_t DisplayMode[10]    = "6-6-4     ";
     uint8_t DisplayMode2[10]   = "7-7-5     ";
     uint8_t DisplayMode3[10]   = "8-7-5     ";
+    uint8 producto1[13] = "CORRIENTE    ";
+    uint8 producto2[13] = "ACPM         ";
+    uint8 producto3[13] = "EXTRA        ";
+    uint8 producto4[13] = "             ";
+    for(x=0; x<13;x++)
+    {
+        producto[0][x] = producto1[x];
+    }
+    for(x=0; x<13;x++)
+    {
+        producto[1][x] = producto2[x];
+    }
+    for(x=0; x<13;x++)
+    {
+        producto[2][x] = producto3[x];
+    }
+    for(x=0; x<13;x++)
+    {
+        producto[3][x] = producto4[x];
+    }
     
     if(NumPositions == 2)
     {
@@ -417,6 +438,36 @@ void PollingDisplay1(void){
         break;
             
         case 5:
+            
+            if(side.a.GradesHose[0] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[0]-1][x],11,7+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.a.GradesHose[1] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[1]-1][x],17,8+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.a.GradesHose[2] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[2]-1][x],23,9+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.a.GradesHose[3] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(1, producto[side.a.GradesHose[3]-1][x],29,10+x,2,0xFFFF,'Y');
+                } 
+            }
+            
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -569,7 +620,7 @@ void PollingDisplay1(void){
                     switch(bufferDisplay1.flagKeyboard)
                     {
                         case 1://Placa
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.licenceSale[x] = 0;
                             }
@@ -578,7 +629,7 @@ void PollingDisplay1(void){
                         break;
                         
                         case 2://Kilometraje
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.mileageSale[x] = 0;
                             }
@@ -587,13 +638,13 @@ void PollingDisplay1(void){
                         break;
                         
                         case 3://CC/NIT
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.identySale[x] = 0;
                             }
                         break;
                         case 4://ID
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay1.shiftId[x] = 0;
                             }
@@ -1416,6 +1467,34 @@ void PollingDisplay2(void){
         break;
             
         case 5:
+            if(side.b.GradesHose[0] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[0]-1][x],11,7+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.b.GradesHose[1] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[1]-1][x],17,8+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.b.GradesHose[2] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[2]-1][x],23,9+x,2,0xFFFF,'Y');
+                } 
+            }
+            if(side.b.GradesHose[3] !=0)
+            {
+                for(x = 0; x < 10; x++)
+                {
+                    WriteMessage(2, producto[side.b.GradesHose[3]-1][x],29,10+x,2,0xFFFF,'Y');
+                } 
+            }
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -1562,7 +1641,7 @@ void PollingDisplay2(void){
                     switch(bufferDisplay2.flagKeyboard)
                     {
                         case 1://Placa
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.licenceSale[x] = 0;
                             }
@@ -1571,20 +1650,20 @@ void PollingDisplay2(void){
                         break;
                         
                         case 2://Kilometraje
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.mileageSale[x] = 0;
                             }
                         break;
                         
                         case 3://CC/NIT
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.identySale[x] = 0;
                             }
                         break;
                         case 4://ID
-                            for(x = 0; x <= 11; x++)
+                            for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.shiftId[x] = 0;
                             }
@@ -2218,12 +2297,13 @@ void PresetAuthorize(void)
             iButtonFlag = 0;
         }
         
-        
             //iButton Authorized
             if(Credit_Auth_OK == 1 && AuthType == 1)
             {
                 if (side.a.activeHose == side.a.hose)
-                {                    
+                {   
+                    priceChange(side.a.dir, side.a.grade, ppuiButtonA[side.a.grade]);
+                    
                     // PRESET
                     if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
                     {                    
@@ -2261,47 +2341,47 @@ void PresetAuthorize(void)
             }
             if(AuthType == 0)
             {       
-            //Grade selected  =  Grade pump handle
-            if (side.a.activeHose == side.a.hose)
-            {   
-                    
-                    // PRESET
-                    if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
-                    {                    
+                //Grade selected  =  Grade pump handle
+                if (side.a.activeHose == side.a.hose)
+                {   
+                        priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                         
-                        get_state(side.a.dir);
-                  
-                        //Authorize
-                        Authorization(side.a.dir);                                                         
-                        side.a.RFstateReport = 1;
-                        count_protector = 0;                    
-                        bufferDisplay1.flagActiveSale = true;
-                        SetPicture(1, DISPLAY_DESPACHANDO);   
-                        ShowMessage(1,(bufferDisplay1.presetValue[1]),18);
-                        PresetFlag = 0;
-                        AuthType = 0;
-                        return;
-                    }else
-                    {
-                        flowDisplay1 = 0;
-                        SetPicture(1, DISPLAY_ERROR);
-                        vTaskDelay( 200 / portTICK_PERIOD_MS );
-                        SetPicture(1, DISPLAY_INICIO0);
-                        PresetFlag = 0;
-                        AuthType = 0;
-                        return;
-                    }
-            }else
-            {
-                flowDisplay1 = 7;
-                return;
-            }
+                        // PRESET
+                        if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
+                        {                    
+                            
+                            get_state(side.a.dir);
+                      
+                            //Authorize
+                            Authorization(side.a.dir);                                                         
+                            side.a.RFstateReport = 1;
+                            count_protector = 0;                    
+                            bufferDisplay1.flagActiveSale = true;
+                            SetPicture(1, DISPLAY_DESPACHANDO);   
+                            ShowMessage(1,(bufferDisplay1.presetValue[1]),18);
+                            PresetFlag = 0;
+                            AuthType = 0;
+                            return;
+                        }else
+                        {
+                            flowDisplay1 = 0;
+                            SetPicture(1, DISPLAY_ERROR);
+                            vTaskDelay( 200 / portTICK_PERIOD_MS );
+                            SetPicture(1, DISPLAY_INICIO0);
+                            PresetFlag = 0;
+                            AuthType = 0;
+                            return;
+                        }
+                }else
+                {
+                    flowDisplay1 = 7;
+                    return;
+                }
          PresetFlag = 0;
          AuthType = 0;
         }
-        }
+    }
         
-       
     if(PresetFlag2 == 1)
     {
         side.b.activeHose = PumpHoseActiveState(side.b.dir);  
@@ -2316,8 +2396,11 @@ void PresetAuthorize(void)
         //iButton Authorized
             if(Credit_Auth_OK2 == 1 && AuthType2 == 1)
             {
+                priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
+                
                 if (side.b.activeHose == side.b.hose)
-                {                
+                {   
+                    
                     if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
                     {                    
                         get_state(side.b.dir);
@@ -2347,10 +2430,16 @@ void PresetAuthorize(void)
                     flowDisplay2 = 7;
                     return;
                 }
-            }
+            }else
+                {
+                    flowDisplay2 = 7;
+                    return;
+                }
             
             if(AuthType2 == 0)
             {
+                priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
+                
                 if (side.b.activeHose == side.b.hose)
                 {                
                     if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
@@ -2401,7 +2490,6 @@ void Display_Task(void *arg)
 
     while(1) 
     {
-
         PollingDisplay1();
         PollingDisplay2();   
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -2416,7 +2504,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
     {
         flowDisplay1 = 0;
         flowDisplay2 = 0;
-        InitPump();
+        //InitPump();
     }
     
     // Zero Sale detect
@@ -2452,7 +2540,10 @@ void PumpAction(uint8 PositionPump, uint8 State)
     {
         case PUMP_FAIL:          
             SetPicture(1,DISPLAY_ERROR);
-            SetPicture(2,DISPLAY_ERROR);            
+            SetPicture(2,DISPLAY_ERROR);
+            side.a.rfState = RF_ERROR;
+            side.b.rfState = RF_ERROR;
+                         
         break;
         case PUMP_IDLE:
 
@@ -2473,8 +2564,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
                 }       			
                 side.b.rfState = RF_IDLE;
             }
-                
-            
+                         
         break;
         case PUMP_CALLING:
                                      
@@ -2521,7 +2611,8 @@ void PumpAction(uint8 PositionPump, uint8 State)
                         SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO); 
                     }
                     bufferDisplay1.flagActiveSale = false;
-                    side.a.RFstateReport = 1;                    
+                    side.a.RFstateReport = 1;  
+                    priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                }
                if(PositionPump == side.b.dir)
                {
@@ -2538,10 +2629,12 @@ void PumpAction(uint8 PositionPump, uint8 State)
                     }
                     bufferDisplay2.flagActiveSale = false;
                     side.b.RFstateReport = 1;
+                    priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
                 }
                               
             }
             iButtonFlag = 0;
+            
         break;
         case PUMP_FEOT:
             
@@ -2561,7 +2654,8 @@ void PumpAction(uint8 PositionPump, uint8 State)
                         SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO); 
                     }
                     bufferDisplay1.flagActiveSale = false;
-                    side.a.RFstateReport = 1;                    
+                    side.a.RFstateReport = 1;   
+                    priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                }
                if(PositionPump == side.b.dir)
                {
@@ -2578,6 +2672,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
                     }
                     bufferDisplay2.flagActiveSale = false;
                     side.b.RFstateReport = 1;
+                    priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
                 }
                               
             }
@@ -2610,7 +2705,7 @@ bool LoopOpen(void)
         case 2:
             if(StatePosition[0] != 0 && StatePosition[1] != 0)
             {
-               
+               StatePosition[0];
                 return true;
             }
             else
@@ -2656,6 +2751,163 @@ void CheckInitState(void)
         }        
     }
 }
+
+void SetPPU(void)
+{
+    uint8 i;
+  
+    // PPU Change
+        if(side.a.changePPU)
+        {
+            for(i = 0; i <  side.a.hoseNumber; i++)
+            {   
+                if(i == 0)
+                {
+                    if(priceChange(side.a.dir, i, side.a.ppuAuthorized[i]))
+                    {
+                        //side.a.changePPU = false;
+                    }
+                }
+                if(i == 1)
+                {
+                    if(priceChange(side.a.dir, i, side.a.ppuAuthorized[i]))
+                    {
+                        //side.a.changePPU = false;
+                    }
+                }
+                if(i == 2)
+                {
+                    if(priceChange(side.a.dir, i, side.a.ppuAuthorized[i]))
+                    {
+                        //side.a.changePPU = false;
+                    }
+                }
+                if(i == 3)
+                {
+                    if(priceChange(side.a.dir, i, side.a.ppuAuthorized[i]))
+                    {
+                        //side.a.changePPU = false;
+                    }
+                }
+            }  
+        }
+        
+        if(side.b.changePPU)
+        {
+            for(i = 0; i <  side.b.hoseNumber; i++)
+            {   
+                if(i == 0)
+                {
+                    if(priceChange(side.b.dir, i, side.b.ppuAuthorized[i]))
+                    {
+                        //side.b.changePPU = false;
+                    }
+                }
+                if(i == 1)
+                {
+                    if(priceChange(side.b.dir, i, side.b.ppuAuthorized[i]))
+                    {
+                        //side.b.changePPU = false;
+                    }
+                }
+                if(i == 2)
+                {
+                    if(priceChange(side.b.dir, i, side.b.ppuAuthorized[i]))
+                    {
+                        //side.b.changePPU = false;
+                    }
+                }
+                if(i == 3)
+                {
+                    if(priceChange(side.b.dir, i, side.b.ppuAuthorized[i]))
+                    {
+                        //side.b.changePPU = false;
+                    }
+                }
+            }
+        }
+        
+   
+    side.a.changePPU = false;
+    side.b.changePPU = false;
+}
+
+void ReadPPUFromEEprom(void)
+{
+    uint8 i, x;
+                               
+    //PPU recovery from EEprom
+        for(i = 0; i <  side.a.hoseNumber; i++)
+        {   
+            if(i == 0)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[0][x] =  EEPROM_1_ReadByte(20 + x); //PPU to EEprom
+                }
+            }
+            
+            if(i == 1)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[1][x] =  EEPROM_1_ReadByte(25 + x); //PPU to EEprom
+                }
+            }
+            if(i == 2)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[2][x] =  EEPROM_1_ReadByte(30 + x); //PPU to EEprom
+                }
+            }
+            if(i == 3)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[3][x] =  EEPROM_1_ReadByte(35 + x); //PPU to EEprom
+                }
+            }
+                    
+        }
+        
+        for(i = 0; i <  side.b.hoseNumber; i++)
+        {   
+            if(i == 0)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[0][x] =  EEPROM_1_ReadByte(40 + x); //PPU to EEprom
+                }
+            }
+            
+            if(i == 1)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[1][x] =  EEPROM_1_ReadByte(45 + x); //PPU to EEprom
+                }
+            }
+            if(i == 2)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[2][x] =  EEPROM_1_ReadByte(50 + x); //PPU to EEprom
+                }
+            }
+            if(i == 3)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[3][x] =  EEPROM_1_ReadByte(55 + x); //PPU to EEprom
+                }
+            }
+                    
+        }
+
+}
+
+
 /* Pump Task */
 void Pump_Task(void *arg)
 {
@@ -2666,13 +2918,17 @@ void Pump_Task(void *arg)
     xLastWakeTime = xTaskGetTickCount();
     
     // Vector State Init
-    for(i = 0; i < 4; i++)
+    for(i = 0; i < 8; i++)
     {
         StatePosition[i] = 0x00;
     }
     
-    CheckInitState();
-    
+    CheckInitState();   
+    ReadPPUFromEEprom();                       
+    side.a.changePPU = true;
+    side.b.changePPU = true;
+    SetPPU();
+        
     while(1) 
     {    
         
@@ -2680,25 +2936,24 @@ void Pump_Task(void *arg)
         for(i = 0; i < NumPositions; i++)
         {               
             if(i == 0)
-            {
-                //side.a.dir = EEPROM_1_ReadByte(12);
-                StatePosition[i] = get_state(side.a.dir);
-                side.a.pumpState = StatePosition[i];
+            {      
+                StatePosition[0] = get_state(side.a.dir);
+                side.a.pumpState = StatePosition[0];
             }
             if(i == 1)
             {
-                StatePosition[i] = get_state(side.b.dir);
-                side.b.pumpState = StatePosition[i];
+                StatePosition[1] = get_state(side.b.dir);
+                side.b.pumpState = StatePosition[1];
             }
             if(i == 2)
             {
-                StatePosition[i] = get_state(side.c.dir);
-                side.c.pumpState = StatePosition[i];
+                StatePosition[2] = get_state(side.c.dir);
+                side.c.pumpState = StatePosition[2];
             }
             if(i == 3)
             {
-                StatePosition[i] = get_state(side.d.dir);
-                side.d.pumpState = StatePosition[i];
+                StatePosition[3] = get_state(side.d.dir);
+                side.d.pumpState = StatePosition[3];
             }       
         }
         
@@ -2715,39 +2970,21 @@ void Pump_Task(void *arg)
                 {              
                     PumpAction(side.b.dir, StatePosition[i]);
                 }
-                if(i == 2)
-                {                
-                    PumpAction(side.c.dir, StatePosition[i]);
-                }
-                if(i == 3)
-                {                  
-                    PumpAction(side.d.dir, StatePosition[i]);
-                }       
+//                if(i == 2)
+//                {                
+//                    PumpAction(side.c.dir, StatePosition[i]);
+//                }
+//                if(i == 3)
+//                {                  
+//                    PumpAction(side.d.dir, StatePosition[i]);
+//                }       
             }      
         }else
         {
-            PumpAction(side.a.dir, 0);
-            
+            PumpAction(side.a.dir, 0);           
         }
-        
-        // PPU Change
-        if(side.a.changePPU)
-        {
-            if(priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]))
-            {
-                side.a.changePPU = false;
-            }
-        } 
-        
-        if(side.b.changePPU)
-        {
-            if(priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]))
-            {
-                side.b.changePPU = false;
-            
-            }
-        }
-        
+       
+     
         // Totals
         if(pollTotals == 1)
         {   
@@ -2767,9 +3004,12 @@ void Pump_Task(void *arg)
                 side.a.RFstateReport = 0;
                 FlagTotalB = 1;
             }
-        
         }
         
+        if(side.a.changePPU || side.b.changePPU)
+        {
+            SetPPU();
+        }
         //vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
 }

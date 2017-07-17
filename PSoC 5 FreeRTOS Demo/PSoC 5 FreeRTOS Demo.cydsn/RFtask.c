@@ -36,12 +36,15 @@ void RF_Task(void *arg)
     const TickType_t xFrequency = 10;
     xLastWakeTime = xTaskGetTickCount();
     
+    
+    //setup();
+    
     while(1) 
     {        
         pollingRF_Rx();
-        pollingRFA_Tx();
-        pollingRFB_Tx();
-        //vTaskDelayUntil(&xLastWakeTime, xFrequency);    
+        //pollingRFA_Tx();
+        //pollingRFB_Tx();
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);    
 	}
 }
 
