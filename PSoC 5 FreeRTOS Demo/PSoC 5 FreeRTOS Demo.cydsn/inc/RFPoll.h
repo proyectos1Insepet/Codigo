@@ -15,7 +15,8 @@
 #include <device.h>
 #include <stdbool.h>
     
-void pollingRF_Rx(void);
+//void pollingRF_Rx(void);
+void pollingRF_Rx(uint8 PRF_rxBuffer[]);
 void pollingRFA_Tx(void);
 void pollingRFB_Tx(void);
 uint8 verificar_check(uint8 *datos, uint16 size);
