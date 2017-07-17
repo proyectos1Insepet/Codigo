@@ -196,10 +196,7 @@ CY_ISR(animacion2){
     count_protector2++;
 }
 
-CY_ISR(Interrupt)
-{
-    
-}
+
 
 /*----------------------------------------------------------------------------
    Main: Initialize and start Kernel

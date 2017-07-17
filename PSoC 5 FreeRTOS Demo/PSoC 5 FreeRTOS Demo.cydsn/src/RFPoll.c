@@ -8,12 +8,15 @@
 #include <device.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 /* RTOS includes. */
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include "os_resource.h"
 
 extern xSemaphoreHandle g_pUARTSemaphore;
+uint8_t lengthPrint;
 
 void RFTotalA(void)
 {
@@ -77,6 +80,7 @@ void RFTotalA(void)
        
     bufferAready = 0; 
     FlagTotal = 0;
+    pollTotals = 0;
     return;
 }
 
@@ -142,6 +146,7 @@ void RFTotalB(void)
         side.b.RFstateReport = 0;
         bufferAreadyB = 0; 
         FlagTotalB = 0;
+        pollTotals = 0;
         return;
        
     }    
@@ -184,67 +189,54 @@ uint8 verificar_check(uint8 *datos, uint16 size){
 	}
 	return checksum;
 }
+/*
+*********************************************************************************************************
+*                             uint8 verificar_check(uint8 *datos, uint16 size)
+*
+* Description : calcula el checksum
+*               
 
-
-/* Recibe comandos desde el modulo RF y contesta con la respectiva trama */
-void pollingRF_Rx()
+*********************************************************************************************************
+*/
+uint16 hexadecimal_to_decimal(uint16 x)
 {
-    uint16 i,x,y,contEscape;  
+      uint16 decimal_number, remainder, count = 0;
+      while(x > 0)
+      {
+            remainder = x % 10;
+            decimal_number = decimal_number + remainder * pow(16,count);
+            x = x / 10;
+            count++;
+      }
+      return decimal_number;
+}
+
+void pollingRF_Rx(uint8 PRF_rxBuffer[])
+{
+    uint16 i,x,y, j, contEscape;  
     uint8 buffer_rfTMP;
     uint8 EEpromGradeAddress;
+   
+    ActiveRF = 1;
+    counterRF = 0;
+    i = 0;
     
-    vTaskDelay( 55 / portTICK_PERIOD_MS );            
-    
-    // RF command received
-    if(RF_Connection_GetRxBufferSize() >= 1)
-    {
-        ActiveRF = 1;
-        counterRF = 0;
-        i = 0;
-        
-        //Save command in buffer
-        while(RF_Connection_GetRxBufferSize() > 0)  //&& (RF_Connection_RX_STS_FIFO_NOTEMPTY)
-        {      
-            buffer_rf[i] = RF_Connection_ReadRxData(); 	
-    	   i++;
-//            buffer_rfTMP = RF_Connection_ReadRxData();
-//            if (buffer_rfTMP == 0xBC)
-//            {
-//               i = 0;
-//            }
-//            
-//           buffer_rf[i] = buffer_rfTMP;
-//            
-//            if(i == 6)
-//            {
-//                if(buffer_rf[6] == 0xA1)
-//                {
-//                    contEscape = 7;
-//                    
-//                    if(i == contEscape)
-//                    {
-//                        break;
-//                    }
-//            
-//                }
-//            }            
-//            i++;
-        } 
-        y = 0;
-        buffer_tx[y] = 0xBC; y++;
-        buffer_tx[y] = 0xCB; y++;
-        buffer_tx[y] = 0xC8; y++;
-        buffer_tx[y] = IDCast[0]; y++;
-        buffer_tx[y] = IDCast[1]; y++;
+   
+    y = 0;
+    buffer_tx[y] = 0xBC; y++;
+    buffer_tx[y] = 0xCB; y++;
+    buffer_tx[y] = 0xC8; y++;
+    buffer_tx[y] = IDCast[0]; y++;
+    buffer_tx[y] = IDCast[1]; y++;
         
         // Query Command Action
-        if(((buffer_rf[0] == 0xBC) && (buffer_rf[1] == 0xBB) && (buffer_rf[2] == 0xB8) && (buffer_rf[3] == IDCast[0]) && (buffer_rf[4] == IDCast[1])) )
+        if(((PRF_rxBuffer[0] == 0xBC) && (PRF_rxBuffer[1] == 0xBB) && (PRF_rxBuffer[2] == 0xB8) && (PRF_rxBuffer[3] == IDCast[0]) && (PRF_rxBuffer[4] == IDCast[1])) )
         {                  
-            switch(buffer_rf[6])
+            switch(PRF_rxBuffer[6])
             {
                case 0xA1:                  // Status
                 // Position 1
-                if(buffer_rf[5] == side.a.dir)                  
+                if(PRF_rxBuffer[5] == side.a.dir)                  
                 {                 
                     // Idle state
                     if(bufferAready == 0 && FlagTotal == 0)
@@ -307,7 +299,7 @@ void pollingRF_Rx()
                 }
                 
                 // Position 2
-                if(buffer_rf[5] == side.b.dir)
+                if(PRF_rxBuffer[5] == side.b.dir)
                 {
                     if(bufferAreadyB == 0 && FlagTotalB == 0)
                     {
@@ -342,8 +334,7 @@ void pollingRF_Rx()
                         bufferAreadyB = 0;
                         
                     }
-                                                          
-                                      
+                                                                                              
                     // Totales
                     if(bufferAreadyB == 0 && FlagTotalB == 1)
                     {                                           
@@ -354,23 +345,36 @@ void pollingRF_Rx()
                     }           
                 }
                 
-
-                
+             
                 RF_Connection_ClearRxBuffer(); 
                 break;
                 
                 case 0xA3:               //Credit Authorization Response
-                    if(buffer_rf[5] == side.a.dir)
+                    if(PRF_rxBuffer[5] == side.a.dir)
                     {
-                        if(buffer_rf[8] == 0x01)
+                        if(PRF_rxBuffer[8] == 0x01)
                         {                                      
                             
                             // PPU
+                            
+                           
+                            
                             for(x = 19; x < 24 ; x++ )
                             {
-                                ppuiButtonA[x] = buffer_rf[x];
+                                ppuiButtonA[x - 19] = PRF_rxBuffer[x];                            
+                            } 
+                             for(x = 0; x < 5 ; x++ )
+                            {
+                                if(ppuiButtonA[x] == 0x00)
+                                { 
+                                    ppuiButtonA[x] = '0';
+                                }
                                 
-                            }  
+                            }
+                            
+                            //Grade
+                            side.a.grade = PRF_rxBuffer[18];
+                            
                             buffer_B[0]  = 0xBC;
                             buffer_B[1]  = 0xCB;
                             buffer_B[2]  = 0xC8;
@@ -381,6 +385,7 @@ void pollingRF_Rx()
                             buffer_B[7]  = RF_IDLE;
                             buffer_B[8]  = ACK;
                             buffer_B[9]  = buffer_B[36] = verificar_check(buffer_B, 9);
+                            
                             for (x = 0; x < 10; x++)
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
@@ -392,8 +397,7 @@ void pollingRF_Rx()
                             
                         }
                         else
-                        {
-                            
+                        {                           
                             PresetFlag = 0;
                             iButtonFlag = 0;                           
                             AckFlag = 1;
@@ -410,6 +414,7 @@ void pollingRF_Rx()
                             buffer_B[7]  = RF_IDLE;
                             buffer_B[8]  = ACK;
                             buffer_B[9]  = buffer_B[36] = verificar_check(buffer_B, 9);
+                            
                             for (x = 0; x < 10; x++)
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
@@ -417,15 +422,15 @@ void pollingRF_Rx()
                                                 
                         }
                     } 
-                    if(buffer_rf[5] == side.b.dir)
+                    
+                    if(PRF_rxBuffer[5] == side.b.dir)
                     {
-                        if(buffer_rf[8] == 0x01)
-                        {
-                            
+                        if(PRF_rxBuffer[8] == 0x01)
+                        {                           
                             // PPU
                             for(x = 19; x < 24 ; x++ )
                             {
-                                side.b.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
+                                ppuiButtonB[x - 19] = PRF_rxBuffer[x];                            
                             }                                                 
                             
                             buffer_B[0]  = 0xBC;
@@ -438,6 +443,7 @@ void pollingRF_Rx()
                             buffer_B[7]  = RF_IDLE;
                             buffer_B[8]  = ACK;
                             buffer_B[9]  = buffer_B[36] = verificar_check(buffer_B, 9);
+                            
                             for (x = 0; x < 10; x++)
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
@@ -445,8 +451,7 @@ void pollingRF_Rx()
                            
                             Credit_Auth_OK2 = 1;
                             bufferAreadyB = 0;
-                            PresetFlag2 = 1;
-                        
+                            PresetFlag2 = 1;                     
                                                        
                         }
                         else
@@ -471,191 +476,176 @@ void pollingRF_Rx()
                             for (x = 0; x < 10; x++)
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
-                            }
-                                                                      
+                            }                                                                     
                         }
-                    } 
-                               
+                    }                           
                 break;
                   
                 case 0xA5:               // Total Request
-                    if(buffer_rf[5] == side.a.dir)
+                    
+                    if(PRF_rxBuffer[5] == side.a.dir)
                     {                      
-                        pollTotals = 1;
-                        buffer_tx[5] = side.a.dir;y++;
-                        buffer_tx[y] = 0xA1;y++;
-                        buffer_tx[y] = side.a.rfState; y++;
-                        buffer_tx[y] = verificar_check(buffer_tx,y+1);y++;
-                        for (x = 0; x < y; x++)
-                        {
-                            RF_Connection_PutChar(buffer_tx[x]);
-                        }                    
+                        pollTotals = 1;                     
+                        return;
                     }                
-                    if(buffer_rf[5] == side.b.dir)
+                    
+                    if(PRF_rxBuffer[5] == side.b.dir)
                     {                      
                         pollTotals = 2;
-                        buffer_tx[5] = side.b.dir;y++;
-                        buffer_tx[y] = 0xA1;y++;
-                        buffer_tx[y] = side.b.rfState; y++;
-                        buffer_tx[y] = verificar_check(buffer_tx,y+1);y++;
-                        for (x = 0; x < y; x++)
-                        {
-                            RF_Connection_PutChar(buffer_tx[x]);
-                        }                    
+                        return;
                     }                 
                  
                 break;
                 
                 case 0xA6:               //PPU configure
                     
-                    if(buffer_rf[5] == side.a.dir)
+                    if(PRF_rxBuffer[5] == side.a.dir)
                     {                        
                         for(x = 9; x < 14 ; x++ )
                         {
-                            side.a.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
+                            side.a.ppuAuthorized[PRF_rxBuffer[8]][x - 9] = PRF_rxBuffer[x];
                         }
                         
-                        if(buffer_rf[8] == 0)
+                        if(PRF_rxBuffer[8] == 0)
                         {
                             EEpromGradeAddress = 20; //Address 20 to 24
                         }
                         
-                        if(buffer_rf[8] == 1)
+                        if(PRF_rxBuffer[8] == 1)
                         {
                             EEpromGradeAddress = 25; //Address 25 to 29
                         }
                         
-                        if(buffer_rf[8] == 2)
+                        if(PRF_rxBuffer[8] == 2)
                         {
                             EEpromGradeAddress = 30; //Address 30 to 34
                         }
                         
-                        if(buffer_rf[8] == 3)
+                        if(PRF_rxBuffer[8] == 3)
                         {
                             EEpromGradeAddress = 35; //Address 35 to 39
                         }
                                                 
                         for(x = 0; x < 5 ; x++ )
                         {
-                           // EEPROM_1_WriteByte(side.a.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
+                           EEPROM_1_WriteByte(side.a.ppuAuthorized[PRF_rxBuffer[8]][x], EEpromGradeAddress + x); //PPU to EEprom
                         }
                         
                         side.a.changePPU = true;
-                        side.a.grade = buffer_rf[8];
+                        side.a.grade = PRF_rxBuffer[8];
                         buffer_tx[5] = side.a.dir; y++;
                         buffer_tx[6] = 0xA6; y++;
                         buffer_tx[7] = 0x03; y++;
                  
                     }                   
-                    if(buffer_rf[5] == side.b.dir)
+                    if(PRF_rxBuffer[5] == side.b.dir)
                     {                        
                         for(x = 9; x < 14 ; x++ )
                         {
-                            side.b.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
+                            side.b.ppuAuthorized[PRF_rxBuffer[8]][x - 9] = PRF_rxBuffer[x];
                         }
                         
-                         if(buffer_rf[8] == 0)
+                         if(PRF_rxBuffer[8] == 0)
                         {
                             EEpromGradeAddress = 40; //Address 40 to 44
                         }
                         
-                        if(buffer_rf[8] == 1)
+                        if(PRF_rxBuffer[8] == 1)
                         {
                             EEpromGradeAddress = 45; //Address 45 to 49
                         }
                         
-                        if(buffer_rf[8] == 2)
+                        if(PRF_rxBuffer[8] == 2)
                         {
                             EEpromGradeAddress = 50; //Address 50 to 54
                         }
                         
-                        if(buffer_rf[8] == 3)
+                        if(PRF_rxBuffer[8] == 3)
                         {
                             EEpromGradeAddress = 55; //Address 55 to 59
                         }
                         
                         for(x = 0; x < 5 ; x++ )
                         {
-                            //EEPROM_1_WriteByte(side.b.ppuAuthorized[buffer_rf[8]][x], EEpromGradeAddress + x); //PPU to EEprom
+                            EEPROM_1_WriteByte(side.b.ppuAuthorized[PRF_rxBuffer[8]][x], EEpromGradeAddress + x); //PPU to EEprom
                         }
                         
                         side.b.changePPU = true;
-                        side.b.grade = buffer_rf[8];
+                        side.b.grade = PRF_rxBuffer[8];
                         buffer_tx[5] = side.b.dir; y++;
                         buffer_tx[6] = 0xA6; y++;
                         buffer_tx[7] = 0x03; y++;
                        
                     }                     
-                    if(buffer_rf[5] == side.c.dir)
+                    if(PRF_rxBuffer[5] == side.c.dir)
                     {                        
                         for(x = 9; x < 14 ; x++ )
                         {
-                            side.c.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
+                            side.c.ppuAuthorized[PRF_rxBuffer[8]][x - 9] = PRF_rxBuffer[x];
                         }
                         
                         side.c.changePPU = true;
-                        side.c.grade = buffer_rf[8];
+                        side.c.grade = PRF_rxBuffer[8];
                         buffer_tx[5] = side.c.dir; y++;
                         buffer_tx[y] = 0xA6;y++;
                         buffer_tx[y] = 0x03;y++;
                     } 
-                    if(buffer_rf[5] == side.d.dir)
+                    if(PRF_rxBuffer[5] == side.d.dir)
                     {                        
                         for(x = 9; x < 14 ; x++ )
                         {
-                            side.d.ppuAuthorized[buffer_rf[8]][x - 9] = buffer_rf[x];
+                            side.d.ppuAuthorized[PRF_rxBuffer[8]][x - 9] = PRF_rxBuffer[x];
                         }
                         side.d.changePPU = true;
-                        side.d.grade = buffer_rf[8];
+                        side.d.grade = PRF_rxBuffer[8];
                         buffer_tx[5] = side.d.dir; y++;
-                        buffer_tx[y] = 0xA6;y++;
-                        buffer_tx[y] = 0x03;y++;
+                        buffer_tx[6] = 0xA6;y++;
+                        buffer_tx[7] = 0x03;y++;
                     }
                     
                     buffer_tx[8] = verificar_check(buffer_tx, y + 1); y++;
-
-                    //RF_Connection_ClearTxBuffer();
-                   
+                                      
                     for (x = 0; x < 9; x++)
                     {
                         PPUAux =   buffer_tx[x];                   
                         RF_Connection_PutChar(PPUAux);
                     }
                     return;
-                                        
-                    
-
-               
+                                                       
                 break;
                 
                 case 0xA7:               //Impresion general
-                    for(x = 9; x <= buffer_rf[8];x++)
+                    //lengthPrint = hexadecimal_to_decimal(PRF_rxBuffer[8]);
+                    if(PRF_rxBuffer[5] == side.a.dir)
                     {
-                        //buffer_print[x-9] = buffer_rf[x];
-                        write_psoc1(printPortA, buffer_rf[x]);
-                    }
-                    if(buffer_rf[5] == side.a.dir)
-                    {
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {
+                            //buffer_print[x-9] = PRF_rxBuffer[x];
+                            write_psoc1(printPortA, PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortA,10);
+                        write_psoc1(printPortA,10);
+                        
                         buffer_tx[5] = side.a.dir;
                         buffer_tx[6] = 0xA7;
                         buffer_tx[7] = side.a.rfState;
                         buffer_tx[8] = 0x03;
                     }  
-                    if(buffer_rf[5] == side.b.dir)
+                    if(PRF_rxBuffer[5] == side.b.dir)
                     {
                         buffer_tx[5] = side.b.dir;
                         buffer_tx[6] = 0xA7;
                         buffer_tx[7] = side.b.rfState;
                         buffer_tx[8] = 0x03;
                     }
-                    if(buffer_rf[5] == side.c.dir)
+                    if(PRF_rxBuffer[5] == side.c.dir)
                     {
                         buffer_tx[5] = side.c.dir;
                         buffer_tx[6] = 0xA7;
                         buffer_tx[7] = side.c.rfState;
                         buffer_tx[8] = 0x03;
                     }
-                    if(buffer_rf[5] == side.d.dir)
+                    if(PRF_rxBuffer[5] == side.d.dir)
                     {
                         buffer_tx[5] = side.d.dir;
                         buffer_tx[6] = 0xA7;
@@ -671,88 +661,92 @@ void pollingRF_Rx()
                 break;
                 
                 case 0xA9:              // ID Transaction
-                    if(buffer_rf[5] == side.a.dir)
+                    if(PRF_rxBuffer[5] == side.a.dir)
                     {
                         for(x = 0; x < 10; x++)
                         {
-                            side.a.saleNumber[x] = buffer_rf[x+8];
+                            side.a.saleNumber[x] = PRF_rxBuffer[x+8];
                         }
                         
                     }
-                    if(buffer_rf[5] == side.b.dir)
+                    if(PRF_rxBuffer[5] == side.b.dir)
                     {
                         for(x = 0; x < 10; x++)
                         {
-                            side.b.saleNumber[x] = buffer_rf[x+8];
+                            side.b.saleNumber[x] = PRF_rxBuffer[x+8];
                         }
 
                     }
-                    if(buffer_rf[5] == side.c.dir)
+                    if(PRF_rxBuffer[5] == side.c.dir)
                     {
                         for(x = 0; x < 10; x++)
                         {
-                            side.c.saleNumber[x] = buffer_rf[x + 8];
+                            side.c.saleNumber[x] = PRF_rxBuffer[x + 8];
                         }
 
                     }
-                    if(buffer_rf[5] == side.d.dir)
+                    if(PRF_rxBuffer[5] == side.d.dir)
                     {
                         for(x = 0; x < 10; x++)
                         {
-                            side.d.saleNumber[x] = buffer_rf[x + 8];
+                            side.d.saleNumber[x] = PRF_rxBuffer[x + 8];
                         }
 
                     }
                 break;
                 
-                case 0xAB:               
-                    buffer_tx[0] = 0xBC;
-                break;
-                
+                             
                 case 0xE1:               //Configuracion de la estacion
-                    symbols[1] = buffer_rf[8];
-                    date[0]    = buffer_rf[9];
-                    date[1]    = buffer_rf[10];
-                    date[2]    = buffer_rf[11];
-                    time[1]    = buffer_rf[12];
-                    time[0]    = buffer_rf[13];
+                    symbols[1] = PRF_rxBuffer[8];
+                    date[0]    = PRF_rxBuffer[9];
+                    date[1]    = PRF_rxBuffer[10];
+                    date[2]    = PRF_rxBuffer[11];
+                    time[1]    = PRF_rxBuffer[12];
+                    time[0]    = PRF_rxBuffer[13];
                     
-                    for(x = 17; x < 47; x++){
-                        Encabezado1[x-17] = buffer_rf[x];
+                    for(x = 17; x < 47; x++)
+                    {
+                        Encabezado1[x-17] = PRF_rxBuffer[x];
                     }
-                    for(x = 47; x < 77; x++){
-                        Encabezado2[x-47] = buffer_rf[x];
+                    for(x = 47; x < 77; x++)
+                    {
+                        Encabezado2[x-47] = PRF_rxBuffer[x];
                     }
-                    for(x = 77; x < 107; x++){
-                        Encabezado3[x-77] = buffer_rf[x];
+                    for(x = 77; x < 107; x++)
+                    {
+                        Encabezado3[x-77] = PRF_rxBuffer[x];
                     }
-                    for(x = 107; x < 137; x++){
-                        Encabezado4[x-77] = buffer_rf[x];
+                    for(x = 107; x < 137; x++)
+                    {
+                        Encabezado4[x-77] = PRF_rxBuffer[x];
                     }
-                    CopiasCredito = buffer_rf[16];
+                    CopiasCredito = PRF_rxBuffer[16];
                     write_hora();
                     write_fecha(); 
-                    for(x =0 ; x <30; x++){
-                        EEPROM_1_WriteByte(Encabezado1[x],16+x);
+                    
+                    for(x = 0 ; x < 30; x++)
+                    {
+                       // EEPROM_1_WriteByte(Encabezado1[x],16 + x);
                     }
-                    for(x =30 ; x <60; x++){
-                        EEPROM_1_WriteByte(Encabezado2[x-30],16+x);
+                    for(x = 30 ; x < 60; x++)
+                    {
+                       // EEPROM_1_WriteByte(Encabezado2[x - 30], 16 + x);
                     }
-                    for(x =60 ; x <90; x++){
-                        EEPROM_1_WriteByte(Encabezado3[x-30],16+x);
+                    for(x = 60 ; x < 90; x++){
+                       // EEPROM_1_WriteByte(Encabezado3[x - 30], 16 + x);
                     }
-                    for(x =90 ; x <120; x++){
-                        EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
+                    for(x =90 ; x < 120; x++){
+                       // EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
                     }
-                    side.a.dir = EEPROM_1_ReadByte(12);
-                    side.b.dir = EEPROM_1_ReadByte(13);
-                    side.c.dir = EEPROM_1_ReadByte(14);
-                    side.d.dir = EEPROM_1_ReadByte(15);
+//                    side.a.dir = EEPROM_1_ReadByte(12);
+//                    side.b.dir = EEPROM_1_ReadByte(13);
+//                    side.c.dir = EEPROM_1_ReadByte(14);
+//                    side.d.dir = EEPROM_1_ReadByte(15);
                     imprimir(printPortA,side.a.dir);
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 
-                    buffer_tx[5] = buffer_rf[5];
+                    buffer_tx[5] = PRF_rxBuffer[5];
                     buffer_tx[6] = 0xE2;
                     buffer_tx[7] = 0x08;
                     buffer_tx[8] = 0x03;
@@ -760,86 +754,97 @@ void pollingRF_Rx()
                     for (x = 0; x < 10; x++){
                         RF_Connection_PutChar(buffer_tx[x]);
                     }
-                    if(buffer_rf[5] == side.a.dir)
+                    if(PRF_rxBuffer[5] == side.a.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.a.GradesHose[x-8] = buffer_rf[x];
+                            side.a.GradesHose[x-8] = PRF_rxBuffer[x];
                         }
                     }
-                    if(buffer_rf[5] == side.b.dir)
+                    if(PRF_rxBuffer[5] == side.b.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.b.GradesHose[x-8] = buffer_rf[x];
+                            side.b.GradesHose[x-8] = PRF_rxBuffer[x];
                         }
                     }
-                    if(buffer_rf[5] == side.c.dir)
+                    if(PRF_rxBuffer[5] == side.c.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.c.GradesHose[x-8] = buffer_rf[x];
+                            side.c.GradesHose[x-8] = PRF_rxBuffer[x];
                         }
                     }
-                    if(buffer_rf[5] == side.d.dir)
+                    if(PRF_rxBuffer[5] == side.d.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.c.GradesHose[x-8] = buffer_rf[x];
+                            side.c.GradesHose[x-8] = PRF_rxBuffer[x];
                         }
                     }
-                    lockTurn = buffer_rf[12];
+                    lockTurn = PRF_rxBuffer[12];
                     EEPROM_1_WriteByte(lockTurn,7);
-                    y = 60;
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
-                        y++;
-                    }
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
-                        y++;
-                    }
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
-                        y++;
-                    }
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
-                        y++;
-                    }
+
+//                    y = 60;
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
+//                        y++;
+//                    }
                 break;
                 
-                case 0xE4:               //Turno                                                 
-                    if(buffer_rf[7] == 0x02)
+                case 0xE4:               //Turno  
+                    if(PRF_rxBuffer[5] == side.a.dir && ShiftDone == 0)
                     {
-                        flowDisplay1 = 0;
-                        ShiftState = 0;
-                        side.a.rfState = RF_IDLE;
-                        side.a.RFstateReport = 0;
-                        SetPicture(1,DISPLAY_ERROR);
-                    }else
-                    {
-                        ShiftState = 0;
-                        lockTurn = buffer_rf[7];
-                        flowDisplay1 = 0;
-                        side.a.RFstateReport = 0;
-                        //CyDelay(200);
-                        //vTaskDelay( 200 / portTICK_PERIOD_MS );
-                        SetPicture(1,DISPLAY_ID_RECONOCIDO);
+                        ShiftDone = 1;
+                        if(PRF_rxBuffer[7] == 0x02)
+                        {                        
+                            SetPicture(1,DISPLAY_PASSWORD_INVALIDO);
+                            vTaskDelay( 900 / portTICK_PERIOD_MS );
+                            flowDisplay1 = 0;
+                            ShiftState = 0;
+                            side.a.rfState = RF_IDLE;
+                            side.a.RFstateReport = 0;
+                        }
+                        else
+                        {
+                            SetPicture(1,DISPLAY_ID_RECONOCIDO);
+                            vTaskDelay( 900 / portTICK_PERIOD_MS );
+                            ShiftState = 0;
+                            lockTurn = PRF_rxBuffer[7];
+                            EEPROM_1_WriteByte(lockTurn,7);
+                            flowDisplay1 = 0;
+                            SetPicture(1,DISPLAY_INICIO0);
+                            side.a.RFstateReport = 0;
+                            side.a.rfState = RF_IDLE; 
+                            return;
+                        }
+
                     }
      
                break;                
            }                       
         } 
-       
-    }                            
+                                 
     //countRX = 0;
     RF_Connection_ClearRxBuffer(); 
 }
 
 
 void pollingRFA_Tx(){   
-    uint16 x,y;         
+    uint16 x,y;
+    
     /////////////// TICKET COPY //////////////////
 //    if(side.a.rfState == RF_COPY_RECEIPT && side.a.RFstateReport == 1){        
 //        buffer_txDisplay[5] = side.a.dir;
@@ -979,18 +984,33 @@ void pollingRFA_Tx(){
     }                                               
     ////////////// SHIFT ////////////////////////////////////
     if(ShiftState == 1  && side.a.RFstateReport == 1){   
-        buffer_txDisplay[0]  = 0xBC;
-        buffer_txDisplay[1]  = 0xCB;
-        buffer_txDisplay[2]  = 0xC8;
-        buffer_txDisplay[3]  = IDCast[0];
-        buffer_txDisplay[4]  = IDCast[1];
-        buffer_txDisplay[5]  = side.a.dir;
-        buffer_txDisplay[6]  = 0xE3;
-        buffer_txDisplay[7]  = RF_WORKSHIFTREQ;
         
+        buffer_A[0]  = 35;
+        buffer_A[1]  = 0xBC;
+        buffer_A[2]  = 0xCB;
+        buffer_A[3]  = 0xC8;
+        buffer_A[4]  = IDCast[0];
+        buffer_A[5]  = IDCast[1];
+        buffer_A[6]  = side.a.dir;
+        buffer_A[7]  = 0xE3;
+        buffer_A[8]  = RF_WORKSHIFTREQ;
+        
+//        buffer_txDisplay[0]  = 0xBC;
+//        buffer_txDisplay[1]  = 0xCB;
+//        buffer_txDisplay[2]  = 0xC8;
+//        buffer_txDisplay[3]  = IDCast[0];
+//        buffer_txDisplay[4]  = IDCast[1];
+//        buffer_txDisplay[5]  = side.a.dir;
+//        buffer_txDisplay[6]  = 0xE3;
+//        buffer_txDisplay[7]  = RF_WORKSHIFTREQ;
+        
+//        for(x = bufferDisplay1.shiftId[0]; x >= 1; x--)
+//        {						   							
+//    		buffer_txDisplay[x+7]= bufferDisplay1.shiftId[x];            
+//    	}
         for(x = bufferDisplay1.shiftId[0]; x >= 1; x--)
         {						   							
-    		buffer_txDisplay[x+7]= bufferDisplay1.shiftId[x];            
+    		buffer_A[x+8]= bufferDisplay1.shiftId[x];            
     	}
 //        for(x=8; x<19; x++){
 //            if(buffer_txDisplay[x] ==0x00)
@@ -998,21 +1018,28 @@ void pollingRFA_Tx(){
 //        }
         for(x = 1; x <= bufferDisplay1.shiftPassword[0] ;x++)
         {						   							
-    		buffer_txDisplay[x + 18] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
+    		buffer_A[x + 19] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
     	}
+//        for(x = 1; x <= bufferDisplay1.shiftPassword[0] ;x++)
+//        {						   							
+//    		buffer_txDisplay[x + 18] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
+//    	}
 //        for(x=19; x<31; x++){
 //            if(buffer_txDisplay[x] ==0x00)
 //                buffer_txDisplay[x]=0x30;
 //        }
-        buffer_txDisplay[32] = verificar_check(buffer_txDisplay,33);
+        buffer_A[33] = verificar_check(buffer_txDisplay,34);
         
-        for (x = 0; x < 33; x++)
-        {
-            RF_Connection_PutChar(buffer_txDisplay[x]);
-        }
+//        for (x = 0; x < 33; x++)
+//        {
+//            RF_Connection_PutChar(buffer_txDisplay[x]);
+//        }
         
-        side.a.rfState          = RF_IDLE;
-        side.a.RFstateReport    = 0;
+        //side.a.rfState = RF_IDLE;
+        side.a.RFstateReport = 0;
+        ShiftState = 0;
+        bufferAready = 1;
+        ShiftDone = 0;
     }
 
     ////////////// AUTHORIZATION REQUEST ////////////////////////
@@ -1027,8 +1054,7 @@ void pollingRFA_Tx(){
         buffer_A[6]  = 0xA2;
         buffer_A[7]  = RF_CREDITSALEAUTH;
         buffer_A[8]  = side.a.hose - 1;
-          
-                      
+                                
         //iButton id
         for(y = 1; y <= 16; y++)
         {           
@@ -1049,38 +1075,38 @@ void pollingRFA_Tx(){
             x++;
         }
         
-        //Km
+        //Km (10 bytes)
         for(y = 0; y < 10; y++)
         {
-            buffer_A[17 + y] = '0';
+            buffer_A[17 + y] = 0x00;
         }
-               
-        for(y = 1; y <= 10; y++)
+        
+        x = 0;
+        
+        for(y = bufferDisplay1.mileageSale[0]; y >= 1; y--)
         {           
-            buffer_A[26 - bufferDisplay1.mileageSale[0] + y] = bufferDisplay1.mileageSale[y];     
-            
+            buffer_A[17 + x] = bufferDisplay1.mileageSale[y]; 
+            x++;
         }
         
         // Preset Type
         buffer_A[27] =  bufferDisplay1.presetType[0];         
        
-        //Preset (8 bytes)
-        
+        //Preset (8 bytes)    
         for(y = 0; y < 8; y++)
         {
-            buffer_A[28 + y] = '0';
+            buffer_A[28 + y] = 0x00;
         }
+        x = 0;
         
-        for(y = 1; y <= 8; y++)
+        for(y = 8; y >= 1; y--)
         {
-            buffer_A[35 - bufferDisplay1.presetValue[0][0] + y] = bufferDisplay1.presetValue[0][y];
-        }
-        
+            buffer_A[28 + x] = bufferDisplay1.presetValue[0][y];
+            x++;
+        }       
         
         // CRC
-        buffer_A[36] = verificar_check(buffer_A,37);
-
-        
+        buffer_A[36] = verificar_check(buffer_A,37);    
         side.a.RFstateReport = 0;
         bufferAready = 2;
         FlagTotal = 0;
@@ -1088,29 +1114,7 @@ void pollingRFA_Tx(){
         CreditAuth = 0;
         AckFlag = 0;
     }
-    
-    ///////////// ACKNOWLEDGE CREDIT AUTHORIZATION RESPONSE /////////////////////////
-//    if(AckFlag == 1)
-//    {       
-//        buffer_A[0]  = 0xBC;
-//        buffer_A[1]  = 0xCB;
-//        buffer_A[2]  = 0xC8;
-//        buffer_A[3]  = IDCast[0];
-//        buffer_A[4]  = IDCast[1];
-//        buffer_A[5]  = side.a.dir;
-//        buffer_A[6]  = 0xA7;
-//        buffer_A[7]  = RF_IDLE;
-//        buffer_A[8]  = ACK;
-//        buffer_A[9]  = buffer_A[36] = verificar_check(buffer_A, 9);
-//        AckFlag = 0;
-//        side.a.RFstateReport = 0;
-//        bufferAready = 3;
-//        FlagTotal = 0;
-//        side.a.rfState = RF_IDLE;
-//    
-//    }
-    
-   
+     
 }
 
 void pollingRFB_Tx(){   
@@ -1183,8 +1187,8 @@ void pollingRFB_Tx(){
             
     }      
     ////////////// END SALE ////////////////////////////////////
-    
-    if ((side.b.pumpState == PUMP_PEOT || side.b.pumpState == PUMP_FEOT) && side.b.RFstateReport == 1 && bufferDisplay2.flagEndSale == true) //(bufferDisplay2.flagEndSale == true && side.b.RFstateReport == 1)
+ 
+    if ((side.b.pumpState == PUMP_PEOT || side.b.pumpState == PUMP_FEOT) && side.b.RFstateReport == 1)    
     {
         buffer_B[100] = 31;
         buffer_B[0]  = 0xBC;
@@ -1297,6 +1301,7 @@ void pollingRFB_Tx(){
         
         side.b.rfState = RF_WORKSHIFTREQ;
         side.b.RFstateReport = 0;
+        ShiftState = 0;
     }
     
     ////////////// AUTHORIZATION REQUEST ////////////////////////
@@ -1311,8 +1316,7 @@ void pollingRFB_Tx(){
         buffer_B[6]  = 0xA2;
         buffer_B[7]  = RF_CREDITSALEAUTH;
         buffer_B[8]  = side.b.hose - 1;
-          
-                      
+                             
         //iButton id
         for(y = 1; y <= 16; y++)
         {           
@@ -1323,10 +1327,11 @@ void pollingRFB_Tx(){
             else
             {
                 Temp[y] = bufferDisplay2.idSerial[y] - 55;
-            }
-                                   
+            }                                
         }
-        x = 0;      
+        
+        x = 0;
+        
         for(y = 1; y < 17; y+=2)
         {
             buffer_B[9 + x] =  ((Temp[y] & 0x0F) << 4) | (Temp[y + 1] & 0x0F);
@@ -1336,31 +1341,34 @@ void pollingRFB_Tx(){
         //Km
         for(y = 0; y < 10; y++)
         {
-            buffer_B[17 + y] = '0';
+            buffer_B[17 + y] = 0x00;
         }
-               
-        for(y = 1; y <= 10; y++)
+        
+        x = 0;
+        
+        for(y = bufferDisplay2.mileageSale[0]; y >= 1; y--)
         {           
-            buffer_B[26 - bufferDisplay2.mileageSale[0] + y] = bufferDisplay2.mileageSale[y];     
-            
+            buffer_B[17 + x] = bufferDisplay2.mileageSale[y]; 
+            x++;
         }
         
         // Preset Type
         buffer_B[27] =  bufferDisplay2.presetType[0];         
        
-        //Preset (8 bytes)
-        
+        //Preset (8 bytes)       
         for(y = 0; y < 8; y++)
         {
-            buffer_B[28 + y] = '0';
+            buffer_B[28 + y] = 0x00;
         }
+
+        x = 0;
         
-        for(y = 1; y <= 8; y++)
+        for(y = bufferDisplay2.presetValue[0][0]; y >= 1; y--)
         {
-            buffer_B[35 - bufferDisplay2.presetValue[0][0] + y] = bufferDisplay2.presetValue[0][y];
-        }
-        
-        
+            buffer_B[35 - y] = bufferDisplay2.presetValue[0][y];
+            x++;
+        }     
+ 
         // CRC
         buffer_B[36] = verificar_check(buffer_B,37);
         
@@ -1371,21 +1379,6 @@ void pollingRFB_Tx(){
         CreditAuth2 = 0;
         AckFlag2 = 0;
     }
-    
-    ///////////// ACKNOWLEDGE CREDIT AUTHORIZATION RESPONSE /////////////////////////
-   
-    
-//    if(AckFlag2 == 1)
-//    {       
-//        
-//        AckFlag2 = 0;
-//        side.b.RFstateReport = 0;
-//        bufferAreadyB = 3;
-//        FlagTotalB = 0;
-//        side.b.rfState = RF_IDLE;
-//    
-//    }
-
   
  }
 
