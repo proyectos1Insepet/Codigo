@@ -289,20 +289,33 @@ void PollingDisplay1(void){
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C)){
                     switch(Display1_rxBuffer[3])
                     {
-                        case 0x0D:  //Pantalla efectivo              
-                            flowDisplay1 = 3; 
-                            bufferDisplay1.saleType = 1;
-                            SetPicture(1, DISPLAY_FORMA_PROGRAMACION);  
-                            AuthType = 0;
+                        case 0x0D:  //Pantalla efectivo   
+                            if(lockTurn == 1){
+                                flowDisplay1 = 3; 
+                                bufferDisplay1.saleType = 1;
+                                SetPicture(1, DISPLAY_FORMA_PROGRAMACION);  
+                                AuthType = 0;
+                            }else{
+                                SetPicture(1, DISPLAY_CANCELADO_X_PC);
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay1 = 0;                                                                
+                            }
                         break;
                         case 0x0E:  //Pantalla credito  
-                            flowDisplay1 = 3;
-                            bufferDisplay1.saleType = 2;
-                            count_protector = 0;
-                            SetPicture(1, DISPLAY_FORMA_PROGRAMACION);
-                            //SetPicture(1, DISPLAY_ID_DIGITAL);
-                            AuthType = 1;
+                            if(lockTurn == 1){
+                                flowDisplay1 = 3;
+                                bufferDisplay1.saleType = 2;
+                                count_protector = 0;
+                                SetPicture(1, DISPLAY_FORMA_PROGRAMACION);
+                                //SetPicture(1, DISPLAY_ID_DIGITAL);
+                                AuthType = 1;
+                            }else{
+                                SetPicture(1, DISPLAY_CANCELADO_X_PC);
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay1 = 0;                                                                
+                            }
                         break;
+                            
                         case 0x45:  //Pantalla otras opciones 
                             flowDisplay1 = 12;                            
                             SetPicture(1,  DISPLAY_OPERACIONES);
@@ -864,10 +877,16 @@ void PollingDisplay1(void){
                             SetPicture(1,DISPLAY_INGRESE_PASSWORD);                           
                         break;
                         case 0xB5:  //Copia de recibo 
-                            flowDisplay1  = 0;
-                            side.a.RFstateReport = 1;
-                            side.a.rfState = RF_COPY_RECEIPT;
-                            SetPicture(1,DISPLAY_INICIO0);                            
+                            if(lockTurn == 1){
+                                flowDisplay1  = 0;
+                                side.a.RFstateReport = 1;
+                                side.a.rfState = RF_COPY_RECEIPT;
+                                SetPicture(1,DISPLAY_INICIO0);  
+                            }else{
+                                SetPicture(1, DISPLAY_CANCELADO_X_PC);
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay1 = 0;                                                                
+                            }
                         break;
                         
                         case 0x3B:  //Pantalla Inicial    
@@ -1356,18 +1375,31 @@ void PollingDisplay2(void){
                 {
                     switch(Display2_rxBuffer[3])
                     {
-                        case 0x0D:  //Pantalla efectivo              
-                            flowDisplay2 = 3; 
-                            bufferDisplay2.saleType = 1;
-                            SetPicture(2,DISPLAY_FORMA_PROGRAMACION);
-                            AuthType2 = 0;
+                        case 0x0D:  //Pantalla efectivo   
+                            if(lockTurn == 1){
+                                flowDisplay2 = 3; 
+                                bufferDisplay2.saleType = 1;
+                                SetPicture(2,DISPLAY_FORMA_PROGRAMACION);
+                                AuthType2 = 0;
+                            }else{
+                                SetPicture(2, DISPLAY_CANCELADO_X_PC);
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay2 = 0;                                                                
+                            }
                         break;
                         case 0x0E:  //Pantalla credito  
-                            flowDisplay2 = 3;
-                            bufferDisplay2.saleType = 2;
-                            count_protector2 = 0;
-                            SetPicture(2,DISPLAY_FORMA_PROGRAMACION); 
-                            AuthType2 = 1;
+                            if(lockTurn == 1){
+                                flowDisplay2 = 3;
+                                bufferDisplay2.saleType = 2;
+                                count_protector2 = 0;
+                                SetPicture(2,DISPLAY_FORMA_PROGRAMACION); 
+                                AuthType2 = 1;
+                            }else{
+                                SetPicture(2, DISPLAY_CANCELADO_X_PC);
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay2 = 0;                                                                
+                            }
+                            
                         break;
                         case 0x45:  //Pantalla otras opciones 
                             flowDisplay2 = 12;                            
@@ -1928,10 +1960,16 @@ void PollingDisplay2(void){
                         break;
                             
                         case 0xB5:  //Copia de recibo 
-                            flowDisplay2  = 0;
-                            side.b.RFstateReport = 1;
-                            side.b.rfState = RF_COPY_RECEIPT;
-                            SetPicture(2,DISPLAY_INICIO0);                            
+                            if(lockTurn == 1){
+                                flowDisplay2  = 0;
+                                side.b.RFstateReport = 1;
+                                side.b.rfState = RF_COPY_RECEIPT;
+                                SetPicture(2,DISPLAY_INICIO0);
+                            }else{
+                                SetPicture(2, DISPLAY_CANCELADO_X_PC);
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay2 = 0;                                                                
+                            }
                         break;
                         
                         case 0x3B:  //Pantalla Inicial    
