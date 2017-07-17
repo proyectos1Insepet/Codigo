@@ -83,6 +83,7 @@
     volatile uint8 sizeSendB;
     volatile uint8 bufferAready;
     volatile uint8 bufferAreadyB;
+    volatile uint8 ShiftDone;
   
     
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +144,7 @@
     uint8 ppuiButtonB[5];
     uint8 PPUAux;
     uint16 LongEsperada;
+     
 
     
 /*

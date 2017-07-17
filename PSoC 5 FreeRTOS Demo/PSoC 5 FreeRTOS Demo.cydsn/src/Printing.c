@@ -344,10 +344,22 @@ void printLogoP(uint8 val, uint8 logo){
 void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     uint8 x;    
     PrinterType = 1;
-    if(PrinterType == 1)
+    if(pos == side.a.dir || pos == side.c.dir)
     {
-        printLogoP(printPortA,11);
-    }			
+        if(PrinterType == 1)
+        {
+            printLogoP(printPortA,11);
+    
+        }
+    }
+    if(pos == side.b.dir || pos == side.d.dir)
+    {
+        if(PrinterType == 1)
+        {
+            printLogoP(printPortB,11);
+    
+        }
+    }
     write_psoc1(val,10);
     
     for(x = 0; x < 30; x++)
@@ -736,10 +748,20 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {										//Ppu							
     		write_psoc1(val,msn_ppu[x]);
     	}   
-        for(x = 1; x <= side.b.ppuSale[0]; x++)
-        {						   							
-    		write_psoc1(val,side.b.ppuSale[x]);
-    	}
+        if(digits >= 7)
+        {
+            if(side.b.ppuSale[2] == 0x30)
+                side.b.ppuSale[2] = 0x00;
+            for(x = 2; x <= side.b.ppuSale[0]; x++)
+            {                                    
+        		write_psoc1(val,side.b.ppuSale[x]);
+        	}
+        }else{
+            for(x = 1; x <= side.b.ppuSale[0]; x++)
+            {						   							
+        		write_psoc1(val,side.b.ppuSale[x]);
+        	}
+        }
         write_psoc1(val,0x20);
         write_psoc1(val,PRN_CURRENCY[0]);
         write_psoc1(val,0x2F);

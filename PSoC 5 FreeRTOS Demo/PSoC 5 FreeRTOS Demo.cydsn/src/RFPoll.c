@@ -16,6 +16,7 @@
 #include "os_resource.h"
 
 extern xSemaphoreHandle g_pUARTSemaphore;
+uint8_t lengthPrint;
 
 void RFTotalA(void)
 {
@@ -187,6 +188,27 @@ uint8 verificar_check(uint8 *datos, uint16 size){
 		checksum = table[index];				
 	}
 	return checksum;
+}
+/*
+*********************************************************************************************************
+*                             uint8 verificar_check(uint8 *datos, uint16 size)
+*
+* Description : calcula el checksum
+*               
+
+*********************************************************************************************************
+*/
+uint16 hexadecimal_to_decimal(uint16 x)
+{
+      uint16 decimal_number, remainder, count = 0;
+      while(x > 0)
+      {
+            remainder = x % 10;
+            decimal_number = decimal_number + remainder * pow(16,count);
+            x = x / 10;
+            count++;
+      }
+      return decimal_number;
 }
 
 void pollingRF_Rx(uint8 PRF_rxBuffer[])
@@ -593,13 +615,17 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 break;
                 
                 case 0xA7:               //Impresion general
-                    for(x = 9; x <= PRF_rxBuffer[8];x++)
-                    {
-                        //buffer_print[x-9] = PRF_rxBuffer[x];
-                        write_psoc1(printPortA, PRF_rxBuffer[x]);
-                    }
+                    //lengthPrint = hexadecimal_to_decimal(PRF_rxBuffer[8]);
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {
+                            //buffer_print[x-9] = PRF_rxBuffer[x];
+                            write_psoc1(printPortA, PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortA,10);
+                        write_psoc1(printPortA,10);
+                        
                         buffer_tx[5] = side.a.dir;
                         buffer_tx[6] = 0xA7;
                         buffer_tx[7] = side.a.rfState;
@@ -754,44 +780,57 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     }
                     lockTurn = PRF_rxBuffer[12];
                     EEPROM_1_WriteByte(lockTurn,7);
-                    y = 60;
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
-                        y++;
-                    }
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
-                        y++;
-                    }
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
-                        y++;
-                    }
-                    for(x = y; x< y+5; x++)
-                    {
-                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
-                        y++;
-                    }
+
+//                    y = 60;
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
+//                        y++;
+//                    }
+//                    for(x = y; x< y+5; x++)
+//                    {
+//                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
+//                        y++;
+//                    }
                 break;
                 
-                case 0xE4:               //Turno                                                 
-                    if(PRF_rxBuffer[7] == 0x02)
+                case 0xE4:               //Turno  
+                    if(PRF_rxBuffer[5] == side.a.dir && ShiftDone == 0)
                     {
-                        flowDisplay1 = 0;
-                        ShiftState = 0;
-                        side.a.rfState = RF_IDLE;
-                        side.a.RFstateReport = 0;
-                        SetPicture(1,DISPLAY_ERROR);
-                    }else
-                    {
-                        ShiftState = 0;
-                        lockTurn = PRF_rxBuffer[7];
-                        flowDisplay1 = 0;
-                        side.a.RFstateReport = 0;
-                        SetPicture(1,DISPLAY_ID_RECONOCIDO);
+                        ShiftDone = 1;
+                        if(PRF_rxBuffer[7] == 0x02)
+                        {                        
+                            SetPicture(1,DISPLAY_PASSWORD_INVALIDO);
+                            vTaskDelay( 900 / portTICK_PERIOD_MS );
+                            flowDisplay1 = 0;
+                            ShiftState = 0;
+                            side.a.rfState = RF_IDLE;
+                            side.a.RFstateReport = 0;
+                        }
+                        else
+                        {
+                            SetPicture(1,DISPLAY_ID_RECONOCIDO);
+                            vTaskDelay( 900 / portTICK_PERIOD_MS );
+                            ShiftState = 0;
+                            lockTurn = PRF_rxBuffer[7];
+                            EEPROM_1_WriteByte(lockTurn,7);
+                            flowDisplay1 = 0;
+                            SetPicture(1,DISPLAY_INICIO0);
+                            side.a.RFstateReport = 0;
+                            side.a.rfState = RF_IDLE; 
+                            return;
+                        }
+
                     }
      
                break;                
@@ -945,18 +984,33 @@ void pollingRFA_Tx(){
     }                                               
     ////////////// SHIFT ////////////////////////////////////
     if(ShiftState == 1  && side.a.RFstateReport == 1){   
-        buffer_txDisplay[0]  = 0xBC;
-        buffer_txDisplay[1]  = 0xCB;
-        buffer_txDisplay[2]  = 0xC8;
-        buffer_txDisplay[3]  = IDCast[0];
-        buffer_txDisplay[4]  = IDCast[1];
-        buffer_txDisplay[5]  = side.a.dir;
-        buffer_txDisplay[6]  = 0xE3;
-        buffer_txDisplay[7]  = RF_WORKSHIFTREQ;
         
+        buffer_A[0]  = 35;
+        buffer_A[1]  = 0xBC;
+        buffer_A[2]  = 0xCB;
+        buffer_A[3]  = 0xC8;
+        buffer_A[4]  = IDCast[0];
+        buffer_A[5]  = IDCast[1];
+        buffer_A[6]  = side.a.dir;
+        buffer_A[7]  = 0xE3;
+        buffer_A[8]  = RF_WORKSHIFTREQ;
+        
+//        buffer_txDisplay[0]  = 0xBC;
+//        buffer_txDisplay[1]  = 0xCB;
+//        buffer_txDisplay[2]  = 0xC8;
+//        buffer_txDisplay[3]  = IDCast[0];
+//        buffer_txDisplay[4]  = IDCast[1];
+//        buffer_txDisplay[5]  = side.a.dir;
+//        buffer_txDisplay[6]  = 0xE3;
+//        buffer_txDisplay[7]  = RF_WORKSHIFTREQ;
+        
+//        for(x = bufferDisplay1.shiftId[0]; x >= 1; x--)
+//        {						   							
+//    		buffer_txDisplay[x+7]= bufferDisplay1.shiftId[x];            
+//    	}
         for(x = bufferDisplay1.shiftId[0]; x >= 1; x--)
         {						   							
-    		buffer_txDisplay[x+7]= bufferDisplay1.shiftId[x];            
+    		buffer_A[x+8]= bufferDisplay1.shiftId[x];            
     	}
 //        for(x=8; x<19; x++){
 //            if(buffer_txDisplay[x] ==0x00)
@@ -964,22 +1018,28 @@ void pollingRFA_Tx(){
 //        }
         for(x = 1; x <= bufferDisplay1.shiftPassword[0] ;x++)
         {						   							
-    		buffer_txDisplay[x + 18] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
+    		buffer_A[x + 19] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
     	}
+//        for(x = 1; x <= bufferDisplay1.shiftPassword[0] ;x++)
+//        {						   							
+//    		buffer_txDisplay[x + 18] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
+//    	}
 //        for(x=19; x<31; x++){
 //            if(buffer_txDisplay[x] ==0x00)
 //                buffer_txDisplay[x]=0x30;
 //        }
-        buffer_txDisplay[32] = verificar_check(buffer_txDisplay,33);
+        buffer_A[33] = verificar_check(buffer_txDisplay,34);
         
-        for (x = 0; x < 33; x++)
-        {
-            RF_Connection_PutChar(buffer_txDisplay[x]);
-        }
+//        for (x = 0; x < 33; x++)
+//        {
+//            RF_Connection_PutChar(buffer_txDisplay[x]);
+//        }
         
-        side.a.rfState          = RF_WORKSHIFTREQ;
-        side.a.RFstateReport    = 0;
+        //side.a.rfState = RF_IDLE;
+        side.a.RFstateReport = 0;
         ShiftState = 0;
+        bufferAready = 1;
+        ShiftDone = 0;
     }
 
     ////////////// AUTHORIZATION REQUEST ////////////////////////
