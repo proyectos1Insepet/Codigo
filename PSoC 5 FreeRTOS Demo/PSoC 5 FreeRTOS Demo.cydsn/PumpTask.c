@@ -2588,6 +2588,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
     switch(State)
     {
         case PUMP_FAIL:          
+            
             SetPicture(1,DISPLAY_ERROR);
             SetPicture(2,DISPLAY_ERROR);
             side.a.rfState = RF_ERROR;

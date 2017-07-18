@@ -733,26 +733,26 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     CopiasCredito = PRF_rxBuffer[16];
                     write_hora();
                     write_fecha(); 
-                    
-                    for(x = 0 ; x < 30; x++)
-                    {
-                       // EEPROM_1_WriteByte(Encabezado1[x],16 + x);
-                    }
-                    for(x = 30 ; x < 60; x++)
-                    {
-                       // EEPROM_1_WriteByte(Encabezado2[x - 30], 16 + x);
-                    }
-                    for(x = 60 ; x < 90; x++){
-                       // EEPROM_1_WriteByte(Encabezado3[x - 30], 16 + x);
-                    }
-                    for(x =90 ; x < 120; x++){
-                       // EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
-                    }
-//                    side.a.dir = EEPROM_1_ReadByte(12);
-//                    side.b.dir = EEPROM_1_ReadByte(13);
-//                    side.c.dir = EEPROM_1_ReadByte(14);
-//                    side.d.dir = EEPROM_1_ReadByte(15);
-                    imprimir(printPortA,side.a.dir);
+//                    
+//                    for(x = 0 ; x < 30; x++)
+//                    {
+//                       // EEPROM_1_WriteByte(Encabezado1[x],16 + x);
+//                    }
+//                    for(x = 30 ; x < 60; x++)
+//                    {
+//                       // EEPROM_1_WriteByte(Encabezado2[x - 30], 16 + x);
+//                    }
+//                    for(x = 60 ; x < 90; x++){
+//                       // EEPROM_1_WriteByte(Encabezado3[x - 30], 16 + x);
+//                    }
+//                    for(x =90 ; x < 120; x++){
+//                       // EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
+//                    }
+////                    side.a.dir = EEPROM_1_ReadByte(12);
+////                    side.b.dir = EEPROM_1_ReadByte(13);
+////                    side.c.dir = EEPROM_1_ReadByte(14);
+////                    side.d.dir = EEPROM_1_ReadByte(15);
+//                    //imprimir(printPortA,side.a.dir);
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 

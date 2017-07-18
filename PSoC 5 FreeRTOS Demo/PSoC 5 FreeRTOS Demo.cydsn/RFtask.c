@@ -54,6 +54,7 @@ void RF_Task(void *arg)
             {
                 i = 0;
             }
+            
             // Status
             if( buffer_rf[6] == 0xA1)
             {
@@ -63,20 +64,23 @@ void RF_Task(void *arg)
             {
                 LongEsperada = 25;
             }
+            
             // Totals request
             else if ( buffer_rf[6] == 0xA5)
             {
                 LongEsperada = 8;
-            }            
+            }
+            
             // PPU Setting
             else if ( buffer_rf[6] == 0xA6)
             {
                 LongEsperada = 15;
             }
+            
             // Impresion general   
             else if ( buffer_rf[6] == 0xA7)
             {
-                if(buffer_rf[8] <30)
+                if(buffer_rf[8] < 30)
                 {
                     LongEsperada = buffer_rf[8] + 0x09;
                 }
@@ -85,14 +89,16 @@ void RF_Task(void *arg)
                     LongEsperada = 30;
                 }
             } 
+            
             else if ( buffer_rf[6] == 0xA9)
             {
                 LongEsperada = 19;
             }
+            
             // big config
             else if ( buffer_rf[6] == 0xE1)
             {
-                LongEsperada = 140;
+                LongEsperada = 338;
             }
             
 //            else if ( buffer_rf[6] == 0xE2)
@@ -123,6 +129,8 @@ void RF_Task(void *arg)
                 RF_Connection_ClearRxBuffer();
                 pollingRF_Rx(buffer_rf);
                 buffer_rf[6] = 0xFF;
+                RF_Connection_ClearRxBuffer();
+                break;
             }
             
             i++;                       
