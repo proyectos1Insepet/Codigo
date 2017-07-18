@@ -34,8 +34,8 @@ uint8 leer_hora();
 uint8 leer_fecha();
 uint8 write_hora( void );
 uint8 write_fecha( void );
-uint8 write_eeprom(uint16 page, uint8 *valor);
-uint8 leer_eeprom(uint16 page, uint8 size);
+uint8 WriteEeprom(uint16 page, uint8 *valor);
+uint8 LeerEeprom(uint16 page, uint8 size);
 uint8 write_psoc1( uint8 puerto, uint8 valor );
 
 #endif

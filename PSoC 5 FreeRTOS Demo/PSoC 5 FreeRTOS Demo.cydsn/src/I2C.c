@@ -257,4 +257,114 @@ uint8 write_hora( void ){
 	return 1;
 }
 
+/*
+*********************************************************************************************************
+*                              uint8 write_eeprom(uint16 page, uint8 valor)
+*
+* Description : 
+*               
+*
+* Argument(s) : none
+*
+* Return(s)   : none
+*
+* Caller(s)   : 
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+
+uint8 WriteEeprom(uint16 page, uint8 *valor){
+	uint8 status, dato[4],i;
+	dato[1]=(page&0xFF);
+	page=(page>>8)&0xFF;
+	dato[0]=page;
+	Pin_WP_Write(0);
+	I2C_Bus_MasterClearStatus();
+    status = I2C_Bus_MasterSendStart(0x54, I2C_Bus_WRITE_XFER_MODE);
+    if(I2C_Bus_MSTR_NO_ERROR == status) 
+    {
+        for(i=0; i<2; i++)
+        {
+            status = I2C_Bus_MasterWriteByte(dato[i]);
+            if(status != I2C_Bus_MSTR_NO_ERROR)
+            {
+                return 0;
+            }
+        }
+        for(i=0; i<=valor[0]; i++)
+        {
+            status = I2C_Bus_MasterWriteByte(valor[i]);
+            if(status != I2C_Bus_MSTR_NO_ERROR)
+            {
+                return 0;
+            }
+			CyDelay(5);
+        }		
+    }
+    else{
+		return 0;
+    }
+    I2C_Bus_MasterSendStop();	
+	CyDelay(6);
+	Pin_WP_Write(1);
+	return 1;
+}
+
+/*
+*********************************************************************************************************
+*                               uint8 leer_eeprom(uint16 page, uint8 size))
+*
+* Description : 
+*               
+*
+* Argument(s) : none
+*
+* Return(s)   : none
+*
+* Caller(s)   : 
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+uint8 LeerEeprom(uint16 page, uint8 size){
+	uint16 status, dato[4],i;
+	dato[1]=(page&0xFF);
+	page=(page>>8)&0xFF;
+	dato[0]=page;	
+    I2C_Bus_MasterClearStatus();
+    status = I2C_Bus_MasterSendStart(0x54, I2C_Bus_WRITE_XFER_MODE);
+    if(I2C_Bus_MSTR_NO_ERROR == status)								 		/* Check if transfer completed without errors */
+	{
+        for(i=0;i<2;i++)
+        {
+            status = I2C_Bus_MasterWriteByte(dato[i]);
+            if(status != I2C_Bus_MSTR_NO_ERROR)
+            {
+            	return 0;
+            }
+			CyDelay(5);
+        }		
+    }
+	else{
+		return 0;
+	}
+	I2C_Bus_MasterSendStop();	
+    CyDelay(50);
+    status = I2C_Bus_MasterSendStart(0x54, I2C_Bus_READ_XFER_MODE);
+    if(I2C_Bus_MSTR_NO_ERROR == status){
+		for(i=0;i<size;i++){
+	        buffer_i2c[i] = I2C_Bus_MasterReadByte(I2C_Bus_ACK_DATA);
+			CyDelay(5);
+		}
+    }
+	else{
+		return 0;
+	}
+    I2C_1_MasterSendStop();	
+	CyDelay(6);	
+	return 1;
+}
+
+
 /* [] END OF FILE */

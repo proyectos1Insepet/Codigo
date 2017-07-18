@@ -189,27 +189,7 @@ uint8 verificar_check(uint8 *datos, uint16 size){
 	}
 	return checksum;
 }
-/*
-*********************************************************************************************************
-*                             uint8 verificar_check(uint8 *datos, uint16 size)
-*
-* Description : calcula el checksum
-*               
 
-*********************************************************************************************************
-*/
-uint16 hexadecimal_to_decimal(uint16 x)
-{
-      uint16 decimal_number, remainder, count = 0;
-      while(x > 0)
-      {
-            remainder = x % 10;
-            decimal_number = decimal_number + remainder * pow(16,count);
-            x = x / 10;
-            count++;
-      }
-      return decimal_number;
-}
 
 void pollingRF_Rx(uint8 PRF_rxBuffer[])
 {
@@ -626,15 +606,8 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 case 0xA7:               //Impresion general
                     //lengthPrint = hexadecimal_to_decimal(PRF_rxBuffer[8]);
                     if(PRF_rxBuffer[5] == side.a.dir)
-                    {
-                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
-                        {
-                            
-                            write_psoc1(printPortA, PRF_rxBuffer[x]);
-                        }
-                        write_psoc1(printPortA,10);
-                        write_psoc1(printPortA,10);
-                        
+
+                    {                                                
                         buffer_tx[5] = side.a.dir;
                         buffer_tx[6] = 0xA7;
                         buffer_tx[7] = side.a.rfState;
@@ -666,11 +639,19 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     }
                     
                     buffer_tx[8] = verificar_check(buffer_tx,9);
-                    
+
+                                                            
+                    for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                    {
+                        //buffer_print[x-9] = PRF_rxBuffer[x];
+                        write_psoc1(printPortA, PRF_rxBuffer[x]);
+                    }
+                    write_psoc1(printPortA,0x0A);
                     for (x = 0; x < 9; x++)
                     {
                         RF_Connection_PutChar(buffer_tx[x]);
-                    }                              
+                    }         
+
                 break;
                 
                 case 0xA9:              // ID Transaction
@@ -727,7 +708,39 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     }
                     for(x = 107; x < 137; x++)
                     {
-                        Encabezado4[x-77] = PRF_rxBuffer[x];
+                        Encabezado4[x-107] = PRF_rxBuffer[x];
+                    }
+                    for(x = 137; x < 167; x++)
+                    {
+                        Encabezado5[x-137] = PRF_rxBuffer[x];
+                    }
+                    for(x = 167; x < 197; x++)
+                    {
+                        Pie1[x-167] = PRF_rxBuffer[x];
+                    }
+                    for(x = 197; x < 227; x++)
+                    {
+                        Pie2[x-227] = PRF_rxBuffer[x];
+                    }
+                    for(x = 227; x < 257; x++)
+                    {
+                        Pie3[x-227] = PRF_rxBuffer[x];
+                    }
+                    for(x = 257; x < 273; x++)
+                    {
+                        Product1[x-257] = PRF_rxBuffer[x];
+                    }
+                    for(x = 273; x < 289; x++)
+                    {
+                        Product2[x-273] = PRF_rxBuffer[x];
+                    }
+                    for(x = 289; x < 305; x++)
+                    {
+                        Product3[x-289] = PRF_rxBuffer[x];
+                    }
+                    for(x = 305; x < 321; x++)
+                    {
+                        Product4[x-305] = PRF_rxBuffer[x];
                     }
                     CopiasCredito = PRF_rxBuffer[16];
                     write_hora();
@@ -755,14 +768,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 
-                    buffer_tx[5] = PRF_rxBuffer[5];
-                    buffer_tx[6] = 0xE2;
-                    buffer_tx[7] = 0x08;
-                    buffer_tx[8] = 0x03;
-                    buffer_tx[9] = verificar_check(buffer_tx,10);
-                    for (x = 0; x < 10; x++){
-                        RF_Connection_PutChar(buffer_tx[x]);
-                    }
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {
                         for(x = 8; x < 12; x++){
@@ -852,16 +857,26 @@ void pollingRFA_Tx(){
     uint16 x,y;
     
     /////////////// TICKET COPY //////////////////
-//    if(side.a.rfState == RF_COPY_RECEIPT && side.a.RFstateReport == 1){        
-//        buffer_txDisplay[5] = side.a.dir;
-//        buffer_txDisplay[6] = 0xE6;
-//        buffer_txDisplay[7] = RF_COPY_RECEIPT;
-//        buffer_txDisplay[8] = verificar_check(buffer_txDisplay,9);
-//        for (x = 0; x < 9; x++){
-//            RF_Connection_PutChar(buffer_txDisplay[x]);
-//        }
-//		side.a.RFstateReport = 0;
-//    }    
+    if(side.a.rfState == RF_COPY_RECEIPT && side.a.RFstateReport == 1){ 
+        buffer_A[0]   = 11;
+		buffer_A[1]   = 0xBC;                                 // Encabezado byte 1
+        buffer_A[2]   = 0xCB;                                 // Encabezado byte 2
+        buffer_A[3]   = 0xC8;                                 // Encabezado byte 3
+        buffer_A[4]   = IDCast[0];                            // ID estacion byte 1
+        buffer_A[5]   = IDCast[1];                            // ID estacion byte 2
+        buffer_A[6]   = side.a.dir;                           // ID posicion 
+        buffer_A[7]   = 0xE6;
+        buffer_A[8]   = RF_COPY_RECEIPT;
+        buffer_A[9]   = verificar_check(buffer_A,10);        
+		side.a.RFstateReport = 0;
+        side.a.rfState = RF_IDLE;
+        bufferAready = 1;
+        if(PrinterType == 1)
+        {
+            printLogoP(printPortA,11);    
+        }       
+        write_psoc1(printPortA,10);
+    }
     ////////////// PRESET - BUSY ////////////////////////////////////
     if(side.a.pumpState == PUMP_BUSY && side.a.RFstateReport == 1)
     {
@@ -990,7 +1005,9 @@ void pollingRFA_Tx(){
     }                                               
     ////////////// SHIFT ////////////////////////////////////
     if(ShiftState == 1  && side.a.RFstateReport == 1){   
-        
+        for(x = 0; x < 100; x++){
+            buffer_A[x] = 0x00;
+        }
         buffer_A[0]  = 35;
         buffer_A[1]  = 0xBC;
         buffer_A[2]  = 0xCB;
@@ -1127,16 +1144,26 @@ void pollingRFA_Tx(){
 void pollingRFB_Tx(){   
     uint16 x,y;      
     /////////////// COPIA DE RECIBO //////////////////
-//    if(side.b.rfState == RF_COPY_RECEIPT && side.b.RFstateReport == 1){        
-//        buffer_txDisplay[5] = side.b.dir;
-//        buffer_txDisplay[6] = 0xE6;
-//        buffer_txDisplay[7] = RF_COPY_RECEIPT;
-//        buffer_txDisplay[8] = verificar_check(buffer_txDisplay,9);
-//        for (x = 0; x < 9; x++){
-//            RF_Connection_PutChar(buffer_txDisplay[x]);
-//        }
-//		side.b.RFstateReport = 0;
-//    }    
+    if(side.b.rfState == RF_COPY_RECEIPT && side.b.RFstateReport == 1){ 
+        buffer_B[100]   = 11;
+		buffer_B[0]   = 0xBC;                                 // Encabezado byte 1
+        buffer_B[1]   = 0xCB;                                 // Encabezado byte 2
+        buffer_B[2]   = 0xC8;                                 // Encabezado byte 3
+        buffer_B[3]   = IDCast[0];                            // ID estacion byte 1
+        buffer_B[4]   = IDCast[1];                            // ID estacion byte 2
+        buffer_B[5]   = side.b.dir;                           // ID posicion 
+        buffer_B[6]   = 0xE6;
+        buffer_B[7]   = RF_COPY_RECEIPT;
+        buffer_B[8]   = verificar_check(buffer_B,9);        
+		side.b.RFstateReport = 0;
+        side.b.rfState = RF_IDLE;
+        bufferAreadyB = 1;
+        if(PrinterType == 1)
+        {
+            printLogoP(printPortB,11);    
+        }       
+        write_psoc1(printPortB,10);
+    }    
     ////////////// PRESET - DISPENSANDO ////////////////////////////////////
     if(side.b.pumpState == PUMP_BUSY && side.b.RFstateReport == 1)
     {

@@ -342,8 +342,7 @@ void printLogoP(uint8 val, uint8 logo){
 */
 
 void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
-    uint8 x;    
-    PrinterType = 1;
+    uint8 x;        
     if(pos == side.a.dir || pos == side.c.dir)
     {
         if(PrinterType == 1)

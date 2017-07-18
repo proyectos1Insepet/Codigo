@@ -38,8 +38,8 @@
 
 xSemaphoreHandle g_pUARTSemaphore;
       
-CY_ISR(animacion2);
-CY_ISR(animacion);
+//CY_ISR(animacion2);
+//CY_ISR(animacion);
 
 void GlobalInitializer(){
     EEPROM_1_Start();
@@ -49,8 +49,8 @@ void GlobalInitializer(){
     Printer_Start();   
     I2C_Bus_Start();
     RF_Connection_Start();
-    isr_3_StartEx(animacion);
-    isr_4_StartEx(animacion2);    
+//    isr_3_StartEx(animacion);
+//    isr_4_StartEx(animacion2);    
 }
 
 /* 
@@ -91,7 +91,7 @@ void loadConfiguration(){
     side.b.dir = EEPROM_1_ReadByte(13); //Segunda posicion
     side.c.dir = EEPROM_1_ReadByte(14); //Tercera posicion
     side.d.dir = EEPROM_1_ReadByte(15); //Cuarta posicion
-
+    PrinterType = 1; // Tipo de impresora
 }
 void console(void)
 {
@@ -221,7 +221,7 @@ int main()
 	vTaskStartScheduler();                  /* Start the scheduler                      */
     
     g_pUARTSemaphore = xSemaphoreCreateMutex();  /* Initialize the UARTg Mutex          */
-    
+        
 	return 1;
 }
 
