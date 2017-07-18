@@ -120,12 +120,10 @@ void RF_Task(void *arg)
                 LongEsperada = 400;
             }
                                 
-            buffer_rf[i] = buffer_rfTMP;
-            //buffer_rf[1] = 0xCB;
+            buffer_rf[i] = buffer_rfTMP;         
             
             if (i == LongEsperada - 1)
-            {
-                //RF_Connection_PutString(buffer_rf);
+            {                
                 RF_Connection_ClearRxBuffer();
                 pollingRF_Rx(buffer_rf);
                 buffer_rf[6] = 0xFF;

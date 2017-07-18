@@ -504,7 +504,6 @@ uint8 priceChange(uint8 pos,uint8 handle,uint8 *value){
             
             Pump_ClearRxBuffer();
             
-			//CyDelay(50);
             vTaskDelay( 50 / portTICK_PERIOD_MS );
             
 //			if(get_state(pos) == 0)

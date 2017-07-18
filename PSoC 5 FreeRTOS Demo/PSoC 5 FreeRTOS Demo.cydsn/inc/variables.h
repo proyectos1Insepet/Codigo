@@ -144,6 +144,7 @@
     uint8 ppuiButtonB[5];
     uint8 PPUAux;
     uint16 LongEsperada;
+    
      
 
     

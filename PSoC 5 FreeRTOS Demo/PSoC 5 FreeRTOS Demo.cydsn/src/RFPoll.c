@@ -353,22 +353,19 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {
                         if(PRF_rxBuffer[8] == 0x01)
-                        {                                      
-                            
-                            // PPU                            
-                            
+                        {                                                                 
+                            // PPU                                                        
                             for(x = 19; x < 24 ; x++ )
                             {
                                 ppuiButtonA[x - 19] = PRF_rxBuffer[x];                            
                             } 
-                             
+                       
                             for(x = 0; x < 5 ; x++ )
                             {
                                 if(ppuiButtonA[x] == 0x00)
                                 { 
                                     ppuiButtonA[x] = '0';
-                                }
-                                
+                                }                                
                             }
                             
                             //Grade
@@ -418,7 +415,8 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
                             }
-                                                
+                            flowDisplay1 = 21;
+                                                                           
                         }
                     } 
                     
@@ -486,7 +484,8 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             for (x = 0; x < 10; x++)
                             { 
                                 RF_Connection_PutChar(buffer_B[x]);
-                            }                                                                     
+                            }    
+                            flowDisplay2 = 21;
                         }
                     }                           
                 break;
@@ -630,7 +629,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     {
                         for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
                         {
-                            //buffer_print[x-9] = PRF_rxBuffer[x];
+                            
                             write_psoc1(printPortA, PRF_rxBuffer[x]);
                         }
                         write_psoc1(printPortA,10);
@@ -641,6 +640,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         buffer_tx[7] = side.a.rfState;
                         buffer_tx[8] = 0x03;
                     }  
+                    
                     if(PRF_rxBuffer[5] == side.b.dir)
                     {
                         buffer_tx[5] = side.b.dir;
@@ -648,6 +648,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         buffer_tx[7] = side.b.rfState;
                         buffer_tx[8] = 0x03;
                     }
+                    
                     if(PRF_rxBuffer[5] == side.c.dir)
                     {
                         buffer_tx[5] = side.c.dir;
@@ -655,6 +656,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         buffer_tx[7] = side.c.rfState;
                         buffer_tx[8] = 0x03;
                     }
+                    
                     if(PRF_rxBuffer[5] == side.d.dir)
                     {
                         buffer_tx[5] = side.d.dir;
@@ -662,12 +664,13 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         buffer_tx[7] = side.d.rfState;
                         buffer_tx[8] = 0x03;
                     }
+                    
                     buffer_tx[8] = verificar_check(buffer_tx,9);
+                    
                     for (x = 0; x < 9; x++)
                     {
                         RF_Connection_PutChar(buffer_tx[x]);
-                    }
-                              
+                    }                              
                 break;
                 
                 case 0xA9:              // ID Transaction
@@ -676,8 +679,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         for(x = 0; x < 10; x++)
                         {
                             side.a.saleNumber[x] = PRF_rxBuffer[x+8];
-                        }
-                        
+                        }                      
                     }
                     if(PRF_rxBuffer[5] == side.b.dir)
                     {
@@ -685,7 +687,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         {
                             side.b.saleNumber[x] = PRF_rxBuffer[x+8];
                         }
-
                     }
                     if(PRF_rxBuffer[5] == side.c.dir)
                     {
@@ -693,7 +694,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         {
                             side.c.saleNumber[x] = PRF_rxBuffer[x + 8];
                         }
-
                     }
                     if(PRF_rxBuffer[5] == side.d.dir)
                     {
@@ -701,7 +701,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         {
                             side.d.saleNumber[x] = PRF_rxBuffer[x + 8];
                         }
-
                     }
                 break;
                 
@@ -840,14 +839,11 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             side.a.rfState = RF_IDLE; 
                             return;
                         }
-
-                    }
-     
+                    }    
                break;                
            }                       
         } 
-                                 
-    //countRX = 0;
+
     RF_Connection_ClearRxBuffer(); 
 }
 
@@ -1084,6 +1080,7 @@ void pollingRFA_Tx(){
             buffer_A[9 + x] =  ((Temp[y] & 0x0F) << 4) | (Temp[y + 1] & 0x0F);
             x++;
         }
+       
         
         //Km (10 bytes)
         for(y = 0; y < 10; y++)
