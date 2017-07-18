@@ -872,10 +872,11 @@ void PollingDisplay1(void){
                         break;
                         case 0xB5:  //Copia de recibo 
                             if(lockTurn == 1){
-                                flowDisplay1  = 0;
                                 side.a.RFstateReport = 1;
                                 side.a.rfState = RF_COPY_RECEIPT;
-                                SetPicture(1,DISPLAY_INICIO0);  
+                                SetPicture(1,DISPLAY_IMPRIMIENDO_RECIBO); 
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay1  = 0;                                                                                                 
                             }else{
                                 SetPicture(1, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
@@ -1947,10 +1948,11 @@ void PollingDisplay2(void){
                             
                         case 0xB5:  //Copia de recibo 
                             if(lockTurn == 1){
-                                flowDisplay2  = 0;
                                 side.b.RFstateReport = 1;
                                 side.b.rfState = RF_COPY_RECEIPT;
-                                SetPicture(2,DISPLAY_INICIO0);
+                                SetPicture(2,DISPLAY_IMPRIMIENDO_RECIBO); 
+                                vTaskDelay( 900 / portTICK_PERIOD_MS );
+                                flowDisplay2  = 0;
                             }else{
                                 SetPicture(2, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );

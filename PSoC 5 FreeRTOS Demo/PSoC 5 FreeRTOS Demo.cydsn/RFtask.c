@@ -76,13 +76,13 @@ void RF_Task(void *arg)
             // Impresion general   
             else if ( buffer_rf[6] == 0xA7)
             {
-                if(buffer_rf[8] <30)
+                if(buffer_rf[8] + 0x09 < 234)
                 {
                     LongEsperada = buffer_rf[8] + 0x09;
                 }
                 else
                 {
-                    LongEsperada = 30;
+                    LongEsperada = 234;
                 }
             } 
             else if ( buffer_rf[6] == 0xA9)
@@ -92,13 +92,13 @@ void RF_Task(void *arg)
             // big config
             else if ( buffer_rf[6] == 0xE1)
             {
-                LongEsperada = 140;
+                LongEsperada = 337;
             }
             
-//            else if ( buffer_rf[6] == 0xE2)
-//            {
-//                LongEsperada = 14;
-//            }
+            else if ( buffer_rf[6] == 0xE2)
+            {
+                LongEsperada = 14;
+            }
             //Short Config 
 //            else if ( buffer_rf[6] == 0xAD)
 //            {
@@ -109,10 +109,10 @@ void RF_Task(void *arg)
             {
                 LongEsperada = 9;
             }
-            else
-            {
-                LongEsperada = 400;
-            }
+//            else
+//            {
+//                LongEsperada = 400;
+//            }
                                 
             buffer_rf[i] = buffer_rfTMP;
             //buffer_rf[1] = 0xCB;

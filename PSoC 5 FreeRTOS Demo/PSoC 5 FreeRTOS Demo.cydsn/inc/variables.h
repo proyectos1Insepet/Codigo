@@ -104,7 +104,7 @@
     uint8 pumpGap[3];
     uint8 printPortA;
     uint8 printPortB;
-    uint8 buffer_rf[512];
+    uint8 buffer_rf[1024];
     uint8 buffer_tx[512];
     uint8 buffer_txTotals[512];
     uint8 buffer_A[255];
@@ -118,6 +118,14 @@
     uint8 Encabezado2[30];
     uint8 Encabezado3[30];
     uint8 Encabezado4[30];
+    uint8 Encabezado5[30];
+    uint8 Pie1[30];
+    uint8 Pie2[30];
+    uint8 Pie3[30];
+    uint8 Product1[16];
+    uint8 Product2[16];
+    uint8 Product3[16];
+    uint8 Product4[16];
     uint8 CopiasCredito;        
     uint8 FlagTotal;
     uint8 FlagTotalB;
@@ -144,7 +152,7 @@
     uint8 ppuiButtonB[5];
     uint8 PPUAux;
     uint16 LongEsperada;
-     
+    uint8 buffer_i2c[64];													//Buffer de lectura del i2c 
 
     
 /*
