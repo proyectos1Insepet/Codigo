@@ -31,6 +31,11 @@
 #include <stdlib.h>
 #include "os_resource.h"
 
+char mensaje[] = {"OPERACION"};
+char mensaje2[] = {"RECHAZADA"};
+char mensaje3[] = {"MANGUERA"};
+char mensaje4[] = {"INCORRECTA"};
+
 /* Drivers */
 #include "PumpTask.h"
 
@@ -271,7 +276,7 @@ void PollingDisplay1(void){
             }
         break;
         case 1: //Menu
-            
+   
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -291,26 +296,29 @@ void PollingDisplay1(void){
                     switch(Display1_rxBuffer[3])
                     {
                         case 0x0D:  //Pantalla efectivo   
-                            if(lockTurn == 1){
+                            if(lockTurn == 1)
+                            {
                                 flowDisplay1 = 3; 
                                 bufferDisplay1.saleType = 1;
                                 SetPicture(1, DISPLAY_FORMA_PROGRAMACION);  
-                                AuthType = 0;
-                            }else{
+                                AuthType = 2;
+                            }else
+                            {
                                 SetPicture(1, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
                                 flowDisplay1 = 0;                                                                
                             }
                         break;
                         case 0x0E:  //Pantalla credito  
-                            if(lockTurn == 1){
-                                flowDisplay1 = 3;
+                            if(lockTurn == 1)
+                            {
+                                flowDisplay1 = 10;
                                 bufferDisplay1.saleType = 2;
                                 count_protector = 0;
-                                SetPicture(1, DISPLAY_FORMA_PROGRAMACION);
-                                //SetPicture(1, DISPLAY_ID_DIGITAL);
+                                SetPicture(1, DISPLAY_ID_DIGITAL);
                                 AuthType = 1;
-                            }else{
+                            }else
+                            {
                                 SetPicture(1, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
                                 flowDisplay1 = 0;                                                                
@@ -356,8 +364,8 @@ void PollingDisplay1(void){
                             bufferDisplay1.presetType[0] = 2;
                             bufferDisplay1.presetType[1] = 'D';
                             numberKeys1 = 0;
-                            SetPicture(1,DISPLAY_INTRODUZCA_VALOR);   
-                            WriteLCD(1,'$',3,2,1,0x0000,'N');
+                            SetPicture(1, DISPLAY_INTRODUZCA_VALOR);   
+                            WriteLCD(1, '$', 3, 2, 1, 0x0000, 'N');
                             
                             if(MoneyDec > 0)
                             {
@@ -373,7 +381,7 @@ void PollingDisplay1(void){
                             bufferDisplay1.presetType[1] = 'V';
                             numberKeys1 = 0;                            
                             SetPicture(1, DISPLAY_INTRODUZCA_VOLUMEN);                            
-                            WriteLCD(1,'G',3,2,1,0x0000,'N');
+                            WriteLCD(1, 'G', 3, 2, 1, 0x0000, 'N');
                             
                             if(VolDec > 0)
                             {
@@ -490,30 +498,78 @@ void PollingDisplay1(void){
                     {
                         case 0x80:  //Grado 1 
                             
-                            flowDisplay1 = 6;
-                            side.a.hose = 1;
-                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                            flowDisplay1 = 9;
+                            side.a.hose = 1;                         
+                            //Credit
+                            if(AuthType == 2)
+                            {
+                                bufferDisplay1.flagKeyboard = 1; 
+                                SetPicture(1, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType == 1)
+                            {                    
+                                bufferDisplay1.flagKeyboard = 2;
+                                SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            }
                             
                         break;
                             
                         case 0x81:  //Grado 2 
-                            flowDisplay1 = 6;
+                            flowDisplay1 = 9;
                             side.a.hose = 2;
-                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                            //Credit
+                            if(AuthType == 2)
+                            {
+                                bufferDisplay1.flagKeyboard = 1; 
+                                SetPicture(1, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType == 1)
+                            {                    
+                                bufferDisplay1.flagKeyboard = 2;
+                                SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            }
                             
                         break;
                             
                         case 0x7F:  //Grado 3
-                            flowDisplay1 = 6;
+                            flowDisplay1 = 9;
                             side.a.hose = 3;
-                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                           //Credit
+                            if(AuthType == 2)
+                            {
+                                bufferDisplay1.flagKeyboard = 1; 
+                                SetPicture(1, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType == 1)
+                            {                    
+                                bufferDisplay1.flagKeyboard = 2;
+                                SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            }
                             
                         break;   
                         
                         case 0xB8:  //Grado 4 
-                            flowDisplay1 = 6;
+                            flowDisplay1 = 9;
                             side.a.hose = 4;
-                            SetPicture(1,DISPLAY_DESEA_IMPRIMIR_RECIBO); 
+                            //Credit
+                            if(AuthType == 2)
+                            {
+                                bufferDisplay1.flagKeyboard = 1; 
+                                SetPicture(1, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType == 1)
+                            {                    
+                                bufferDisplay1.flagKeyboard = 2;
+                                SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            } 
                             
                         break;
                             
@@ -536,7 +592,7 @@ void PollingDisplay1(void){
             }
         break;
                     
-        case 6: // Pantalla impresion
+        case 6: // Print Screen
 
             if(Display1_GetRxBufferSize() == 8)
             {
@@ -544,15 +600,14 @@ void PollingDisplay1(void){
                 {
                     switch(Display1_rxBuffer[3])
                     {
-                        case 0x39:  //Si imprimir  
-                            flowDisplay1 = 9;
+                        case 0x39:  //Print 
+                            flowDisplay1 = 7;
                             numberKeys1 = 0;
-                            bufferDisplay1.flagKeyboard = 1;
                             bufferDisplay1.flagPrint =  1;
                             PrintON = 1;
-                            SetPicture(1, DISPLAY_DIGITE_PLACA);                            
+                            SetPicture(1, DISPLAY_SUBA_MANIJA);                            
                         break; 
-                        case 0x38:  //No imprimir 
+                        case 0x38:  //No Print 
                             if(bufferDisplay1.flagEndSale)
                             {
                                 flowDisplay1 = 0;
@@ -560,22 +615,23 @@ void PollingDisplay1(void){
                                 SetPicture(1, DISPLAY_INICIO0);
                             }else
                             {
-                                flowDisplay1 = 7; //Esperando estado del dispensador 
+                                flowDisplay1 = 7; // Wait of handle up
                                 bufferDisplay1.flagPrint =  0;
                                 count_protector = 0;
                                 SetPicture(1, DISPLAY_SUBA_MANIJA);
-                            }
+                            } 
                         break;
-                        case 0x7E:  //Pantalla Inicial                                                                                    
+                        case 0x7E:  //Return to initial screen                                                                                    
                             flowDisplay1 = 0;
                              bufferDisplay1.flagPrint =  0;
                             SetPicture(1,DISPLAY_INICIO0);
                             bufferDisplay1.flagPrint =  0;
+                            AuthType = 0;
                         break;
                     }                    
                 }
-                //CyDelay(10);
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+               
+                vTaskDelay( 10 / portTICK_PERIOD_MS );              // 10mS delay
                 Display1_ClearRxBuffer();
             }
             if(count_protector >= 30)
@@ -586,19 +642,11 @@ void PollingDisplay1(void){
     		}
         break;
                                         
-            // Realiza el preset
+            // PRESET flag ON and wait to handle up
         case 7:
+
+            PresetFlag = 1;                   
             
-            PresetFlag = 1;
-            bufferDisplay1.flagKeyboard = 2;
-            flowDisplay1 = 9;
-            SetPicture(1,DISPLAY_INTRODUZCA_KILOMETRAJE);
-               
-        break;
-            
-        // Wait to end of transaction   
-        case 8:
-                          
             //Touch for return to init display
             if(Display1_GetRxBufferSize() == 8)
             {
@@ -606,38 +654,55 @@ void PollingDisplay1(void){
                 {
                     switch(Display1_rxBuffer[3])
                     {                        
-                        case 0x7E:  //Pantalla Inicial 
-                            bufferDisplay1.flagPrint =  0;
+                        case 0x7E:  //Init Screen                                                        
                             SetPicture(1, DISPLAY_INICIO0);
                             flowDisplay1 = 0;
+                            bufferDisplay1.flagPrint =  0;
                             PresetFlag = 0;
+                            iButtonFlag = 0;
+                            AuthType = 0;
+                        break;
+                        
+                        case 0x94:  //Cancel Button                                                        
+                            SetPicture(1, DISPLAY_INICIO0);
+                            flowDisplay1 = 0;
+                            bufferDisplay1.flagPrint =  0;
+                            PresetFlag = 0;
+                            iButtonFlag = 0;
                             AuthType = 0;
                         break;
                     }                    
                 }
-                //CyDelay(10);
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              
+                
+                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
             }
             Display1_ClearRxBuffer();
+           
+        break;
+            
+          
+        case 8:
+                          
+           //Pump Busy...
                         
         break;
             
-        case 9: //Teclado           
+        case 9: //Keyboard           
             switch (alphanumeric_keyboard(11,0))
             {
-                case 0: //Cancelar
+                case 0: //Cancel
                     switch(bufferDisplay1.flagKeyboard)
                     {
-                        case 1://Placa
+                        case 1://License plate
                             for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.licenceSale[x] = 0;
                             }
                             flowDisplay1 = 0; 
-                            SetPicture(1,DISPLAY_INICIO0);
+                            SetPicture(1, DISPLAY_INICIO0);
                         break;
                         
-                        case 2://Kilometraje
+                        case 2://Mileage
                             for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.mileageSale[x] = 0;
@@ -664,7 +729,7 @@ void PollingDisplay1(void){
                 case 1: //Enter
                     switch(bufferDisplay1.flagKeyboard)
                     {
-                        case 1://Placa
+                        case 1://License plate
                             for(x = 0; x <= bufferDisplay1.valueKeys[0]; x++)
                             {
                                 bufferDisplay1.licenceSale[x] = bufferDisplay1.valueKeys[x];
@@ -675,11 +740,12 @@ void PollingDisplay1(void){
                                 flowDisplay1 = 0;
                                 SetPicture(1, DISPLAY_INICIO0); 
                             }else{
-                                flowDisplay1 = 7;   //handle Up
-                                                            }
+                                flowDisplay1 = 6;
+                                SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO);                                 
+                            }
                         break;
                         
-                        case 2:// Kilometraje
+                        case 2:// mileage
                                                      
                             for(x = 0; x <= bufferDisplay1.valueKeys[0]; x++)
                             {
@@ -689,33 +755,38 @@ void PollingDisplay1(void){
                             //Credit Sale
                             if(AuthType == 1)
                             {
-                                flowDisplay1 = 10;
-                                SetPicture(1,DISPLAY_ID_DIGITAL);
+                                flowDisplay1 = 7;
+                                SetPicture(1, DISPLAY_SUBA_MANIJA);
                             }
                             else
                             {                                
-                                flowDisplay1 = 8;       //Handle Up
-                                SetPicture(1,DISPLAY_SUBA_MANIJA);
+                                flowDisplay1 = 6;       
+                                SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO);
                             }                                               
                                                        
                         break;
                         
                         case 3:     //CC/NIT
+                            
                             for(x = 0; x <= bufferDisplay1.valueKeys[0]; x++)
                             {
                                 bufferDisplay1.identySale[x] = bufferDisplay1.valueKeys[x];
                             }
+                        break;
                         case 4:     //ID
+                            
                             for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.shiftId[x] = bufferDisplay1.valueKeys[x];
                             }
+                            
                             flowDisplay1 = 14;          //password request                    
                             numberKeys1 = 0;
                             hiddenKeys = 10;
                             controlChar = '*';
                             bufferDisplay1.flagKeyboard = 3;
                             SetPicture(1,DISPLAY_INGRESE_PASSWORD);
+
                         break;
                     }                    
                     Display1_ClearRxBuffer();
@@ -732,15 +803,15 @@ void PollingDisplay1(void){
                 {
                     switch(Display1_rxBuffer[3])
                     {
-                        case 0xB6:  //Solicitud ibutton  
+                        case 0xB6:  //ibutton Request   
                             flowDisplay1 = 11;
                             numberKeys1 = 0;                            
                             bufferDisplay1.flagPrint =  1;
                             SetPicture(1, DISPLAY_ESPERANDO_ID);                            
                         break; 
-                        case 0xB7:  //ID por número
+                        case 0xB7:  //ID Number
                             bufferDisplay1.flagKeyboard = 0;
-                            flowDisplay1 = 7;//Esperando estado del dispensador  
+                            flowDisplay1 = 7;
                             count_protector = 0;
                             SetPicture(1,DISPLAY_SUBA_MANIJA);                            
                         break;
@@ -770,7 +841,7 @@ void PollingDisplay1(void){
                 {
 					for(x = 1; x <= 8; x++)
                     {
-						temporal[x] = touch_read_byte(1);   // Id
+						temporal[x] = touch_read_byte(1);  // Id
 					}
 					y = 0;
 					for(x = 1; x < 8; x++)
@@ -802,15 +873,27 @@ void PollingDisplay1(void){
 						}
                         
                         // Authorization request
-                        SetPicture(1,DISPLAY_ID_RECONOCIDO);                                           
-                        Display1_ClearRxBuffer();
+                        SetPicture(1,DISPLAY_ID_RECONOCIDO);                                                                 
                         vTaskDelay( 700 / portTICK_PERIOD_MS );                       
                         iButtonFlag = 1;
-                        SetPicture(1, DISPLAY_SUBA_MANIJA);
-                        flowDisplay1 = 8;                                                
+                        SetPicture(1, DISPLAY_FORMA_PROGRAMACION);
+                        flowDisplay1 = 3;
+                        
                                                 
 					}
-				}
+				}else
+                    {
+                        SetPicture(1,DISPLAY_ID_NO_RECONOCIDO);                                           
+                        Display1_ClearRxBuffer();
+                        vTaskDelay( 700 / portTICK_PERIOD_MS );    
+                        SetPicture(1, DISPLAY_INICIO0);
+                        flowDisplay1 = 0;
+                        bufferDisplay1.flagPrint =  0;
+                        PresetFlag = 0;
+                        iButtonFlag = 0;
+                        AuthType = 0;
+                        
+                    }
 			}
                      
             //Touch for return to init display
@@ -916,13 +999,13 @@ void PollingDisplay1(void){
                 {
                     switch(Display1_rxBuffer[3])
                     {
-                        case 0x47:  //Cambio de turno: Abrir  
+                        case 0x47:  //Open Shift  
                             flowDisplay1 = 9;
                             numberKeys1 = 0;    
                             bufferDisplay1.flagKeyboard = 4;
                             SetPicture(1,DISPLAY_INTRODUZCA_CEDULA);                            
                         break;
-                        case 0x48:  //Cambio de turno: Cerrar 
+                        case 0x48:  //Close shift 
                             flowDisplay1 = 9;
                             numberKeys1 = 0;   
                             bufferDisplay1.flagKeyboard = 4;
@@ -1194,6 +1277,7 @@ void PollingDisplay1(void){
                             SetPicture(1,DISPLAY_INICIO0);
                             flowDisplay1 = 0;
                         break;
+                            
                         case 0x94:  //Pantalla Inicial
                             bufferDisplay1.flagPrint =  0;
                             SetPicture(1,DISPLAY_INICIO0);
@@ -1201,7 +1285,7 @@ void PollingDisplay1(void){
                         break;
                     }                    
                 }
-                //CyDelay(10);
+
                 vTaskDelay( 10 / portTICK_PERIOD_MS );
                 Display1_ClearRxBuffer();
             }                        
@@ -1318,6 +1402,48 @@ void PollingDisplay1(void){
             Display1_ClearRxBuffer();
             
         break;
+            
+            // Credit NOT authorized
+        case 21:
+            
+            SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
+            bufferDisplay1.flagPrint == 0;
+            for(x = 0; x < 9; x++)
+            {
+                WriteMessage(1, mensaje[x],17,1 + x,4,0x0000,'Y');
+                WriteMessage(1, mensaje2[x],21,1 + x,4,0x0000,'Y');
+                    
+            }
+             
+            vTaskDelay( 2000 / portTICK_PERIOD_MS );
+            flowDisplay1 = 0;
+            SetPicture(1, DISPLAY_INICIO0);
+        break;
+            
+        // Wrong Grade handle
+        case 22:
+            
+            SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
+            bufferDisplay1.flagPrint == 0;
+
+            for(x = 0; x < 8; x++)
+            {
+                
+                WriteMessage(1, mensaje3[x], 17, 1 + x, 4, 0x0000, 'Y');
+                    
+            }
+            for(x = 0; x < 10; x++)
+            {
+                
+                WriteMessage(1, mensaje4[x], 21, 1 + x, 4, 0x0000, 'Y');
+                    
+            }
+             
+            vTaskDelay( 2000 / portTICK_PERIOD_MS );
+            flowDisplay1 = 0;
+            SetPicture(1, DISPLAY_INICIO0);
+        break;
+            
     }    
 }
 
@@ -1356,7 +1482,6 @@ void PollingDisplay2(void){
                 {                                             
                     flowDisplay2 = 2;                          //Pantalla forma de pago                      
                     SetPicture(2,DISPLAY_FORMA_PAGO_DESEADA);                                                                                                  
-
                 }  
 
                 vTaskDelay( 10 / portTICK_PERIOD_MS );
@@ -1371,11 +1496,12 @@ void PollingDisplay2(void){
                     switch(Display2_rxBuffer[3])
                     {
                         case 0x0D:  //Pantalla efectivo   
-                            if(lockTurn == 1){
+                            if(lockTurn == 1)
+                            {
                                 flowDisplay2 = 3; 
                                 bufferDisplay2.saleType = 1;
                                 SetPicture(2,DISPLAY_FORMA_PROGRAMACION);
-                                AuthType2 = 0;
+                                AuthType2 = 2;
                             }else{
                                 SetPicture(2, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
@@ -1383,13 +1509,15 @@ void PollingDisplay2(void){
                             }
                         break;
                         case 0x0E:  //Pantalla credito  
-                            if(lockTurn == 1){
-                                flowDisplay2 = 3;
+                            if(lockTurn == 1)
+                            {
+                                flowDisplay2 = 10;
                                 bufferDisplay2.saleType = 2;
                                 count_protector2 = 0;
-                                SetPicture(2,DISPLAY_FORMA_PROGRAMACION); 
+                                SetPicture(2, DISPLAY_ID_DIGITAL);
                                 AuthType2 = 1;
-                            }else{
+                            }else
+                            {
                                 SetPicture(2, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
                                 flowDisplay2 = 0;                                                                
@@ -1561,26 +1689,74 @@ void PollingDisplay2(void){
                     switch(Display2_rxBuffer[3])
                     {
                         case 0x80:  //Grado 1 
-                            flowDisplay2 = 6;
+                            flowDisplay2 = 9;
                             side.b.hose = 1;                            
-                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
+                            //Credit
+                            if(AuthType2 == 2)
+                            {
+                                bufferDisplay2.flagKeyboard = 2; 
+                                SetPicture(2, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType2 == 1)
+                            {                    
+                                bufferDisplay2.flagKeyboard = 2;
+                                SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            }
                         break;        
                         case 0x81:  //Grado 2 
-                            flowDisplay2 = 6;
+                            flowDisplay2 = 9;
                             side.b.hose = 2;                          
-                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
+                            //Credit
+                            if(AuthType2 == 2)
+                            {
+                                bufferDisplay2.flagKeyboard = 2; 
+                                SetPicture(2, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType2 == 1)
+                            {                    
+                                bufferDisplay2.flagKeyboard = 2;
+                                SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            }
                         break;
                             
                         case 0x7F:  //Grado 3
-                            flowDisplay2 = 6;
+                            flowDisplay2 = 9;
                             side.b.hose = 3;                            
-                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
+                            //Credit
+                            if(AuthType2 == 2)
+                            {
+                                bufferDisplay2.flagKeyboard = 2; 
+                                SetPicture(2, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType2 == 1)
+                            {                    
+                                bufferDisplay2.flagKeyboard = 2;
+                                SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            }
                         break;   
                         
                         case 0xB8:  //Grado 4 
-                            flowDisplay2 = 6;
+                            flowDisplay2 = 9;
                             side.b.hose = 4;                           
-                            SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
+                            //Credit
+                            if(AuthType2 == 2)
+                            {
+                                bufferDisplay2.flagKeyboard = 2; 
+                                SetPicture(2, DISPLAY_DIGITE_PLACA);
+                            }
+                            
+                            //Cash
+                            if(AuthType2 == 1)
+                            {                    
+                                bufferDisplay2.flagKeyboard = 2;
+                                SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
+                            }
                         break;
                             
                         case 0x94:  //Retroceso
@@ -1612,11 +1788,10 @@ void PollingDisplay2(void){
                     switch(Display2_rxBuffer[3])
                     {
                         case 0x39:  //Si imprimir  
-                            flowDisplay2 = 9;
+                            flowDisplay2 = 7;
                             numberKeys2 = 0;
-                            bufferDisplay2.flagKeyboard = 1;
                             bufferDisplay2.flagPrint =  1;
-                            SetPicture(2,DISPLAY_DIGITE_PLACA);                            
+                            SetPicture(2,DISPLAY_SUBA_MANIJA);                            
                         break; 
                         case 0x38:  //No imprimir 
                             if(bufferDisplay2.flagEndSale)
@@ -1654,53 +1829,33 @@ void PollingDisplay2(void){
         break;                                             
         case 7:
 
-            PresetFlag2 = 1;
-            bufferDisplay2.flagKeyboard = 2;
-            flowDisplay2 = 9;  
-            SetPicture(2,DISPLAY_INTRODUZCA_KILOMETRAJE);
-           
+            PresetFlag2 = 1;            
+            flowDisplay2 = 8;  
                        
         break;
             
-        case 8:            
-            if(Display2_GetRxBufferSize() == 8)
-            {
-                if((Display2_rxBuffer[0]==0xAA) && (Display2_rxBuffer[6]==0xC3) && (Display2_rxBuffer[7]==0x3C))
-                {
-                    switch(Display2_rxBuffer[3])
-                    {                        
-                        case 0x7E:  //Pantalla Inicial 
-                            bufferDisplay2.flagPrint =  0;
-                            SetPicture(2,DISPLAY_INICIO0);
-                            flowDisplay2 = 0;
-                            PresetFlag2 = 0;
-                            AuthType2 = 0;
-                        break;
-                    }                    
-                }
-                //CyDelay(10);
-                vTaskDelay( 10 / portTICK_PERIOD_MS );
-            }
-            Display2_ClearRxBuffer();    
+        case 8:       
+            
+            //Wait to handle up  
             
         break;
             
-        case 9: //Teclado           
+        case 9: // Keyboard           
             switch (alphanumeric_keyboard2(11,0))
             {
-                case 0: //Cancelar
+                case 0: //Cancel
                     switch(bufferDisplay2.flagKeyboard)
                     {
-                        case 1://Placa
+                        case 1://License plate
                             for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.licenceSale[x] = 0;
                             }
-                            flowDisplay2 = 0;//Inicio
+                            flowDisplay2 = 0;
                             SetPicture(2,DISPLAY_INICIO0);
                         break;
                         
-                        case 2://Kilometraje
+                        case 2://Mileage
                             for(x = 0; x < 10; x++)
                             {
                                 bufferDisplay2.mileageSale[x] = 0;
@@ -1726,25 +1881,24 @@ void PollingDisplay2(void){
                 case 1: //Enter
                     switch(bufferDisplay2.flagKeyboard)
                     {
-                        case 1://Placa
+                        case 1://Licence plate
                             for(x = 0; x <= bufferDisplay2.valueKeys[0]; x++)
                             {
                                 bufferDisplay2.licenceSale[x] = bufferDisplay2.valueKeys[x];
                             }
                             if(bufferDisplay2.flagEndSale)
-                            {
-                                
+                            {                                
                                 bufferDisplay2.flagPrint = 1;
                                 flowDisplay2 = 0;
                                 SetPicture(2,DISPLAY_INICIO0); 
-                            }else{
-                                flowDisplay2 = 7;   //Suba manija
-
-                                
+                            }else
+                            {
+                                flowDisplay2 = 6;   
+                                SetPicture(2, DISPLAY_DESEA_IMPRIMIR_RECIBO);                              
                             }
                         break;
                         
-                        case 2:                     //Kilometraje
+                        case 2:  //Mileage
                             for(x = 0; x <= bufferDisplay2.valueKeys[0]; x++)
                             {
                                 bufferDisplay2.mileageSale[x] = bufferDisplay2.valueKeys[x];
@@ -1752,13 +1906,13 @@ void PollingDisplay2(void){
                             
                             if(AuthType2 == 1)
                             {
-                                flowDisplay2 = 10;
-                                SetPicture(2,DISPLAY_ID_DIGITAL);
+                                flowDisplay2 = 7;
+                                SetPicture(2,DISPLAY_SUBA_MANIJA);
                             }
                             else
                             {
-                                flowDisplay2 = 8;       //Suba manija
-                                SetPicture(2,DISPLAY_SUBA_MANIJA);
+                                flowDisplay2 = 6;      
+                                SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
                             }
                             
                         break;
@@ -1862,28 +2016,28 @@ void PollingDisplay2(void){
                             y--;
 						}                        
                         SetPicture(2,DISPLAY_ID_RECONOCIDO);                                           
-                        Display2_ClearRxBuffer();
                         vTaskDelay( 700 / portTICK_PERIOD_MS ); 
                         iButtonFlag2 = 1;
-                        SetPicture(2, DISPLAY_SUBA_MANIJA);
-                        flowDisplay2 = 8;
+                        SetPicture(2, DISPLAY_FORMA_PROGRAMACION);
+                        flowDisplay2 = 3;
                         
 					}
-                    else
-                    {
-//                        SetPicture(2,DISPLAY_ID_NO_RECONOCIDO);                                           
-//                        Display2_ClearRxBuffer();
-//                        vTaskDelay( 700 / portTICK_PERIOD_MS );    
-//                        SetPicture(2, DISPLAY_INICIO0);
-//                        flowDisplay2 = 0;
-//                        bufferDisplay2.flagPrint =  0;
-//                        PresetFlag2 = 0;
-//                        iButtonFlag2 = 0;
-//                        AuthType2 = 0;
-                    }
+                    
                     
                     
 				}
+                else
+                {
+                    SetPicture(2,DISPLAY_ID_NO_RECONOCIDO);                                           
+                    Display2_ClearRxBuffer();
+                    vTaskDelay( 700 / portTICK_PERIOD_MS );    
+                    SetPicture(2, DISPLAY_INICIO0);
+                    flowDisplay2 = 0;
+                    bufferDisplay2.flagPrint =  0;
+                    PresetFlag2 = 0;
+                    iButtonFlag2 = 0;
+                    AuthType2 = 0;
+                }
 			}
            //Touch for return to init display
             if(Display2_GetRxBufferSize() == 8)
@@ -2337,9 +2491,48 @@ void PollingDisplay2(void){
             side.b.RFstateReport = 1;
             ShiftState =1;
         break;
+            
+         // Credit NOT authorized
+        case 21:
+            
+            SetPicture(2, DISPLAY_AUTORIZACION_RECHAZADA);
+            bufferDisplay2.flagPrint == 0;
+            for(x = 0; x < 9; x++)
+            {
+                WriteMessage(1, mensaje[x],17,1 + x,3,0x0000,'Y');
+                WriteMessage(1, mensaje2[x],21,1 + x,3,0x0000,'Y');
+                    
+            }
+            vTaskDelay( 2000 / portTICK_PERIOD_MS );
+            flowDisplay2 = 0;
+            SetPicture(2, DISPLAY_INICIO0);
+        break;
+            // Wrong Grade handle
+        case 22:
+            
+            SetPicture(2, DISPLAY_AUTORIZACION_RECHAZADA);
+            bufferDisplay2.flagPrint == 0;
+            for(x = 0; x < 8; x++)
+            {
+                
+                WriteMessage(2, mensaje3[x],17,1 + x,4,0x0000,'Y');
+                    
+            }
+            for(x = 0; x < 10; x++)
+            {
+                
+                WriteMessage(2, mensaje4[x],21,1 + x,4,0x0000,'Y');
+                    
+            }
+             
+            vTaskDelay( 2000 / portTICK_PERIOD_MS );
+            flowDisplay2 = 0;
+            SetPicture(2, DISPLAY_INICIO0);
+        break;
          
     }    
 }
+
 
 void PresetAuthorize(void)
 {
@@ -2364,8 +2557,7 @@ void PresetAuthorize(void)
                 
                 // PRESET
                 if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
-                {                    
-                    
+                {                                     
                     get_state(side.a.dir);
               
                     //Authorize
@@ -2375,10 +2567,11 @@ void PresetAuthorize(void)
                     bufferDisplay1.flagActiveSale = true;
                     SetPicture(1, DISPLAY_DESPACHANDO);   
                     ShowMessage(1, (bufferDisplay1.presetValue[1]), 18);
+                    flowDisplay1 = 8;
                     PresetFlag = 0;
                     AuthType = 0;
                     Credit_Auth_OK = 0;
-                    return;
+                    
                 }else
                 {
                     flowDisplay1 = 0;
@@ -2388,14 +2581,19 @@ void PresetAuthorize(void)
                     PresetFlag = 0;
                     AuthType = 0;
                     Credit_Auth_OK = 0;
-                    return;
+                    
                 }
+            }else
+            {
+               // flowDisplay1 = 22;
+               // Credit_Auth_OK = 0;
+               // AuthType = 0;
+               // PresetFlag = 0;            
             }
-            
         }
     
        // Cash Sale
-        if(AuthType == 0)
+        if(AuthType == 2)
         {       
             //Grade selected  =  Grade pump handle
             if (side.a.activeHose == side.a.hose)
@@ -2404,33 +2602,35 @@ void PresetAuthorize(void)
                     
                     // PRESET
                     if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
-                    {                    
-                        
+                    {                                           
+
                         get_state(side.a.dir);
-                  
+    
                         //Authorize
                         Authorization(side.a.dir);                                                         
                         side.a.RFstateReport = 1;
                         count_protector = 0;                    
                         bufferDisplay1.flagActiveSale = true;
-                        SetPicture(1, DISPLAY_DESPACHANDO);   
+                        SetPicture(1, DISPLAY_DESPACHANDO); 
+                        flowDisplay1 = 8;
                         ShowMessage(1,(bufferDisplay1.presetValue[1]),18);
-                        PresetFlag = 0;
+                        PresetFlag = 0;                      
                         
-                        return;
                     }else
                     {
                         flowDisplay1 = 0;
                         SetPicture(1, DISPLAY_ERROR);
                         vTaskDelay( 200 / portTICK_PERIOD_MS );
                         SetPicture(1, DISPLAY_INICIO0);
-                        PresetFlag = 0;
+                        PresetFlag = 0;                    
                         
-                        return;
                     }
+            }else
+            {
+                flowDisplay1 = 22;    
+                PresetFlag = 0;
+                AuthType = 0;               
             }
-        PresetFlag = 0;
-        AuthType = 0;
         }
     }
         
@@ -2447,8 +2647,7 @@ void PresetAuthorize(void)
         
         //iButton Authorized Credit
         if(Credit_Auth_OK2 == 1 && AuthType2 == 1)
-        {
-                          
+        {                          
             if (side.b.activeHose == side.b.hose)
             {   
                 priceChange(side.b.dir, side.b.grade, ppuiButtonB);
@@ -2462,11 +2661,12 @@ void PresetAuthorize(void)
                     side.b.RFstateReport = 1;                    
                     count_protector2 = 0;   
     				bufferDisplay2.flagActiveSale = true;					
-                    SetPicture(2, DISPLAY_DESPACHANDO);   
+                    SetPicture(2, DISPLAY_DESPACHANDO);
+                    flowDisplay2 = 8;
                     ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
                     PresetFlag2 = 0;
                     AuthType2 = 0;
-                    return;
+                    
                 }else
                 {
                     flowDisplay2 = 0;
@@ -2476,19 +2676,22 @@ void PresetAuthorize(void)
                     PresetFlag2 = 0;
                     AuthType2 = 0;
                     Credit_Auth_OK2 = 0;
-                    return;
+                    
                 }
             }else
             {
-                flowDisplay2 = 8;
-                return;
+                //flowDisplay2 = 22;
+                //Credit_Auth_OK2 = 0;
+                //AuthType2 = 0;
+                //PresetFlag2 = 0;
+                             
             }
         }
         
          // Cash Sale
-        if(AuthType2 == 0)
-        {
-                         
+        if(AuthType2 == 2)
+        {   
+            //Grade selected  =  Grade pump handle                   
             if (side.b.activeHose == side.b.hose)
             {                
                 priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
@@ -2502,29 +2705,26 @@ void PresetAuthorize(void)
                     side.b.RFstateReport = 1;                    
                     count_protector2 = 0;   
     				bufferDisplay2.flagActiveSale = true;					
-                    SetPicture(2, DISPLAY_DESPACHANDO);   
+                    SetPicture(2, DISPLAY_DESPACHANDO); 
+                    flowDisplay2 = 8;
                     ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
-                    PresetFlag2 = 0;
-                   
-                    return;
+                    PresetFlag2 = 0;                  
+                    
                 }else
                 {
                     flowDisplay2 = 0;
                     SetPicture(2, DISPLAY_ERROR);
                     vTaskDelay(200 / portTICK_PERIOD_MS);
                     SetPicture(2, DISPLAY_INICIO0);
-                    PresetFlag2 = 0;
-                   
-                    return;
+                    PresetFlag2 = 0;                 
+                    
                 }
             }else
             {
-                flowDisplay2 = 8;
-                return;
+                flowDisplay2 = 22;
+                PresetFlag2 = 0;
+                AuthType2 = 0;                            
             }
-              
-            PresetFlag2 = 0;
-            AuthType2 = 0;
         }
     }
 
@@ -2590,6 +2790,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
     switch(State)
     {
         case PUMP_FAIL:          
+            
             SetPicture(1,DISPLAY_ERROR);
             SetPicture(2,DISPLAY_ERROR);
             side.a.rfState = RF_ERROR;
@@ -2648,25 +2849,24 @@ void PumpAction(uint8 PositionPump, uint8 State)
             if(getSale(PositionPump))
             {
                 if(PositionPump == side.a.dir)
-                {
-                    
+                {                 
                     flowDisplay1 = 0;
                     SetPicture(1, DISPLAY_INICIO0);
                     bufferDisplay1.flagActiveSale = false;
                     side.a.RFstateReport = 1;  
                     priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                }
+               
                if(PositionPump == side.b.dir)
-               {
-                    
+               {                   
                     flowDisplay2 = 0;
                     SetPicture(2,DISPLAY_INICIO0);
                     bufferDisplay2.flagActiveSale = false;
                     side.b.RFstateReport = 1;
                     priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
-                }
-                              
+                }                              
             }
+
             iButtonFlag = 0;
             
         break;
@@ -2921,7 +3121,6 @@ void ReadPPUFromEEprom(void)
             }
                     
         }
-
 }
 
 
