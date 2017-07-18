@@ -2358,7 +2358,7 @@ void PresetAuthorize(void)
         {
             if (side.a.activeHose == side.a.hose)
             {   
-                priceChange(side.a.dir, side.a.grade, ppuiButtonA[side.a.grade]);
+                priceChange(side.a.dir, side.a.grade, ppuiButtonA);
                 
                 // PRESET
                 if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
@@ -2398,7 +2398,7 @@ void PresetAuthorize(void)
             //Grade selected  =  Grade pump handle
             if (side.a.activeHose == side.a.hose)
             {   
-                    priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
+                    priceChange(side.a.dir, side.a.activeHose, side.a.ppuAuthorized[side.a.grade]);
                     
                     // PRESET
                     if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
@@ -2449,7 +2449,7 @@ void PresetAuthorize(void)
                           
             if (side.b.activeHose == side.b.hose)
             {   
-                priceChange(side.b.dir, side.b.grade, ppuiButtonB[side.b.grade]);
+                priceChange(side.b.dir, side.b.grade, ppuiButtonB);
                 
                 if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
                 {                    

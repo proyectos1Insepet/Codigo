@@ -355,15 +355,14 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         if(PRF_rxBuffer[8] == 0x01)
                         {                                      
                             
-                            // PPU
-                            
-                           
+                            // PPU                            
                             
                             for(x = 19; x < 24 ; x++ )
                             {
                                 ppuiButtonA[x - 19] = PRF_rxBuffer[x];                            
                             } 
-                             for(x = 0; x < 5 ; x++ )
+                             
+                            for(x = 0; x < 5 ; x++ )
                             {
                                 if(ppuiButtonA[x] == 0x00)
                                 { 
@@ -431,7 +430,18 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             for(x = 19; x < 24 ; x++ )
                             {
                                 ppuiButtonB[x - 19] = PRF_rxBuffer[x];                            
-                            }                                                 
+                            }  
+                            
+                            for(x = 0; x < 5 ; x++ )
+                            {
+                                if(ppuiButtonB[x] == 0x00)
+                                { 
+                                    ppuiButtonB[x] = '0';
+                                }
+                                
+                            }
+                            //Grade
+                            side.b.grade = PRF_rxBuffer[18];
                             
                             buffer_B[0]  = 0xBC;
                             buffer_B[1]  = 0xCB;
