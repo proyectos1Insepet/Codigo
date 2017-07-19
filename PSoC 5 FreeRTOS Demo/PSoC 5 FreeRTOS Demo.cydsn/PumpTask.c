@@ -88,7 +88,6 @@ void InitDisplay1(){
     {
         SetPicture(1, DISPLAY_INICIO0);         
         ShowMessage(1,iniText,0);    
-        //CyDelay(300);
         vTaskDelay( 300 / portTICK_PERIOD_MS );              //Freertos delay
         if(UnitType == 0)
         {
@@ -139,7 +138,6 @@ void InitDisplay1(){
     {
         SetPicture(1,DISPLAY_SELECCIONE_POSICION);        
         ShowMessage(1, iniText, 0);    
-        //CyDelay(300);
         vTaskDelay( 300 / portTICK_PERIOD_MS );              //Freertos delay
         if(UnitType == 0)
         {
@@ -276,6 +274,39 @@ void PollingDisplay1(void){
                 bufferDisplay1.flagPrint = 0;
                 bufferDisplay1.saleType = 0;
             }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         break;
         case 1: //Menu
    
@@ -1710,7 +1741,7 @@ void PollingDisplay2(void){
                             //Credit
                             if(AuthType2 == 2)
                             {
-                                bufferDisplay2.flagKeyboard = 2; 
+                                bufferDisplay2.flagKeyboard = 1; 
                                 SetPicture(2, DISPLAY_DIGITE_PLACA);
                             }
                             
@@ -1728,7 +1759,7 @@ void PollingDisplay2(void){
                             //Credit
                             if(AuthType2 == 2)
                             {
-                                bufferDisplay2.flagKeyboard = 2; 
+                                bufferDisplay2.flagKeyboard = 1; 
                                 SetPicture(2, DISPLAY_DIGITE_PLACA);
                             }
                             
@@ -1747,7 +1778,7 @@ void PollingDisplay2(void){
                             //Credit
                             if(AuthType2 == 2)
                             {
-                                bufferDisplay2.flagKeyboard = 2; 
+                                bufferDisplay2.flagKeyboard = 1; 
                                 SetPicture(2, DISPLAY_DIGITE_PLACA);
                             }
                             
@@ -1766,7 +1797,7 @@ void PollingDisplay2(void){
                             //Credit
                             if(AuthType2 == 2)
                             {
-                                bufferDisplay2.flagKeyboard = 2; 
+                                bufferDisplay2.flagKeyboard = 1; 
                                 SetPicture(2, DISPLAY_DIGITE_PLACA);
                             }
                             
@@ -2568,8 +2599,8 @@ void PollingDisplay2(void){
             bufferDisplay2.flagPrint == 0;
             for(x = 0; x < 9; x++)
             {
-                WriteMessage(1, mensaje[x],17,1 + x,3,0x0000,'Y');
-                WriteMessage(1, mensaje2[x],21,1 + x,3,0x0000,'Y');
+                WriteMessage(2, mensaje[x],17,1 + x,3,0x0000,'Y');
+                WriteMessage(2, mensaje2[x],21,1 + x,3,0x0000,'Y');
                     
             }
             vTaskDelay( 2000 / portTICK_PERIOD_MS );
@@ -2845,6 +2876,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
 
             if(PositionPump == side.a.dir)
             {
+                bufferDisplay1.flagPrint = 0;
                 flowDisplay1 = 0;
                 side.a.rfState = RF_ZERO_SALE;
                 bufferDisplay1.flagActiveSale = false;
@@ -2854,6 +2886,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
             }
             if(PositionPump == side.b.dir)
             {
+                bufferDisplay2.flagPrint = 0;
                 flowDisplay2 = 0;
                 side.b.rfState = RF_ZERO_SALE;
                 bufferDisplay2.flagActiveSale = false;
@@ -3003,7 +3036,7 @@ bool LoopOpen(void)
         case 2:
             if(StatePosition[0] != 0 && StatePosition[1] != 0)
             {
-               StatePosition[0];
+               
                 return true;
             }
             else

@@ -600,11 +600,13 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         PPUAux =   buffer_tx[x];                   
                         RF_Connection_PutChar(PPUAux);
                     }
+
                     return;
                                                        
                 break;
                 
                 case 0xA7:               //Impresion general
+
                     //lengthPrint = hexadecimal_to_decimal(PRF_rxBuffer[8]);
                     if(PRF_rxBuffer[5] == side.a.dir)
 
@@ -794,6 +796,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 break;
 
                 case 0xA9:              // ID Transaction
+                    
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {
                         for(x = 0; x < 10; x++)
@@ -826,6 +829,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 
                              
                 case 0xE1:               //Configuracion de la estacion
+                    
                     symbols[1] = PRF_rxBuffer[8];
                     date[0]    = PRF_rxBuffer[9];
                     date[1]    = PRF_rxBuffer[10];
@@ -907,6 +911,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 
+                    
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {
                         for(x = 8; x < 12; x++){
@@ -958,6 +963,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 break;
                 
                 case 0xE4:               //Turno  
+                    
                     if(PRF_rxBuffer[5] == side.a.dir && ShiftDone == 0)
                     {
                         ShiftDone = 1;

@@ -1023,8 +1023,9 @@ uint8 getSale(uint8 pos){
 	uint8 x;    
 	Pump_ClearRxBuffer();
 	Pump_PutChar(0x40 | pos);
-    CyDelay(250);
-    CyWdtClear();
+    //CyDelay(250);
+    vTaskDelay(250 / portTICK_PERIOD_MS);
+    //CyWdtClear();
     
     //6 Digits
 	if((digits != 7) && (Pump_GetRxBufferSize() == 33))
