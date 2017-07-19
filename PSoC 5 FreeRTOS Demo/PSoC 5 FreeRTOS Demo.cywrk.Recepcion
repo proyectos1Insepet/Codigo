@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\I2C.h">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\keyboard.c">
 <ExpandedNodeIds>
 <v>PSoC 5 FreeRTOS Demo</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo</v>
@@ -73,7 +73,6 @@
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 4 Driver Layer</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - Misc\os_resource.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - Misc\retarget.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump\Clock_Pump.c</v>
@@ -433,16 +432,10 @@
 <OpenDocs>
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\main.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\PumpTask.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.h" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\protocol.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\variables.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\protocol.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\PumpTask.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\Generated_Source\PSoC5\RF_Connection_INT.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\FreeRTOSConfig.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\TopDesign\TopDesign.cysch" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\PSoC 5 FreeRTOS Demo.cydwr" />
+<name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\RFPoll.c" />
 </OpenDocs>
 <config v="" />
 <AutoUpdate v="true" />

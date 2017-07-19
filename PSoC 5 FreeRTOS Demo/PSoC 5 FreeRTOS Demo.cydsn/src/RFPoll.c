@@ -609,7 +609,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
 
                     //lengthPrint = hexadecimal_to_decimal(PRF_rxBuffer[8]);
                     if(PRF_rxBuffer[5] == side.a.dir)
-
                     {                                                
                         buffer_tx[5] = side.a.dir;
                         buffer_tx[6] = 0xA7;
@@ -643,13 +642,25 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     
                     buffer_tx[8] = verificar_check(buffer_tx,9);
 
-                                                            
-                    for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
-                    {
-                        //buffer_print[x-9] = PRF_rxBuffer[x];
-                        write_psoc1(printPortA, PRF_rxBuffer[x]);
+                    if(PRF_rxBuffer[5] == side.a.dir || PRF_rxBuffer[5] == side.c.dir )
+                    {                                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {
+                            //buffer_print[x-9] = PRF_rxBuffer[x];
+                            write_psoc1(printPortA, PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortA,0x0A);
                     }
-                    write_psoc1(printPortA,0x0A);
+                    
+                    if(PRF_rxBuffer[5] == side.b.dir || PRF_rxBuffer[5] == side.d.dir )
+                    {                                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {
+                            //buffer_print[x-9] = PRF_rxBuffer[x];
+                            write_psoc1(printPortB, PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortB,0x0A);
+                    }
                     for (x = 0; x < 9; x++)
                     {
                         RF_Connection_PutChar(buffer_tx[x]);
@@ -1077,8 +1088,8 @@ void pollingRFA_Tx(){
         bufferAready = 1;
         FlagTotal = 0;
     }            
-    ////////////// END SALE ////////////////////////////////////
-    if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1)//bufferDisplay1.flagEndSale == true  
+    ////////////// END SALE - CASH ////////////////////////////////////
+    if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1 )//bufferDisplay1.flagEndSale == true  
     {        
         buffer_A[0]  = 32;
 		buffer_A[1]  = 0xBC;
@@ -1147,7 +1158,8 @@ void pollingRFA_Tx(){
         bufferAready                    = 1;
         FlagTotal                       = 0;
        
-    }                                               
+    }   
+    
     ////////////// SHIFT ////////////////////////////////////
     if(ShiftState == 1  && side.a.RFstateReport == 1){   
         for(x = 0; x < 100; x++){
@@ -1278,8 +1290,7 @@ void pollingRFA_Tx(){
         buffer_A[36] = verificar_check(buffer_A,37);    
         side.a.RFstateReport = 0;
         bufferAready = 2;
-        FlagTotal = 0;
-        side.a.rfState = RF_IDLE;
+        FlagTotal = 0;        
         CreditAuth = 0;
         AckFlag = 0;
     }
@@ -1553,8 +1564,7 @@ void pollingRFB_Tx(){
         
         side.b.RFstateReport = 0;
         bufferAreadyB = 2;
-        FlagTotalB = 0;
-        side.b.rfState = RF_IDLE;
+        FlagTotalB = 0;        
         CreditAuth2 = 0;
         AckFlag2 = 0;
     }

@@ -260,16 +260,13 @@ void PollingDisplay1(void){
     switch(flowDisplay1){
         case 0:
             InitDisplay1();
-            flowDisplay1 = 1;
-            count_protector = 0;            
+            flowDisplay1 = 1;                     
             bufferDisplay1.flagEndSale = false;  
             side.a.RFstateReport = 0;
-            SetPicture(1, DISPLAY_INICIO0);
-            
-            
+            SetPicture(1, DISPLAY_INICIO0);                        
             if(bufferDisplay1.flagPrint == 1)
             {    
-                vTaskDelay( 200 / portTICK_PERIOD_MS );
+                vTaskDelay( 700 / portTICK_PERIOD_MS );
                 imprimir(printPortA, side.a.dir);
                 bufferDisplay1.flagPrint = 0;
                 bufferDisplay1.saleType = 0;
@@ -308,8 +305,7 @@ void PollingDisplay1(void){
 
 
         break;
-        case 1: //Menu
-   
+        case 1: //Menu   
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -346,8 +342,7 @@ void PollingDisplay1(void){
                             if(lockTurn == 1)
                             {
                                 flowDisplay1 = 10;
-                                bufferDisplay1.saleType = 2;
-                                count_protector = 0;
+                                bufferDisplay1.saleType = 2;                                
                                 SetPicture(1, DISPLAY_ID_DIGITAL);
                                 AuthType = 1;
                             }else
@@ -398,8 +393,7 @@ void PollingDisplay1(void){
                             bufferDisplay1.presetType[1] = 'D';
                             numberKeys1 = 0;
                             SetPicture(1, DISPLAY_INTRODUZCA_VALOR);   
-                            WriteLCD(1, '$', 3, 2, 1, 0x0000, 'N');
-                            
+                            WriteLCD(1, '$', 3, 2, 1, 0x0000, 'N');                            
                             if(MoneyDec > 0)
                             {
                                 flagPoint1 = 0;
@@ -414,8 +408,7 @@ void PollingDisplay1(void){
                             bufferDisplay1.presetType[1] = 'V';
                             numberKeys1 = 0;                            
                             SetPicture(1, DISPLAY_INTRODUZCA_VOLUMEN);                            
-                            WriteLCD(1, 'G', 3, 2, 1, 0x0000, 'N');
-                            
+                            WriteLCD(1, 'G', 3, 2, 1, 0x0000, 'N');                            
                             if(VolDec > 0)
                             {
                                 flagPoint1 = 0;
@@ -426,13 +419,11 @@ void PollingDisplay1(void){
                         break;
                         case 0x43:     //Preset full 
                             bufferDisplay1.presetType[0] = 2;
-                            bufferDisplay1.presetType[1] = 'F';
-                            
+                            bufferDisplay1.presetType[1] = 'F';                            
                             for(x = 1; x <(digits - 1); x++)
                             {
                                 bufferDisplay1.presetValue[0][x] = '9';
-                            }
-                            
+                            }                            
                             bufferDisplay1.presetValue[0][x] = '0';
                             bufferDisplay1.presetValue[0][x + 1] = '0';
                             bufferDisplay1.presetValue[0][0] = digits;
@@ -1451,7 +1442,7 @@ void PollingDisplay1(void){
         case 21:
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint == 0;
+            bufferDisplay1.flagPrint = 0;
             for(x = 0; x < 9; x++)
             {
                 WriteMessage(1, mensaje[x],17,1 + x,4,0x0000,'Y');
@@ -1468,7 +1459,7 @@ void PollingDisplay1(void){
         case 22:
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint == 0;
+            bufferDisplay1.flagPrint = 0;
 
             for(x = 0; x < 8; x++)
             {
@@ -1505,12 +1496,10 @@ void PollingDisplay2(void){
     switch(flowDisplay2){
         case 0:
 			InitDisplay2();
-            flowDisplay2 = 1;
-            count_protector2 = 0;
+            flowDisplay2 = 1;            
             bufferDisplay2.flagEndSale = false;  
 			side.b.RFstateReport = 0;
-            SetPicture(2, DISPLAY_INICIO0);
-            
+            SetPicture(2, DISPLAY_INICIO0);            
             if(bufferDisplay2.flagPrint == 1)
             {    
                 vTaskDelay( 200 / portTICK_PERIOD_MS );
@@ -1519,9 +1508,7 @@ void PollingDisplay2(void){
                 bufferDisplay2.saleType = 0;               
             }
         break;
-        case 1: //Menu
-            
-            
+        case 1: //Menu                        
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -1558,8 +1545,7 @@ void PollingDisplay2(void){
                             if(lockTurn == 1)
                             {
                                 flowDisplay2 = 10;
-                                bufferDisplay2.saleType = 2;
-                                count_protector2 = 0;
+                                bufferDisplay2.saleType = 2;                                
                                 SetPicture(2, DISPLAY_ID_DIGITAL);
                                 AuthType2 = 1;
                             }else
@@ -1610,8 +1596,7 @@ void PollingDisplay2(void){
                             bufferDisplay2.presetType[1] = 'D';
                             numberKeys2 = 0;
                             SetPicture(2,DISPLAY_INTRODUZCA_VALOR);   
-                            WriteLCD(2,'$',3,2,1,0x0000,'N');
-							
+                            WriteLCD(2,'$',3,2,1,0x0000,'N');							
                             if(MoneyDec > 0)
                             {
                                 flagPoint2 = 0;
@@ -1626,8 +1611,7 @@ void PollingDisplay2(void){
                             bufferDisplay2.presetType[1] = 'V';
                             numberKeys2 = 0;                            
                             SetPicture(2,DISPLAY_INTRODUZCA_VOLUMEN);                            
-                            WriteLCD(2,'G',3,2,1,0x0000,'N');                            
-							
+                            WriteLCD(2,'G',3,2,1,0x0000,'N');                            							
                             if(VolDec > 0)
                             {
                                 flagPoint2 = 0;
@@ -1638,13 +1622,11 @@ void PollingDisplay2(void){
                         break;
                         case 0x43:  //Preset full 
                             bufferDisplay2.presetType[0] = 2;
-                            bufferDisplay2.presetType[1] = 'F';
-                            
+                            bufferDisplay2.presetType[1] = 'F';                            
                             for(x = 1; x <(digits - 1); x++)
                             {
                                 bufferDisplay2.presetValue[0][x] = '9';
-                            }
-                            
+                            }                            
                             bufferDisplay2.presetValue[0][x] = '0';
                             bufferDisplay2.presetValue[0][x + 1] = '0';
                             bufferDisplay2.presetValue[0][0] = digits;
@@ -2596,7 +2578,7 @@ void PollingDisplay2(void){
         case 21:
             
             SetPicture(2, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay2.flagPrint == 0;
+            bufferDisplay2.flagPrint = 0;
             for(x = 0; x < 9; x++)
             {
                 WriteMessage(2, mensaje[x],17,1 + x,3,0x0000,'Y');
@@ -2612,7 +2594,7 @@ void PollingDisplay2(void){
             
             SetPicture(2, DISPLAY_AUTORIZACION_RECHAZADA);
             bufferDisplay2.flagPrint = 0;
-            
+
             for(x = 0; x < 8; x++)
             {                
                 WriteMessage(2, mensaje3[x],17,1 + x,4,0x0000,'Y');                    
@@ -3036,7 +3018,11 @@ bool LoopOpen(void)
         case 2:
             if(StatePosition[0] != 0 && StatePosition[1] != 0)
             {
+<<<<<<< HEAD
                
+=======
+               //StatePosition[0]=0; //???????????????
+>>>>>>> bfd87ee02d9d2ccafddafcca97492ea302cb088e
                 return true;
             }
             else
