@@ -193,15 +193,13 @@ uint8 verificar_check(uint8 *datos, uint16 size){
 
 void pollingRF_Rx(uint8 PRF_rxBuffer[])
 {
-    uint16 i,x,y, j, contEscape;  
+    uint16 i, x, y, j, contEscape;  
     uint8 buffer_rfTMP;
     uint8 EEpromGradeAddress;
    
     ActiveRF = 1;
     counterRF = 0;
     i = 0;
-    
-   
     y = 0;
     buffer_tx[y] = 0xBC; y++;
     buffer_tx[y] = 0xCB; y++;
@@ -470,6 +468,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     }                           
                 break;
                   
+                             
                 case 0xA5:               // Total Request
                     
                     if(PRF_rxBuffer[5] == side.a.dir)
@@ -654,6 +653,144 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
 
                 break;
                 
+                case 0xA8:          //Print credit sale
+                    
+                    if(PRF_rxBuffer[5] == side.a.dir)
+                    {   
+                        // Id transaction
+                        for(x = 0; x < 10; x++)
+                        {
+                            side.a.saleNumber[x] = PRF_rxBuffer[x + 8];
+                        }   
+
+                        //Licese plate
+                        for(x = 0; x < 8; x++)
+                        {
+                            LicensePlate[x] = PRF_rxBuffer[x + 18]; 
+                        }                                                  
+
+                        //Balance
+                        for(x = 0; x < 10; x++)
+                        {
+                            BalanceA[x] = PRF_rxBuffer[x + 26]; 
+                        }                
+                            
+                        //Company
+                        for(x = 0; x < 20; x++)
+                        {
+                            Company[x] = PRF_rxBuffer[x + 36]; 
+                        }   
+
+                        //Count ID
+                        for(x = 0; x < 20; x++)
+                        {
+                            CountID[x] = PRF_rxBuffer[x + 36]; 
+                        }  
+
+                        DayVisit = PRF_rxBuffer[76] + 0x30;
+                        WeekVisit = PRF_rxBuffer[77] + 0x30;
+                        MonthVisit = PRF_rxBuffer[78] + 0x30;
+
+                        //Volume for day
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeDay[x] = PRF_rxBuffer[x + 79]; 
+                        } 
+
+                        //Volume for Week
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeWeek[x] = PRF_rxBuffer[x + 86]; 
+                        }
+                         
+                         //Volume for Month
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeMonth[x] = PRF_rxBuffer[x + 93]; 
+                        }
+                       
+
+                        //Count type
+                        for(x = 0; x < 16; x++)
+                        {
+                            CountType[x] = PRF_rxBuffer[x + 100]; 
+                        }
+                        
+                        ControlType = PRF_rxBuffer[116];
+
+                        return;
+
+                    }
+
+                    if(PRF_rxBuffer[5] == side.b.dir)
+                    {
+                        // Id transaction
+                        for(x = 0; x < 10; x++)
+                        {
+                            side.b.saleNumber[x] = PRF_rxBuffer[x + 8];
+                        }   
+
+                        //Licese plate
+                        for(x = 0; x < 8; x++)
+                        {
+                            LicensePlate[x] = PRF_rxBuffer[x + 18]; 
+                        }                                                  
+
+                        //Balance
+                        for(x = 0; x < 10; x++)
+                        {
+                            BalanceA[x] = PRF_rxBuffer[x + 26]; 
+                        }                
+                            
+                        //Company
+                        for(x = 0; x < 20; x++)
+                        {
+                            Company[x] = PRF_rxBuffer[x + 36]; 
+                        }   
+
+                        //Count ID
+                        for(x = 0; x < 20; x++)
+                        {
+                            CountID[x] = PRF_rxBuffer[x + 36]; 
+                        }  
+
+                        DayVisit = PRF_rxBuffer[76] + 0x30;
+                        WeekVisit = PRF_rxBuffer[77] + 0x30;
+                        MonthVisit = PRF_rxBuffer[78] + 0x30;
+
+                        //Volume for day
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeDay[x] = PRF_rxBuffer[x + 79]; 
+                        } 
+
+                        //Volume for Week
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeWeek[x] = PRF_rxBuffer[x + 86]; 
+                        }
+                         
+                         //Volume for Month
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeMonth[x] = PRF_rxBuffer[x + 93]; 
+                        }
+                       
+
+                        //Count type
+                        for(x = 0; x < 16; x++)
+                        {
+                            CountType[x] = PRF_rxBuffer[x + 100]; 
+                        }
+                        
+                        ControlType = PRF_rxBuffer[116];
+                        
+                                            
+                        return;
+                    }
+
+                break;
+
                 case 0xA9:              // ID Transaction
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {

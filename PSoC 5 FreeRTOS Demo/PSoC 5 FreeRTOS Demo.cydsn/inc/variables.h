@@ -153,6 +153,19 @@
     uint8 PPUAux;
     uint16 LongEsperada;
     uint8 buffer_i2c[64];													//Buffer de lectura del i2c 
+    uint8 LicensePlate[9];
+    uint8 BalanceA[11];
+    uint8 Company[21];
+    uint8 CountID[21];
+    uint8 DayVisit;
+    uint8 WeekVisit;
+    uint8 MonthVisit;
+    uint8 VolumeDay[8];
+    uint8 VolumeWeek[8];
+    uint8 VolumeMonth[8];
+    uint8 CountType[17];
+    uint8 ControlType;
+    
     
 /*
 *********************************************************************************************************

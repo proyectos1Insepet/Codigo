@@ -116,6 +116,10 @@ void RF_Task(void *arg)
             {
                 LongEsperada = 9;
             }
+            else if ( buffer_rf[6] == 0xA8)
+            {
+                LongEsperada = 117;
+            }
 //            else
 //            {
 //                LongEsperada = 400;
