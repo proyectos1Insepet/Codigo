@@ -607,7 +607,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 case 0xA7:               //Impresion general
                     //lengthPrint = hexadecimal_to_decimal(PRF_rxBuffer[8]);
                     if(PRF_rxBuffer[5] == side.a.dir)
-
                     {                                                
                         buffer_tx[5] = side.a.dir;
                         buffer_tx[6] = 0xA7;
@@ -641,13 +640,25 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     
                     buffer_tx[8] = verificar_check(buffer_tx,9);
 
-                                                            
-                    for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
-                    {
-                        //buffer_print[x-9] = PRF_rxBuffer[x];
-                        write_psoc1(printPortA, PRF_rxBuffer[x]);
+                    if(PRF_rxBuffer[5] == side.a.dir || PRF_rxBuffer[5] == side.c.dir )
+                    {                                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {
+                            //buffer_print[x-9] = PRF_rxBuffer[x];
+                            write_psoc1(printPortA, PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortA,0x0A);
                     }
-                    write_psoc1(printPortA,0x0A);
+                    
+                    if(PRF_rxBuffer[5] == side.b.dir || PRF_rxBuffer[5] == side.d.dir )
+                    {                                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {
+                            //buffer_print[x-9] = PRF_rxBuffer[x];
+                            write_psoc1(printPortB, PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortB,0x0A);
+                    }
                     for (x = 0; x < 9; x++)
                     {
                         RF_Connection_PutChar(buffer_tx[x]);
