@@ -62,8 +62,8 @@ void InitDisplay1(){
     uint8_t DisplayMode[10]    = "6-6-4     ";
     uint8_t DisplayMode2[10]   = "7-7-5     ";
     uint8_t DisplayMode3[10]   = "8-7-5     ";
-    uint8 producto1[13] = "CORRIENTE    ";
-    uint8 producto2[13] = "ACPM         ";
+    uint8 producto2[13] = "CORRIENTE    ";
+    uint8 producto1[13] = "ACPM         ";
     uint8 producto3[13] = "EXTRA        ";
     uint8 producto4[13] = "             ";
     
@@ -497,7 +497,7 @@ void PollingDisplay1(void){
                     switch(Display1_rxBuffer[3])
                     {
                         case 0x80:  //Grado 1 
-                            
+                            numberKeys1=0; 
                             flowDisplay1 = 9;
                             side.a.hose = 1;                         
                             //Credit
@@ -517,6 +517,7 @@ void PollingDisplay1(void){
                         break;
                             
                         case 0x81:  //Grado 2 
+                            numberKeys1=0; 
                             flowDisplay1 = 9;
                             side.a.hose = 2;
                             //Credit
@@ -536,6 +537,7 @@ void PollingDisplay1(void){
                         break;
                             
                         case 0x7F:  //Grado 3
+                            numberKeys1=0; 
                             flowDisplay1 = 9;
                             side.a.hose = 3;
                            //Credit
@@ -555,6 +557,7 @@ void PollingDisplay1(void){
                         break;   
                         
                         case 0xB8:  //Grado 4 
+                            numberKeys1=0; 
                             flowDisplay1 = 9;
                             side.a.hose = 4;
                             //Credit
@@ -1689,6 +1692,7 @@ void PollingDisplay2(void){
                     switch(Display2_rxBuffer[3])
                     {
                         case 0x80:  //Grado 1 
+                            numberKeys2 = 0; 
                             flowDisplay2 = 9;
                             side.b.hose = 1;                            
                             //Credit
@@ -1706,6 +1710,7 @@ void PollingDisplay2(void){
                             }
                         break;        
                         case 0x81:  //Grado 2 
+                            numberKeys2 = 0;
                             flowDisplay2 = 9;
                             side.b.hose = 2;                          
                             //Credit
@@ -1724,6 +1729,7 @@ void PollingDisplay2(void){
                         break;
                             
                         case 0x7F:  //Grado 3
+                            numberKeys2 = 0;
                             flowDisplay2 = 9;
                             side.b.hose = 3;                            
                             //Credit
@@ -1742,6 +1748,7 @@ void PollingDisplay2(void){
                         break;   
                         
                         case 0xB8:  //Grado 4 
+                            numberKeys2 = 0;
                             flowDisplay2 = 9;
                             side.b.hose = 4;                           
                             //Credit
@@ -2536,6 +2543,7 @@ void PollingDisplay2(void){
 
 void PresetAuthorize(void)
 {
+    uint8 x;
     if(PresetFlag == 1)
     {
         // pump handle detect 
@@ -2614,7 +2622,8 @@ void PresetAuthorize(void)
                         SetPicture(1, DISPLAY_DESPACHANDO); 
                         flowDisplay1 = 8;
                         ShowMessage(1,(bufferDisplay1.presetValue[1]),18);
-                        PresetFlag = 0;                      
+                        PresetFlag = 0;
+                        return;                      
                         
                     }else
                     {
@@ -2622,14 +2631,14 @@ void PresetAuthorize(void)
                         SetPicture(1, DISPLAY_ERROR);
                         vTaskDelay( 200 / portTICK_PERIOD_MS );
                         SetPicture(1, DISPLAY_INICIO0);
-                        PresetFlag = 0;                    
+                        PresetFlag = 0;  
+                        return;                  
                         
                     }
             }else
             {
-                flowDisplay1 = 22;    
-                PresetFlag = 0;
-                AuthType = 0;               
+            
+                return;             
             }
         }
     }
@@ -2666,6 +2675,7 @@ void PresetAuthorize(void)
                     ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
                     PresetFlag2 = 0;
                     AuthType2 = 0;
+                    return;
                     
                 }else
                 {
@@ -2676,6 +2686,7 @@ void PresetAuthorize(void)
                     PresetFlag2 = 0;
                     AuthType2 = 0;
                     Credit_Auth_OK2 = 0;
+                    return;
                     
                 }
             }else
@@ -2707,8 +2718,9 @@ void PresetAuthorize(void)
     				bufferDisplay2.flagActiveSale = true;					
                     SetPicture(2, DISPLAY_DESPACHANDO); 
                     flowDisplay2 = 8;
-                    ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
-                    PresetFlag2 = 0;                  
+                    ShowMessage(2, (bufferDisplay2.presetValue[0]), 18);
+                    PresetFlag2 = 0;  
+                    return;                
                     
                 }else
                 {
@@ -2716,14 +2728,17 @@ void PresetAuthorize(void)
                     SetPicture(2, DISPLAY_ERROR);
                     vTaskDelay(200 / portTICK_PERIOD_MS);
                     SetPicture(2, DISPLAY_INICIO0);
-                    PresetFlag2 = 0;                 
+                    PresetFlag2 = 0;
+                    return;                 
                     
                 }
             }else
             {
-                flowDisplay2 = 22;
-                PresetFlag2 = 0;
-                AuthType2 = 0;                            
+                //flowDisplay2 = 22;
+                //PresetFlag2  = 0;
+                //AuthType2    = 0; 
+                
+                return;                           
             }
         }
     }
@@ -2780,8 +2795,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
                 ActualState[PositionPump] = State;
                 return;
             }
-            
-                
+                         
     }
 
     //Actualize state
