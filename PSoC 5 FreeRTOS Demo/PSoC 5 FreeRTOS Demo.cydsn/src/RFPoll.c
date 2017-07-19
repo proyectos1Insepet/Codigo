@@ -375,6 +375,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             PresetFlag = 0;
                             iButtonFlag = 0;                           
                             AckFlag = 1;
+                            AuthType = 0;
                             CreditAuth = 0;
                             Credit_Auth_OK = 0;
                             bufferAready = 0;
@@ -449,6 +450,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             CreditAuth2 = 0;
                             Credit_Auth_OK2 = 0;
                             bufferAreadyB = 0;
+                            AuthType2 = 0;
                             buffer_B[0]  = 0xBC;
                             buffer_B[1]  = 0xCB;
                             buffer_B[2]  = 0xC8;
@@ -1302,7 +1304,7 @@ void pollingRFB_Tx(){
         write_psoc1(printPortB,10);
     }    
     ////////////// PRESET - DISPENSANDO ////////////////////////////////////
-    if(side.b.pumpState == PUMP_BUSY && side.b.RFstateReport == 1)
+    if(side.b.pumpState == PUMP_BUSY && side.b.RFstateReport == 1 && bufferDisplay2.saleType == 1)
     {
             buffer_B[100]   = 40;
             buffer_B[0]     = 0xBC;
@@ -1476,7 +1478,7 @@ void pollingRFB_Tx(){
     }
     
     ////////////// AUTHORIZATION REQUEST ////////////////////////
-    if(side.b.pumpState == PUMP_CALLING && side.b.RFstateReport == 1 && CreditAuth2 == RF_CREDITSALEAUTH)
+    if(side.b.pumpState == PUMP_CALLING && side.b.RFstateReport == 1 && CreditAuth2 == RF_CREDITSALEAUTH && bufferDisplay2.saleType == 2)
     {   
         buffer_B[0]  = 0xBC;
         buffer_B[1]  = 0xCB;

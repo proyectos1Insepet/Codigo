@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\Printing.c">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\main.c">
 <ExpandedNodeIds>
 <v>PSoC 5 FreeRTOS Demo</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo</v>
@@ -220,17 +220,6 @@
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\project.h</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\FreeRTOS</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\I2C.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\I2C.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\ibuton.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\ibutton.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\keyboard.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\keyboard.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\LCD.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\LCD.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\Logos.h</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\main.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\Printing.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\Printing.h</v>
@@ -251,6 +240,15 @@
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - Misc\retarget.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump\Clock_Pump.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump\Clock_Pump.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\cm3gcc.ld</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\Cm3Iar.icf</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\Cm3RealView.scat</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\Cm3Start.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\core_cm3.h</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
@@ -390,8 +388,6 @@
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\Display2_IntClock.lst</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\Display2_PM.lst</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\EEPROM_1.lst</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\event_groups.lst</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\heap_2.lst</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </TreeStates>

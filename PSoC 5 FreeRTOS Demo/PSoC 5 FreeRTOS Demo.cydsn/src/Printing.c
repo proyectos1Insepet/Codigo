@@ -437,7 +437,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     write_psoc1(val,10);
     ////////////////////// FIN DE ENCABEZADO ////////////////////////////////////////
     for(x = 0; x < 13; x++)
-    {										    //POSICION								
+    {										                            //POSICION								
 		write_psoc1(val,msn_pos[x]);
 	}
     write_psoc1(val,((pos / 10) + 48));
@@ -461,7 +461,8 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     		write_psoc1(val,side.b.saleNumber[x]);
     	}
     }
-    if(pos == side.c.dir){
+    if(pos == side.c.dir)
+    {
         for(x = 0; x < 10; x++)                                        //NUMERO DE VENTA
         {										    							
     		write_psoc1(val,side.c.saleNumber[x]);
@@ -788,7 +789,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     	}
         write_psoc1(val,10);
         
-       
+        
         for(x = 0; x < 13; x++)
         {										                    //Dinero							
     		write_psoc1(val,msn_din[x]);
