@@ -1017,7 +1017,7 @@ void pollingRFA_Tx(){
         write_psoc1(printPortA,10);
     }
     ////////////// PRESET - BUSY ////////////////////////////////////
-    if(side.a.pumpState == PUMP_BUSY && side.a.RFstateReport == 1)
+    if(side.a.pumpState == PUMP_BUSY && side.a.RFstateReport == 1 && bufferDisplay1.saleType == 1)
     {
         buffer_A[0]   = 40;
 		buffer_A[1]   = 0xBC;                                 // Encabezado byte 1
@@ -1205,7 +1205,7 @@ void pollingRFA_Tx(){
     }
 
     ////////////// AUTHORIZATION REQUEST ////////////////////////
-    if(side.a.pumpState == PUMP_CALLING && side.a.RFstateReport == 1 && CreditAuth == RF_CREDITSALEAUTH)
+    if(side.a.pumpState == PUMP_CALLING && side.a.RFstateReport == 1 && CreditAuth == RF_CREDITSALEAUTH && bufferDisplay1.saleType == 2)
     {   
 		buffer_A[0]  = 0xBC;
         buffer_A[1]  = 0xCB;
@@ -1304,7 +1304,7 @@ void pollingRFB_Tx(){
         write_psoc1(printPortB,10);
     }    
     ////////////// PRESET - DISPENSANDO ////////////////////////////////////
-    if(side.b.pumpState == PUMP_BUSY && side.b.RFstateReport == 1)
+    if(side.b.pumpState == PUMP_BUSY && side.b.RFstateReport == 1 && bufferDisplay2.saleType == 1)
     {
             buffer_B[100]   = 40;
             buffer_B[0]     = 0xBC;
@@ -1432,7 +1432,7 @@ void pollingRFB_Tx(){
         bufferDisplay2.flagActiveSale = false;
         side.b.RFstateReport          = 0;
         pollTotals                    = 2;        
-        bufferAreadyB                 = 2;
+        bufferAreadyB                 = 1;
         FlagTotalB                    = 0;    
         
     }                                               
@@ -1478,7 +1478,7 @@ void pollingRFB_Tx(){
     }
     
     ////////////// AUTHORIZATION REQUEST ////////////////////////
-    if(side.b.pumpState == PUMP_CALLING && side.b.RFstateReport == 1 && CreditAuth2 == RF_CREDITSALEAUTH)
+    if(side.b.pumpState == PUMP_CALLING && side.b.RFstateReport == 1 && CreditAuth2 == RF_CREDITSALEAUTH && bufferDisplay2.saleType == 2)
     {   
         buffer_B[0]  = 0xBC;
         buffer_B[1]  = 0xCB;
