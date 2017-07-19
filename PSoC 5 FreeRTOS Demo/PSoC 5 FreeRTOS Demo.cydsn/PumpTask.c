@@ -1420,7 +1420,7 @@ void PollingDisplay1(void){
         case 21:
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint == 0;
+            bufferDisplay1.flagPrint = 0;
             for(x = 0; x < 9; x++)
             {
                 WriteMessage(1, mensaje[x],17,1 + x,4,0x0000,'Y');
@@ -1437,7 +1437,7 @@ void PollingDisplay1(void){
         case 22:
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint == 0;
+            bufferDisplay1.flagPrint = 0;
 
             for(x = 0; x < 8; x++)
             {
@@ -2565,11 +2565,11 @@ void PollingDisplay2(void){
         case 21:
             
             SetPicture(2, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay2.flagPrint == 0;
+            bufferDisplay2.flagPrint = 0;
             for(x = 0; x < 9; x++)
             {
-                WriteMessage(1, mensaje[x],17,1 + x,3,0x0000,'Y');
-                WriteMessage(1, mensaje2[x],21,1 + x,3,0x0000,'Y');
+                WriteMessage(2, mensaje[x],17,1 + x,3,0x0000,'Y');
+                WriteMessage(2, mensaje2[x],21,1 + x,3,0x0000,'Y');
                     
             }
             vTaskDelay( 2000 / portTICK_PERIOD_MS );
@@ -2581,7 +2581,7 @@ void PollingDisplay2(void){
             
             SetPicture(2, DISPLAY_AUTORIZACION_RECHAZADA);
             bufferDisplay2.flagPrint = 0;
-            
+
             for(x = 0; x < 8; x++)
             {                
                 WriteMessage(2, mensaje3[x],17,1 + x,4,0x0000,'Y');                    
@@ -3003,7 +3003,7 @@ bool LoopOpen(void)
         case 2:
             if(StatePosition[0] != 0 && StatePosition[1] != 0)
             {
-               StatePosition[0];
+               //StatePosition[0]=0; //???????????????
                 return true;
             }
             else
