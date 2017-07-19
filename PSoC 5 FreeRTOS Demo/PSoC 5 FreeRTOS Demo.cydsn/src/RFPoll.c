@@ -1015,7 +1015,7 @@ void pollingRFA_Tx(){
         write_psoc1(printPortA,10);
     }
     ////////////// PRESET - BUSY ////////////////////////////////////
-    if(side.a.pumpState == PUMP_BUSY && side.a.RFstateReport == 1)
+    if(side.a.pumpState == PUMP_BUSY && side.a.RFstateReport == 1 && bufferDisplay1.saleType == 1)
     {
         buffer_A[0]   = 40;
 		buffer_A[1]   = 0xBC;                                 // Encabezado byte 1
@@ -1069,8 +1069,8 @@ void pollingRFA_Tx(){
         bufferAready = 1;
         FlagTotal = 0;
     }            
-    ////////////// END SALE ////////////////////////////////////
-    if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1)//bufferDisplay1.flagEndSale == true  
+    ////////////// END SALE - CASH ////////////////////////////////////
+    if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1 )//bufferDisplay1.flagEndSale == true  
     {        
         buffer_A[0]  = 32;
 		buffer_A[1]  = 0xBC;
@@ -1139,7 +1139,8 @@ void pollingRFA_Tx(){
         bufferAready                    = 1;
         FlagTotal                       = 0;
        
-    }                                               
+    }   
+    
     ////////////// SHIFT ////////////////////////////////////
     if(ShiftState == 1  && side.a.RFstateReport == 1){   
         for(x = 0; x < 100; x++){
@@ -1203,7 +1204,7 @@ void pollingRFA_Tx(){
     }
 
     ////////////// AUTHORIZATION REQUEST ////////////////////////
-    if(side.a.pumpState == PUMP_CALLING && side.a.RFstateReport == 1 && CreditAuth == RF_CREDITSALEAUTH)
+    if(side.a.pumpState == PUMP_CALLING && side.a.RFstateReport == 1 && CreditAuth == RF_CREDITSALEAUTH && bufferDisplay1.saleType == 2)
     {   
 		buffer_A[0]  = 0xBC;
         buffer_A[1]  = 0xCB;
@@ -1270,8 +1271,7 @@ void pollingRFA_Tx(){
         buffer_A[36] = verificar_check(buffer_A,37);    
         side.a.RFstateReport = 0;
         bufferAready = 2;
-        FlagTotal = 0;
-        side.a.rfState = RF_IDLE;
+        FlagTotal = 0;        
         CreditAuth = 0;
         AckFlag = 0;
     }
@@ -1430,7 +1430,7 @@ void pollingRFB_Tx(){
         bufferDisplay2.flagActiveSale = false;
         side.b.RFstateReport          = 0;
         pollTotals                    = 2;        
-        bufferAreadyB                 = 2;
+        bufferAreadyB                 = 1;
         FlagTotalB                    = 0;    
         
     }                                               
@@ -1545,8 +1545,7 @@ void pollingRFB_Tx(){
         
         side.b.RFstateReport = 0;
         bufferAreadyB = 2;
-        FlagTotalB = 0;
-        side.b.rfState = RF_IDLE;
+        FlagTotalB = 0;        
         CreditAuth2 = 0;
         AckFlag2 = 0;
     }
