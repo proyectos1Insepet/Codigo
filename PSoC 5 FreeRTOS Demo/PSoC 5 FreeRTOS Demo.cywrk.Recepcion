@@ -216,24 +216,6 @@
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\project.h</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\Printing.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\protocol.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\protocol.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\PumpTask.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\PumpTask.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\RFPoll.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\RFPoll.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\RFtask.c</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\RFtask.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\variables.h</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 2 Data Layer</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 3 Interface Layer</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 4 Driver Layer</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - Misc</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump</v>
-<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump\Clock_Pump.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Clock_Pump\Clock_Pump.h</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\cm3gcc.ld</v>
@@ -252,6 +234,24 @@
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\CyFlash.c</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\CyFlash.h</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\CyLib.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\CyLib.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\cypins.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\cyPm.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\cyPm.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\CySpc.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\CySpc.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\cytypes.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\cy_boot\cyutils.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1\Display1.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1\Display1.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1\Display1_BOOT.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1\Display1_INT.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1\Display1_PM.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1_IntClock</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1_IntClock\Display1_IntClock.c</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display1_IntClock\Display1_IntClock.h</v>
+<v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Generated_Source\PSoC5\Display2</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
@@ -467,16 +467,10 @@
 <OpenDocs>
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\main.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\PumpTask.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.h" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\protocol.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\variables.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\protocol.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\PumpTask.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\Generated_Source\PSoC5\RF_Connection_INT.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\FreeRTOSConfig.h" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\TopDesign\TopDesign.cysch" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\PSoC 5 FreeRTOS Demo.cydwr" />
+<name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\RFPoll.c" />
 </OpenDocs>
 <config v="" />
 <AutoUpdate v="true" />
