@@ -375,6 +375,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             PresetFlag = 0;
                             iButtonFlag = 0;                           
                             AckFlag = 1;
+                            AuthType = 0;
                             CreditAuth = 0;
                             Credit_Auth_OK = 0;
                             bufferAready = 0;
@@ -449,6 +450,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             CreditAuth2 = 0;
                             Credit_Auth_OK2 = 0;
                             bufferAreadyB = 0;
+                            AuthType2 = 0;
                             buffer_B[0]  = 0xBC;
                             buffer_B[1]  = 0xCB;
                             buffer_B[2]  = 0xC8;
