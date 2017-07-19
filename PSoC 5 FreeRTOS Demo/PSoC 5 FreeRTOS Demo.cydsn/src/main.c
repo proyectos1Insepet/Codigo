@@ -57,40 +57,102 @@ void GlobalInitializer(){
  * Almacena la configuracion de puntos decimales y posiciones detectadas 
 */
 void StoreConfiguration(){
-    EEPROM_1_WriteByte(UnitType,0);
-    EEPROM_1_WriteByte(ConversionFactor,1);
-    EEPROM_1_WriteByte(MoneyDec,2);
-    EEPROM_1_WriteByte(VolDec,3);
-    EEPROM_1_WriteByte(PPUDec,4);
-    EEPROM_1_WriteByte(DDMode,5);
-    EEPROM_1_WriteByte(digits,6); 
-    EEPROM_1_WriteByte(side.a.dir,12);
-    EEPROM_1_WriteByte(side.b.dir,13);
-    EEPROM_1_WriteByte(side.c.dir,14);
-    EEPROM_1_WriteByte(side.d.dir,15);
+    WriteEeprom(0,UnitTypeA);
+    WriteEeprom(1,ConversionFactorA);
+    WriteEeprom(2,MoneyDecA);
+    WriteEeprom(3,VolDecA);
+    WriteEeprom(4,PPUDecA);    
+    WriteEeprom(5,DDModeA);
 }
 
 /*
  * Carga las configuraciones desde la memoria EEPROM
 */
-void loadConfiguration(){
-  
-    MoneyDec   = EEPROM_1_ReadByte(2);  //Punto decimal dinero
-    VolDec     = EEPROM_1_ReadByte(3);  //Punto decimal volumen
-    PPUDec     = EEPROM_1_ReadByte(4);  //Punto decimal PPU
-    DDMode     = EEPROM_1_ReadByte(5);  //Punto decimal 
-    digits     = EEPROM_1_ReadByte(6);  //Digitos
-    lockTurn   = EEPROM_1_ReadByte(7);  //Fijo turno abierto para pruebas
-    printPortA = EEPROM_1_ReadByte(8);  //Puertos de impresion
-    printPortB = EEPROM_1_ReadByte(9);  //Puertos de impresion
-    IDCast[0]  = EEPROM_1_ReadByte(10); //ID Estacion1
-    IDCast[1]  = EEPROM_1_ReadByte(11); //ID Estacion2    
-    
+void loadConfiguration(){      
+    uint8 x;
+    LeerEeprom(0,1);
+    UnitType = buffer_i2c[0];
+    LeerEeprom(1,1);
+    ConversionFactor = buffer_i2c[0];
+    LeerEeprom(2,1);
+    MoneyDec = buffer_i2c[0];
+    LeerEeprom(3,1);
+    VolDec = buffer_i2c[0];
+    LeerEeprom(4,1);
+    PPUDec = buffer_i2c[0];
+    LeerEeprom(5,1);
+    DDMode = buffer_i2c[0];
+    LeerEeprom(6,1);
+    lockTurn[0] = buffer_i2c[0];
+    LeerEeprom(7,1);
+    printPortA[0] = buffer_i2c[0];  //Puertos de impresion
+    LeerEeprom(8,1);
+    printPortB[0] = buffer_i2c[0];  //Puertos de impresion
+    LeerEeprom(9,2);
+    IDCast[0]  = buffer_i2c[0]; //ID Estacion1
+    IDCast[1]  = buffer_i2c[1]; //ID Estacion2    
+    ////// CONFIGURACION GENERAL /////////////
+    LeerEeprom(11,30);
+    for(x = 0; x <30; x++)
+    {
+        Encabezado1[x] = buffer_i2c[x];
+    } 
+    LeerEeprom(41,30);
+    for(x = 0; x <30; x++)
+    {
+        Encabezado2[x] = buffer_i2c[x];
+    }
+    LeerEeprom(71,30);
+    for(x = 0; x <30; x++)
+    {
+        Encabezado3[x] = buffer_i2c[x];
+    }
+    LeerEeprom(101,30);
+    for(x = 0; x <30; x++)
+    {
+        Encabezado4[x] = buffer_i2c[x];
+    }
+    LeerEeprom(131,30);
+    for(x = 0; x <30; x++)
+    {
+        Encabezado5[x] = buffer_i2c[x];
+    }
+    LeerEeprom(161,30);
+    for(x = 0; x <30; x++)
+    {
+        Pie1[x] = buffer_i2c[x];
+    }
+    LeerEeprom(191,30);
+    for(x = 0; x <30; x++)
+    {
+        Pie2[x] = buffer_i2c[x];
+    }
+    LeerEeprom(221,30);
+    for(x = 0; x <30; x++)
+    {
+        Pie3[x] = buffer_i2c[x];
+    }
+    LeerEeprom(251,16);
+    for(x = 0; x <16; x++)
+    {
+        Product1[x] = buffer_i2c[x];
+    }
+    LeerEeprom(267,16);
+    for(x = 0; x <16; x++)
+    {
+        Product2[x] = buffer_i2c[x];
+    }
+    LeerEeprom(283,16);
+    for(x = 0; x <16; x++)
+    {
+        Product3[x] = buffer_i2c[x];
+    }
+    LeerEeprom(299,16);
+    for(x = 0; x <16; x++)
+    {
+        Product4[x] = buffer_i2c[x];
+    }
     configAccess[0] = 0x04; 
-    side.a.dir = EEPROM_1_ReadByte(12); //Primera posicion
-    side.b.dir = EEPROM_1_ReadByte(13); //Segunda posicion
-    side.c.dir = EEPROM_1_ReadByte(14); //Tercera posicion
-    side.d.dir = EEPROM_1_ReadByte(15); //Cuarta posicion
     PrinterType = 1; // Tipo de impresora
 }
 void console(void)
@@ -168,35 +230,6 @@ void InitPump(){
         }        
     }
 }
-/*
-*********************************************************************************************************
-*                                         CY_ISR(animacion)
-*
-* Description : Interrupcion que temporiza las imagenes informativas que aparecen en la pantalla 1
-*               
-*
-*********************************************************************************************************
-*/
-CY_ISR(animacion){
-    Timer_Animacion_ReadStatusRegister();    					
-    count_protector++; 							//Incrementa el contador 
-}
-
-/*
-*********************************************************************************************************
-*                                         CY_ISR(animacion2)
-*
-* Description : Interrupcion que temporiza las imagenes informativas que aparecen en la pantalla 2
-*               
-*
-*********************************************************************************************************
-*/
-CY_ISR(animacion2){
-    Timer_Animacion2_ReadStatusRegister();
-    count_protector2++;
-}
-
-
 
 /*----------------------------------------------------------------------------
    Main: Initialize and start Kernel

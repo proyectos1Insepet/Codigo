@@ -70,8 +70,7 @@
     volatile uint8 flagResetMux;     //Bandera que habilita Resetar el MUX
     volatile uint8 stateBeagleSoft;  //Indica si el Beagle se encuentra en comunicaion con el software
     volatile uint8 PrevStatePump[4]; //Estado anterior en el dispensador [0,pos1,1 pos2...    
-    volatile uint8 PlateRequest;
-    volatile uint8 IDCast[2];
+    volatile uint8 PlateRequest;    
     volatile uint8 ActiveRF;
     volatile uint8 counterRF;
     volatile uint8 temporal[30];
@@ -87,10 +86,11 @@
   
     
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    uint8 UnitTypeA[1],ConversionFactorA[1],MoneyDecA[1],VolDecA[1],PPUDecA[1],DDModeA[1],digitsA[1]; // Variables configuracion del dispensador
     uint8 UnitType,ConversionFactor,MoneyDec,VolDec,PPUDec,DDMode; // Variables configuracion del dispensador
     uint8 statePump[4];                      //Estado en el que se encuentra el dispensador
     uint8 NumPositions;
-    uint8 lockTurn;                          //Bloquea temporalmente el turno 1=bloqueado o 0=desbloqueado
+    uint8 lockTurn[1];                          //Bloquea temporalmente el turno 1=bloqueado o 0=desbloqueado    
     uint8 digits;                            //Version de digitos del surtidor
     uint8 hiddenKeys;
     uint8 PrinterType;
@@ -102,8 +102,8 @@
     uint8 controlChar;
     char8 idStation[5];    
     uint8 pumpGap[3];
-    uint8 printPortA;
-    uint8 printPortB;
+    uint8 printPortA[1];
+    uint8 printPortB[1];
     uint8 buffer_rf[1024];
     uint8 buffer_tx[512];
     uint8 buffer_txTotals[512];
@@ -147,7 +147,7 @@
     uint8 Credit_Auth_OK;
     uint8 Credit_Auth_OK2;
     uint8 Temp[20];
-    uint8 producto [4][13];    
+    uint8 producto [4][16];    
     uint8 ppuiButtonA[5];
     uint8 ppuiButtonB[5];
     uint8 PPUAux;
@@ -165,7 +165,7 @@
     uint8 VolumeMonth[8];
     uint8 CountType[17];
     uint8 ControlType;
-    
+    uint8 IDCast[2];
     
 /*
 *********************************************************************************************************

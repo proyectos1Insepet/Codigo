@@ -639,13 +639,22 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     
                     buffer_tx[8] = verificar_check(buffer_tx,9);
 
-                                                            
-                    for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
-                    {
-                        //buffer_print[x-9] = PRF_rxBuffer[x];
-                        write_psoc1(printPortA, PRF_rxBuffer[x]);
+                    if(PRF_rxBuffer[5] == side.a.dir || PRF_rxBuffer[5] == side.c.dir)
+                    {                                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {                            
+                            write_psoc1(printPortA[0], PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortA[0],0x0A);
                     }
-                    write_psoc1(printPortA,0x0A);
+                    if(PRF_rxBuffer[5] == side.b.dir || PRF_rxBuffer[5] == side.d.dir)
+                    {                                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
+                        {                            
+                            write_psoc1(printPortB[0], PRF_rxBuffer[x]);
+                        }
+                        write_psoc1(printPortB[0],0x0A);
+                    }
                     for (x = 0; x < 9; x++)
                     {
                         RF_Connection_PutChar(buffer_tx[x]);
@@ -882,26 +891,18 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     CopiasCredito = PRF_rxBuffer[16];
                     write_hora();
                     write_fecha(); 
-//                    
-//                    for(x = 0 ; x < 30; x++)
-//                    {
-//                       // EEPROM_1_WriteByte(Encabezado1[x],16 + x);
-//                    }
-//                    for(x = 30 ; x < 60; x++)
-//                    {
-//                       // EEPROM_1_WriteByte(Encabezado2[x - 30], 16 + x);
-//                    }
-//                    for(x = 60 ; x < 90; x++){
-//                       // EEPROM_1_WriteByte(Encabezado3[x - 30], 16 + x);
-//                    }
-//                    for(x =90 ; x < 120; x++){
-//                       // EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
-//                    }
-////                    side.a.dir = EEPROM_1_ReadByte(12);
-////                    side.b.dir = EEPROM_1_ReadByte(13);
-////                    side.c.dir = EEPROM_1_ReadByte(14);
-////                    side.d.dir = EEPROM_1_ReadByte(15);
-//                    //imprimir(printPortA,side.a.dir);
+                    WriteEeprom(11,Encabezado1);
+                    WriteEeprom(41,Encabezado2);
+                    WriteEeprom(71,Encabezado3);
+                    WriteEeprom(101,Encabezado4);
+                    WriteEeprom(131,Encabezado5);
+                    WriteEeprom(161,Pie1);
+                    WriteEeprom(191,Pie2);
+                    WriteEeprom(221,Pie3);
+                    WriteEeprom(251,Product1);
+                    WriteEeprom(267,Product2);
+                    WriteEeprom(283,Product3);
+                    WriteEeprom(299,Product4);
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 
@@ -929,8 +930,8 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             side.c.GradesHose[x-8] = PRF_rxBuffer[x];
                         }
                     }
-                    lockTurn = PRF_rxBuffer[12];
-                    EEPROM_1_WriteByte(lockTurn,7);
+                    lockTurn[0] = PRF_rxBuffer[12];
+                    WriteEeprom(6,lockTurn);
 
 //                    y = 60;
 //                    for(x = y; x< y+5; x++)
@@ -973,8 +974,8 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             SetPicture(1,DISPLAY_ID_RECONOCIDO);
                             vTaskDelay( 900 / portTICK_PERIOD_MS );
                             ShiftState = 0;
-                            lockTurn = PRF_rxBuffer[7];
-                            EEPROM_1_WriteByte(lockTurn,7);
+                            lockTurn[0] = PRF_rxBuffer[7];
+                            WriteEeprom(6,lockTurn);
                             flowDisplay1 = 0;
                             SetPicture(1,DISPLAY_INICIO0);
                             side.a.RFstateReport = 0;
@@ -1010,9 +1011,9 @@ void pollingRFA_Tx(){
         bufferAready = 1;
         if(PrinterType == 1)
         {
-            printLogoP(printPortA,11);    
+            printLogoP(printPortA[0],11);    
         }       
-        write_psoc1(printPortA,10);
+        write_psoc1(printPortA[0],10);
     }
     ////////////// PRESET - BUSY ////////////////////////////////////
     if(side.a.pumpState == PUMP_BUSY && side.a.RFstateReport == 1)
@@ -1297,9 +1298,9 @@ void pollingRFB_Tx(){
         bufferAreadyB = 1;
         if(PrinterType == 1)
         {
-            printLogoP(printPortB,11);    
+            printLogoP(printPortB[0],11);    
         }       
-        write_psoc1(printPortB,10);
+        write_psoc1(printPortB[0],10);
     }    
     ////////////// PRESET - DISPENSANDO ////////////////////////////////////
     if(side.b.pumpState == PUMP_BUSY && side.b.RFstateReport == 1)

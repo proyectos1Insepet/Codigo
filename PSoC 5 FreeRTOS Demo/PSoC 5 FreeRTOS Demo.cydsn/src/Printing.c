@@ -347,7 +347,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     {
         if(PrinterType == 1)
         {
-            printLogoP(printPortA,11);
+            printLogoP(printPortA[0],11);
     
         }
     }
@@ -355,7 +355,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     {
         if(PrinterType == 1)
         {
-            printLogoP(printPortB,11);
+            printLogoP(printPortB[0],11);
     
         }
     }
@@ -483,7 +483,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {																
     		write_psoc1(val,PRN_PRODUCT[x]);
     	}    	                        
-        for(x = 0; x < 13; x++)                                     //Producto	
+        for(x = 0; x < 16; x++)                                     //Producto	
         {																
     		write_psoc1(val,producto[side.a.GradesHose[side.a.hose-1]-1][x]);
     	}        
@@ -732,7 +732,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {																
     		write_psoc1(val,PRN_PRODUCT[x]);
     	}    	                        
-        for(x = 0; x < 13; x++)                                     //Producto	
+        for(x = 0; x < 16; x++)                                     //Producto	
         {																
     		write_psoc1(val,producto[side.b.GradesHose[side.b.hose-1]-1][x]);
     	}
@@ -981,7 +981,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {																
     		write_psoc1(val,PRN_PRODUCT[x]);
     	}    	                        
-        for(x = 0; x < 13; x++)                                     //Producto	
+        for(x = 0; x < 16; x++)                                     //Producto	
         {																
     		write_psoc1(val,producto[side.c.GradesHose[side.c.hose-1]-1][x]);
     	}
@@ -1225,7 +1225,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {																
     		write_psoc1(val,PRN_PRODUCT[x]);
     	}    	                        
-        for(x = 0; x < 13; x++)                                     //Producto	
+        for(x = 0; x < 16; x++)                                     //Producto	
         {																
     		write_psoc1(val,producto[side.d.GradesHose[side.d.hose-1]-1][x]);
     	}

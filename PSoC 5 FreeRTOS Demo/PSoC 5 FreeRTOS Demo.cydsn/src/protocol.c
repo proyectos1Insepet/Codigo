@@ -896,10 +896,10 @@ uint8 PumpCompleteConfiguration(uint8 side){
     Pump_ClearRxBuffer();
 
  // Almacena las configuraciones obtenidas
-    UnitType            =  buffer [10] & 0x0F;
-    ConversionFactor    =  buffer [12] & 0x0F;
+    UnitTypeA[0]            =  buffer [10] & 0x0F;
+    ConversionFactorA[0]    =  buffer [12] & 0x0F;
     
-    if(ConversionFactor == 1)
+    if(ConversionFactorA[0] == 1)
     {
         VolUnit[0] = 0x47;
         VolUnit[1] = 0x61;
@@ -909,7 +909,7 @@ uint8 PumpCompleteConfiguration(uint8 side){
         VolUnit[5] = 0x20;
     }
     
-    if(ConversionFactor == 2)
+    if(ConversionFactorA[0] == 2)
     {
         VolUnit[0] = 0x55;
         VolUnit[1] = 0x6B;
@@ -919,21 +919,21 @@ uint8 PumpCompleteConfiguration(uint8 side){
         VolUnit[5] = 0x6C;        
     }
     
-    MoneyDec            = (buffer [14] & 0x0F) - 1;
+    MoneyDecA[0]            = (buffer [14] & 0x0F) - 1;
     
     if( (buffer [16] & 0x0F) == 1 || (buffer [16] & 0x0F) == 4)
     {
-        VolDec              = 3;
+        VolDecA[0]              = 3;
     }
     if( (buffer [16] & 0x0F) == 3 || (buffer [16] & 0x0F) == 0){
-        VolDec              = 2;
+        VolDecA[0]              = 2;
     }
     if( (buffer [16]&0x0F) == 2)
     {
-        VolDec              = 1;
+        VolDecA[0]              = 1;
     }
-    PPUDec              = (buffer [18] & 0x0F) - 1;
-    DDMode              =  buffer [20] & 0x0F;
+    PPUDecA[0]              = (buffer [18] & 0x0F) - 1;
+    DDModeA[0]              =  buffer [20] & 0x0F;
     
     return 0;
 } 

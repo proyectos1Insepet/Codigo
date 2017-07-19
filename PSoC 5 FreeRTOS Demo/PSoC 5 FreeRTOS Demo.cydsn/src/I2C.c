@@ -361,7 +361,7 @@ uint8 LeerEeprom(uint16 page, uint8 size){
 	else{
 		return 0;
 	}
-    I2C_1_MasterSendStop();	
+    I2C_Bus_MasterSendStop();	
 	CyDelay(6);	
 	return 1;
 }
