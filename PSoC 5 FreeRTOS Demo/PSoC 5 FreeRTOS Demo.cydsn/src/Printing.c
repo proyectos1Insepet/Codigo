@@ -63,8 +63,8 @@ uint8 PRN_TRANSTYPE[13]   = "Tipo       : ";
 uint8 msn_pos[13]         = "Posicion   : ";
 uint8 PRN_PRODUCT[13]     = "Producto   : ";
 uint8 msn_ppu[13]         = "Ppu        : ";
-uint8 msn_vol[13]         = "Volumen    : ";
-uint8 msn_din[13]         = "Dinero     : ";
+uint8 msn_vol[15]         = "Volumen    : ";
+uint8 msn_din[15]         = "Dinero     : ";
 uint8 msn_numero[13]      = "Consecutivo: ";
 uint8 PRN_BALANCE[13]     = "Saldo      : ";
 uint8 PRN_COMPANY[13]     = "Empresa    : ";
@@ -522,18 +522,38 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {																	
     		write_psoc1(val,msn_vol[x]);
     	} 
-        ///////////////////////////////////////////////////////////////
-        if(side.a.volumeSale[1] == 0x30)
-            side.a.volumeSale[1] = 0x00;
-        if(side.a.volumeSale[1] == 0x00 && side.a.volumeSale[2] == 0x30)
-            side.a.volumeSale[2] = 0x00;
-        ///////////////////////////////////////////////////////////////
-        for(x = side.a.volumeSale[0]; x >= 1 ;x--)
-        {						   							
-            write_psoc1(val,side.a.volumeSale[side.a.volumeSale[0] - x]);
-            if(x == VolDec)
-                write_psoc1(val,'.');
-    	}
+        if (digits < 7){
+            ///////////////////////////////////////////////////////////////
+            if(side.a.volumeSale[1] == 0x30)
+                side.a.volumeSale[1] = 0x00;
+            if(side.a.volumeSale[1] == 0x00 && side.a.volumeSale[2] == 0x30)
+                side.a.volumeSale[2] = 0x00;
+            ///////////////////////////////////////////////////////////////
+            for(x = side.a.volumeSale[0]; x >= 1 ;x--)
+            {						   							
+                write_psoc1(val,side.a.volumeSale[side.a.volumeSale[0]+ 1 - x]);
+                if(x == VolDec)
+                    write_psoc1(val,'.');
+        	}
+        }else{
+            ///////////////////////////////////////////////////////////////
+            for (x = 1; x < 5; x++ )
+            {
+                if (side.a.volumeSale[x] != 0x30)
+                    break;
+                if (side.a.volumeSale[x] == 0x30)
+                {
+                    side.a.volumeSale[x] = 0x00;                   
+                }                
+            }
+            ///////////////////////////////////////////////////////////////
+            for(x = side.a.volumeSale[0]; x >= 1 ;x--)
+            {						   							
+                write_psoc1(val,side.a.volumeSale[side.a.volumeSale[0]+ 1 - x]);
+                if(x == VolDec+1)
+                    write_psoc1(val,'.');
+        	}
+        }
         write_psoc1(val,0x20);
         for(x = 0; x < 5; x++)                                      //Simbolos $/G
         {																	
@@ -545,18 +565,39 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {																	
     		write_psoc1(val,msn_din[x]);
     	}
-        /////////////////////////////////////////////////////////////
-        if(side.a.moneySale[1] == 0x30)
-            side.a.moneySale[1] = 0x00;
-        if(side.a.moneySale[1] == 0x00 && side.a.moneySale[2] == 0x30)
-            side.a.moneySale[2] = 0x00;
-        /////////////////////////////////////////////////////////////
-        for(x = 1; x <= side.a.moneySale[0]; x++)
-        {						   							
-    		write_psoc1(val,side.a.moneySale[x]);
-            if(x == MoneyDec)
-                write_psoc1(val,'.');
-    	}
+        if (digits < 7){
+            /////////////////////////////////////////////////////////////
+            if(side.a.moneySale[1] == 0x30)
+                side.a.moneySale[1] = 0x00;
+            if(side.a.moneySale[1] == 0x00 && side.a.moneySale[2] == 0x30)
+                side.a.moneySale[2] = 0x00;
+            /////////////////////////////////////////////////////////////
+            for(x = 1; x <= side.a.moneySale[0]; x++)
+            {						   							
+        		write_psoc1(val,side.a.moneySale[x]);
+                if(x == MoneyDec)
+                    write_psoc1(val,'.');
+        	}
+        }else{
+            /////////////////////////////////////////////////////////////
+            for (x = 1; x < 8; x++ )
+            {
+                if (side.a.moneySale[x] != 0x30)
+                    break;
+                if (side.a.moneySale[x] == 0x30)
+                {
+                    side.a.moneySale[x] = 0x00;                   
+                }                
+            }
+            /////////////////////////////////////////////////////////////
+            for(x = 1; x <= side.a.moneySale[0]; x++)
+            {						   							
+        		write_psoc1(val,side.a.moneySale[x]);
+                if(x == MoneyDec)
+                    write_psoc1(val,'.');
+        	}
+            
+        }
         write_psoc1(val,0x20);
         write_psoc1(val,PRN_CURRENCY[0]);        
         write_psoc1(val,10);
@@ -574,12 +615,28 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             write_psoc1(val,10);
             for(x = 0; x < 13; x++)
             {																		
-    			write_psoc1(val,PRN_PRESET[x]);                          //Preset
+    			write_psoc1(val, PRN_PRESET[x]);                          //Preset
     		} 
-    		for(x = 1; x <= bufferDisplay1.presetValue[0][0]; x++)
-            {
-    			write_psoc1(val,bufferDisplay1.presetValue[0][x]);	
-    		}
+            if (digits < 7){
+        		for(x = 1; x <= bufferDisplay1.presetValue[0][0]; x++)
+                {
+        			write_psoc1(val,bufferDisplay1.presetValue[0][x]);	
+        		}
+            }else{
+                for (x = 1; x < 8; x++ )
+                {
+                    if (bufferDisplay1.presetValue[0][x] != 0x30)
+                        break;
+                    if (bufferDisplay1.presetValue[0][x] == 0x30)
+                    {
+                        bufferDisplay1.presetValue[0][x] = 0x00;                   
+                    }                
+                }
+                for(x = 1; x <= bufferDisplay1.presetValue[0][0]; x++)
+                {
+        			write_psoc1(val,bufferDisplay1.presetValue[0][x]);	
+        		}
+            }
             write_psoc1(val,10);
         }
                 
@@ -606,7 +663,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			write_psoc1(val,10);	
 			for(x = 0; x < 13; x++)
             {																		
-				write_psoc1(val,msn_placa[x]);
+				write_psoc1(val, msn_placa[x]);
 			} 
 			for(x = 0; x < 8; x++)
             {
@@ -616,11 +673,11 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             
             for(x = 0; x < 13; x++)
             {																		
-				write_psoc1(val,PRN_BALANCE[x]);
+				write_psoc1(val, PRN_BALANCE[x]);
 			} 
 			for(x = 0; x < 10; x++)
             {
-				write_psoc1(val,BalanceA[x]); // variable saldo	
+				write_psoc1(val, BalanceA[x]); // variable saldo	
 			}
             write_psoc1(val,10);
             
@@ -630,17 +687,17 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 20; x++)
             {
-				write_psoc1(val,Company[x]);	//  variable compañia
+				write_psoc1(val, Company[x]);	//  variable compañia
 			}
             write_psoc1(val,10);
             
             for(x = 0; x < 13; x++)
             {																		
-				write_psoc1(val,PRN_ACCOUNT[x]);
+				write_psoc1(val, PRN_ACCOUNT[x]);
 			} 
 			for(x = 0; x < 20; x++)
             {
-				write_psoc1(val,CountID[x]);	//variable cuenta
+				write_psoc1(val, CountID[x]);	//variable cuenta
 			}
             write_psoc1(val,10);
 			
@@ -770,18 +827,38 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {										                    //Volumen							
     		write_psoc1(val,msn_vol[x]);
     	} 
-        ///////////////////////////////////////////////////////////////
-        if(side.b.volumeSale[1] == 0x30)
-            side.b.volumeSale[1] = 0x00;
-        if(side.b.volumeSale[1] == 0x00 && side.b.volumeSale[2] == 0x30)
-            side.b.volumeSale[2] = 0x00;
-        ///////////////////////////////////////////////////////////////
-        for(x = 1; x <= side.b.volumeSale[0]; x++)
-        {						   							
-            write_psoc1(val,side.b.volumeSale[x]);
-            if(x == VolDec)
-                write_psoc1(val,'.');
-    	}
+         if (digits < 7){
+            ///////////////////////////////////////////////////////////////
+            if(side.a.volumeSale[1] == 0x30)
+                side.a.volumeSale[1] = 0x00;
+            if(side.a.volumeSale[1] == 0x00 && side.a.volumeSale[2] == 0x30)
+                side.a.volumeSale[2] = 0x00;
+            ///////////////////////////////////////////////////////////////
+            for(x = side.a.volumeSale[0]; x >= 1 ;x--)
+            {						   							
+                write_psoc1(val,side.a.volumeSale[side.a.volumeSale[0]+ 1 - x]);
+                if(x == VolDec)
+                    write_psoc1(val,'.');
+        	}
+        }else{
+            ///////////////////////////////////////////////////////////////
+            for (x = 1; x < 5; x++ )
+            {
+                if (side.b.volumeSale[x] != 0x30)
+                    break;
+                if (side.b.volumeSale[x] == 0x30)
+                {
+                    side.b.volumeSale[x] = 0x00;                   
+                }                
+            }
+            ///////////////////////////////////////////////////////////////
+            for(x = side.b.volumeSale[0]; x >= 1 ;x--)
+            {						   							
+                write_psoc1(val,side.b.volumeSale[side.b.volumeSale[0]+ 1 - x]);
+                if(x == VolDec+1)
+                    write_psoc1(val,'.');
+        	}
+        }
         write_psoc1(val,0x20);
         for(x = 0; x < 5; x++)
         {										                    //Simbolos $/G							
@@ -794,18 +871,39 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
         {										                    //Dinero							
     		write_psoc1(val,msn_din[x]);
     	}
-        /////////////////////////////////////////////////////////////
-        if(side.b.moneySale[1] == 0x30)
-            side.b.moneySale[1] = 0x00;
-        if(side.b.moneySale[1] == 0x00 && side.b.moneySale[2] == 0x30)
-            side.b.moneySale[2] = 0x00;
-        /////////////////////////////////////////////////////////////
-        for(x = 1; x <= side.b.moneySale[0]; x++)
-        {						   							
-    		write_psoc1(val,side.b.moneySale[x]);
-            if(x == MoneyDec)
-                write_psoc1(val,'.');
-    	}
+         if (digits < 7){
+            /////////////////////////////////////////////////////////////
+            if(side.b.moneySale[1] == 0x30)
+                side.b.moneySale[1] = 0x00;
+            if(side.b.moneySale[1] == 0x00 && side.b.moneySale[2] == 0x30)
+                side.b.moneySale[2] = 0x00;
+            /////////////////////////////////////////////////////////////
+            for(x = 1; x <= side.b.moneySale[0]; x++)
+            {						   							
+        		write_psoc1(val,side.b.moneySale[x]);
+                if(x == MoneyDec)
+                    write_psoc1(val,'.');
+        	}
+        }else{
+            /////////////////////////////////////////////////////////////
+            for (x = 1; x < 8; x++ )
+            {
+                if (side.b.moneySale[x] != 0x30)
+                    break;
+                if (side.b.moneySale[x] == 0x30)
+                {
+                    side.b.moneySale[x] = 0x00;                   
+                }                
+            }
+            /////////////////////////////////////////////////////////////
+            for(x = 1; x <= side.b.moneySale[0]; x++)
+            {						   							
+        		write_psoc1(val,side.b.moneySale[x]);
+                if(x == MoneyDec)
+                    write_psoc1(val,'.');
+        	}
+            
+        }
         write_psoc1(val,0x20);
         write_psoc1(val,PRN_CURRENCY[0]);        
         write_psoc1(val,10);
@@ -825,10 +923,26 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             {																		
     			write_psoc1(val,PRN_PRESET[x]);                          //Preset
     		} 
-    		for(x = 1; x <= bufferDisplay2.presetValue[0][0]; x++)
-            {
-    			write_psoc1(val,bufferDisplay2.presetValue[0][x]);	
-    		}
+    		if (digits < 7){
+        		for(x = 1; x <= bufferDisplay2.presetValue[0][0]; x++)
+                {
+        			write_psoc1(val,bufferDisplay2.presetValue[0][x]);	
+        		}
+            }else{
+                for (x = 1; x < 8; x++ )
+                {
+                    if (bufferDisplay2.presetValue[0][x] != 0x30)
+                        break;
+                    if (bufferDisplay2.presetValue[0][x] == 0x30)
+                    {
+                        bufferDisplay2.presetValue[0][x] = 0x00;                   
+                    }                
+                }
+                for(x = 1; x <= bufferDisplay2.presetValue[0][0]; x++)
+                {
+        			write_psoc1(val,bufferDisplay2.presetValue[0][x]);	
+        		}
+            }
             write_psoc1(val,10);
         }
                 
