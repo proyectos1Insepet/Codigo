@@ -532,7 +532,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             for(x = side.a.volumeSale[0]; x >= 1 ;x--)
             {						   							
                 write_psoc1(val,side.a.volumeSale[side.a.volumeSale[0]+ 1 - x]);
-                if(x == VolDec)
+                if(x == VolDec+1)
                     write_psoc1(val,'.');
         	}
         }else{
@@ -829,15 +829,15 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     	} 
          if (digits < 7){
             ///////////////////////////////////////////////////////////////
-            if(side.a.volumeSale[1] == 0x30)
-                side.a.volumeSale[1] = 0x00;
-            if(side.a.volumeSale[1] == 0x00 && side.a.volumeSale[2] == 0x30)
-                side.a.volumeSale[2] = 0x00;
+            if(side.b.volumeSale[1] == 0x30)
+                side.b.volumeSale[1] = 0x00;
+            if(side.b.volumeSale[1] == 0x00 && side.b.volumeSale[2] == 0x30)
+                side.b.volumeSale[2] = 0x00;
             ///////////////////////////////////////////////////////////////
-            for(x = side.a.volumeSale[0]; x >= 1 ;x--)
+            for(x = side.b.volumeSale[0]; x >= 1 ;x--)
             {						   							
-                write_psoc1(val,side.a.volumeSale[side.a.volumeSale[0]+ 1 - x]);
-                if(x == VolDec)
+                write_psoc1(val,side.b.volumeSale[side.b.volumeSale[0]+ 1 - x]);
+                if(x == VolDec+1)
                     write_psoc1(val,'.');
         	}
         }else{
