@@ -39,7 +39,8 @@ void RF_Task(void *arg)
     xLastWakeTime = xTaskGetTickCount();
     uint16 i,x,y,contEscape;  
     uint8 buffer_rfTMP;
-    uint8 EEpromGradeAddress;
+    uint8 RFOnline = 0;
+    //uint8 EEpromGradeAddress;
     
     //setup();
     
@@ -80,14 +81,17 @@ void RF_Task(void *arg)
             // Impresion general   
             else if ( buffer_rf[6] == 0xA7)
             {
-                if(buffer_rf[8] + 0x09 < 234)
-
+                if(buffer_rf[8] != 0x00)
                 {
-                    LongEsperada = buffer_rf[8] + 0x09;
-                }
-                else
-                {
-                    LongEsperada = 234;
+                    if(buffer_rf[8] + 0x09 < 234)
+                    {
+                        LongEsperada = buffer_rf[8] + 0x09;
+                        vTaskDelay( 1 / portTICK_PERIOD_MS );
+                    }
+                    else
+                    {
+                        LongEsperada = 234;
+                    }
                 }
             } 
             
@@ -106,11 +110,7 @@ void RF_Task(void *arg)
             {
                 LongEsperada = 14;
             }
-            //Short Config 
-//            else if ( buffer_rf[6] == 0xAD)
-//            {
-//                LongEsperada = 15;
-//            }
+   
             // Turno
             else if ( buffer_rf[6] == 0xE4)
             {
@@ -120,28 +120,44 @@ void RF_Task(void *arg)
             {
                 LongEsperada = 117;
             }
-//            else
-//            {
-//                LongEsperada = 400;
-//            }
                                 
             buffer_rf[i] = buffer_rfTMP;         
             
             if (i == LongEsperada - 1)
             {                
                 RF_Connection_ClearRxBuffer();
-                pollingRF_Rx(buffer_rf);
+                
+                if(buffer_rf[5] == side.a.dir || buffer_rf[5] == side.b.dir)
+                {
+                   pollingRF_Rx(buffer_rf);
+                   RFOnline = 1; 
+                }
+                else
+                {
+                   RFOnline = 0;
+                }  
+                
                 buffer_rf[6] = 0xFF;
                 RF_Connection_ClearRxBuffer();
+                
+                
+                
                 break;
             }
-            
+             
             i++;                       
         }               
-            pollingRFA_Tx();
+         
+        if(RFOnline == 1)
+        {
+            pollingRFA_Tx();           
             pollingRFB_Tx();
         }
         vTaskDelayUntil(&xLastWakeTime, xFrequency);    
+        
+    }
+        
+       
 
 }
 

@@ -76,6 +76,7 @@
     volatile uint8 counterRF;
     volatile uint8 temporal[30];
     volatile uint8 tempPreset[8];
+    volatile uint8 tempPreset2[8];
     volatile uint8 tempPPU[5];
     volatile uint8 CGrade;
     volatile uint8 ShiftState;
@@ -165,6 +166,8 @@
     uint8 VolumeMonth[8];
     uint8 CountType[17];
     uint8 ControlType;
+    uint8 IDPrintFlagA;
+    uint8 IDPrintFlagB;
     
     
 /*
@@ -217,6 +220,8 @@ struct buffer{
     uint8 flagActiveSale;           //Bandera de venta activa
     uint8 shiftId[11];
     uint8 shiftPassword[11];
+    uint8 CreditpresetValue[2][10];
+    uint8 CreditpresetType[2];            //Tipo de programacion, 1V=Volumen 2D=Dinero 2F=Lleno 21=P1 22=P2 23=P3
 };
 
 struct buffer bufferDisplay1;

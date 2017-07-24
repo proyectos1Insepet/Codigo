@@ -547,7 +547,6 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
     char8 PumpDataReceive =0;
     x = 0;
     z = 0;
-    preset  = 0;
     decimal = 0;
     decimal=0;
     for(x = 1; x <= value[0]; x++)
@@ -596,11 +595,11 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
         SendComand[x] = 0xE1; x++;
         if(sideR == side.a.dir)
         {
-            SendComand[x] = 0xF0 | (bufferDisplay1.presetType[0] & 0x0F); x++;
+            SendComand[x] = 0xF0 | (preset & 0x0F); x++;
             SendComand[x] = 0xF6; x++;
             SendComand[x] = 0xE0 | ((grade - 1) & 0x0F); x++;
             SendComand[x] = PRDn; x++;
-            if(bufferDisplay1.presetType[1] == 'F')
+            if(preset == 0x03)
             {
                 for(y = x; y < digits + x; y++ )
                 {
@@ -613,7 +612,7 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
                     x++;
                 }                
             }
-            if(bufferDisplay1.presetType[1] == 'D')
+            if(preset == 0x02)
             {
                 z = value[0];
                 for(y = x; y < value[0] + x; y++)
@@ -627,7 +626,7 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
                     x++;
                 }                
             }
-            if(bufferDisplay1.presetType[1] == 'V')
+            if(preset == 0x01)
             {
                 if(digits != 7)
                 {
@@ -713,11 +712,11 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
         // Lado B
         if(sideR == side.b.dir)
         {
-            SendComand[x] = 0xF0 | (bufferDisplay2.presetType[0] & 0x0F); x++;
+            SendComand[x] = 0xF0 | (preset & 0x0F); x++;
             SendComand[x] = 0xF6; x++;
             SendComand[x] = 0xE0 | ((grade - 1) & 0x0F); x++;
             SendComand[x] = PRDn; x++;
-            if(bufferDisplay2.presetType[1] == 'F')
+            if(preset == 0x03)
             {
                 for(y = x; y < digits + x; y++ )
                 {
@@ -730,7 +729,7 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
                     x++;
                 }                
             }
-            if(bufferDisplay2.presetType[1] == 'D')
+            if(preset == 0x02)
             {
                 z = value[0];
                 for(y = x; y < value[0] + x; y++)
@@ -744,7 +743,7 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
                     x++;
                 }                
             }
-            if(bufferDisplay2.presetType[1] == 'V')
+            if(preset == 0x01)
             {
                 if(digits != 7)
                 {
@@ -1097,23 +1096,29 @@ uint8 getSale(uint8 pos){
 		}
 	}
     // 7 digits
-	else if((digits==7)&&(Pump_GetRxBufferSize()==39)){
-		if((Pump_rxBuffer[0]==0xFF)&&(Pump_rxBuffer[2]==0xF8)&&(Pump_rxBuffer[38]==0xF0)){
-			if(pos==side.a.dir){
-				side.a.productSale=((Pump_rxBuffer[9]&0x0F)+1)+0x30;
-				for(x=1;x<=6;x++){
-					side.a.ppuSale[7-x]=((Pump_rxBuffer[x+11]&0x0F)+0x30);
+	else if((digits == 7) && (Pump_GetRxBufferSize() == 39))
+    {
+		if((Pump_rxBuffer[0] == 0xFF) && (Pump_rxBuffer[2] == 0xF8) && (Pump_rxBuffer[38] == 0xF0))
+        {
+			if(pos == side.a.dir)
+            {
+				side.a.productSale = ((Pump_rxBuffer[9] & 0x0F) + 1) + 0x30;
+				for(x = 1; x <= 6; x++)
+                {
+					side.a.ppuSale[7 - x] = ((Pump_rxBuffer[x + 11] & 0x0F) + 0x30);
 				}
-                side.a.ppuSale[0]=6;
-				for(x=1;x<=8;x++){
-					side.a.volumeSale[9-x]=((Pump_rxBuffer[x+18]&0x0F)+0x30);
+                side.a.ppuSale[0] = 6;
+				for(x = 1; x <= 8; x++)
+                {
+					side.a.volumeSale[9 - x] = ((Pump_rxBuffer[x + 18] & 0x0F) + 0x30);
 				}		
-                side.a.volumeSale[0]=8;
-				for(x=1;x<=7;x++){
-					side.a.moneySale[9-x]=((Pump_rxBuffer[x+28]&0x0F)+0x30);
+                side.a.volumeSale[0] = 8;
+				for(x = 1; x <= 7; x++)
+                {
+					side.a.moneySale[9 - x] = ((Pump_rxBuffer[x + 28] & 0x0F) + 0x30);
 				}
-                side.a.moneySale[1]='0';
-                side.a.moneySale[0]=8;
+                side.a.moneySale[1] = '0';
+                side.a.moneySale[0] = 8;
 			}
 			else{
 				side.b.productSale=((Pump_rxBuffer[9]&0x0F)+1)+0x30;

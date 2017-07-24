@@ -233,14 +233,11 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     
                     // Preset or End Sale
                     if(bufferAready == 1)
-                    {                                           
-                           
+                    {                                                                    
                         for (x = 1; x < buffer_A[0]; x++)
                         { 
                             RF_Connection_PutChar(buffer_A[x]);
-                        }
-                        
-
+                        }                       
                         bufferAready = 0;
                     }
                     
@@ -346,29 +343,48 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                                 }                                
                             }
                             
+                            bufferDisplay1.CreditpresetType[0]= 2;
+                            bufferDisplay1.CreditpresetType[1]= 'D';
+                            for(x= 16; x > 8; x-- )
+                            {
+                                if(PRF_rxBuffer[x] != 0x00)
+                                {
+                                    bufferDisplay1.CreditpresetValue[0][0]= 8-(16-x);
+                                    bufferDisplay1.CreditpresetValue[1][0]= 8-(16-x);
+                                    break;
+                                }
+                            }
+                            
+                            for(x = 0; x < bufferDisplay1.CreditpresetValue[0][0] ; x++)
+                            {
+                                bufferDisplay1.CreditpresetValue[0][x + 1] = PRF_rxBuffer[(bufferDisplay1.CreditpresetValue[0][0]-x)+8];
+                                bufferDisplay1.CreditpresetValue[1][x + 1] = PRF_rxBuffer[(bufferDisplay1.CreditpresetValue[0][0]-x)+8];                                
+                            }
+                            
+                           
                             //Grade
                             side.a.grade = PRF_rxBuffer[18];
                             
-                            buffer_B[0]  = 0xBC;
-                            buffer_B[1]  = 0xCB;
-                            buffer_B[2]  = 0xC8;
-                            buffer_B[3]  = IDCast[0];
-                            buffer_B[4]  = IDCast[1];
-                            buffer_B[5]  = side.a.dir;
-                            buffer_B[6]  = 0xA7;
-                            buffer_B[7]  = RF_IDLE;
-                            buffer_B[8]  = ACK;
-                            buffer_B[9]  = buffer_B[36] = verificar_check(buffer_B, 9);
+                            buffer_A[0]  = 0xBC;
+                            buffer_A[1]  = 0xCB;
+                            buffer_A[2]  = 0xC8;
+                            buffer_A[3]  = IDCast[0];
+                            buffer_A[4]  = IDCast[1];
+                            buffer_A[5]  = side.a.dir;
+                            buffer_A[6]  = 0xA7;
+                            buffer_A[7]  = RF_IDLE;
+                            buffer_A[8]  = ACK;
+                            buffer_A[9]  = buffer_A[36] = verificar_check(buffer_A, 9);
                             
                             for (x = 0; x < 10; x++)
                             { 
-                                RF_Connection_PutChar(buffer_B[x]);
+                                RF_Connection_PutChar(buffer_A[x]);
                             }
                             
                             Credit_Auth_OK = 1;
                             bufferAready = 0; 
                             PresetFlag = 1;
-                            
+                            AuthType = 1;
                         }
                         else
                         {                           
@@ -379,20 +395,21 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             CreditAuth = 0;
                             Credit_Auth_OK = 0;
                             bufferAready = 0;
-                            buffer_B[0]  = 0xBC;
-                            buffer_B[1]  = 0xCB;
-                            buffer_B[2]  = 0xC8;
-                            buffer_B[3]  = IDCast[0];
-                            buffer_B[4]  = IDCast[1];
-                            buffer_B[5]  = side.a.dir;
-                            buffer_B[6]  = 0xA7;
-                            buffer_B[7]  = RF_IDLE;
-                            buffer_B[8]  = ACK;
-                            buffer_B[9]  = buffer_B[36] = verificar_check(buffer_B, 9);
+                            bufferDisplay1.flagPrint = 0;
+                            buffer_A[0]  = 0xBC;
+                            buffer_A[1]  = 0xCB;
+                            buffer_A[2]  = 0xC8;
+                            buffer_A[3]  = IDCast[0];
+                            buffer_A[4]  = IDCast[1];
+                            buffer_A[5]  = side.a.dir;
+                            buffer_A[6]  = 0xA7;
+                            buffer_A[7]  = RF_IDLE;
+                            buffer_A[8]  = ACK;
+                            buffer_A[9]  = buffer_A[36] = verificar_check(buffer_A, 9);
                             
                             for (x = 0; x < 10; x++)
                             { 
-                                RF_Connection_PutChar(buffer_B[x]);
+                                RF_Connection_PutChar(buffer_A[x]);
                             }
                             flowDisplay1 = 21;
                                                                            
@@ -417,6 +434,25 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                                 }
                                 
                             }
+                            
+                            //Preset
+                            bufferDisplay2.CreditpresetType[0]= 2;
+                            bufferDisplay2.CreditpresetType[1]= 'D';
+                            for(x= 16; x > 8; x-- )
+                            {
+                                if(PRF_rxBuffer[x] != 0x00)
+                                {
+                                    bufferDisplay2.CreditpresetValue[0][0]= 8-(16-x);
+                                    bufferDisplay2.CreditpresetValue[1][0]= 8-(16-x);
+                                    break;
+                                }
+                            }
+                            
+                            for(x = 0; x < bufferDisplay2.CreditpresetValue[0][0] ; x++)
+                            {
+                                bufferDisplay2.CreditpresetValue[0][x + 1] = PRF_rxBuffer[(bufferDisplay2.CreditpresetValue[0][0]-x)+8];
+                                bufferDisplay2.CreditpresetValue[1][x + 1] = PRF_rxBuffer[(bufferDisplay2.CreditpresetValue[0][0]-x)+8];                                
+                            }
                             //Grade
                             side.b.grade = PRF_rxBuffer[18];
                             
@@ -438,7 +474,8 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                            
                             Credit_Auth_OK2 = 1;
                             bufferAreadyB = 0;
-                            PresetFlag2 = 1;                     
+                            PresetFlag2 = 1; 
+                            AuthType2 = 1;
                                                        
                         }
                         else
@@ -451,6 +488,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             Credit_Auth_OK2 = 0;
                             bufferAreadyB = 0;
                             AuthType2 = 0;
+                            bufferDisplay2.flagPrint = 0;
                             buffer_B[0]  = 0xBC;
                             buffer_B[1]  = 0xCB;
                             buffer_B[2]  = 0xC8;
@@ -607,6 +645,10 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 
                 case 0xA7:               //Impresion general
 
+                    for(x = 0; x < 250; x++)
+                    {
+                        buffer_print[x] = 0x00;
+                    }
                     //lengthPrint = hexadecimal_to_decimal(PRF_rxBuffer[8]);
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {                                                
@@ -614,6 +656,25 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         buffer_tx[6] = 0xA7;
                         buffer_tx[7] = side.a.rfState;
                         buffer_tx[8] = 0x03;
+                        buffer_tx[9] = verificar_check(buffer_tx,10); 
+                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8; x++)
+                        {
+                            buffer_print[x - 9] = PRF_rxBuffer[x];                     
+                        }
+                        
+                        for(x = 0; x <= PRF_rxBuffer[8]; x++)
+                        {
+                            write_psoc1(printPortA, buffer_print[x]);
+                        }
+                        
+                        write_psoc1(printPortA, 0x0A);
+                                               
+                        for (x = 0; x < 9; x++)
+                        {
+                            RF_Connection_PutChar(buffer_tx[x]);
+                        } 
+                        
                     }  
                     
                     if(PRF_rxBuffer[5] == side.b.dir)
@@ -622,6 +683,23 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         buffer_tx[6] = 0xA7;
                         buffer_tx[7] = side.b.rfState;
                         buffer_tx[8] = 0x03;
+                        buffer_tx[9] = verificar_check(buffer_tx, 10);
+                        
+                        for(x = 9; x <= PRF_rxBuffer[8] + 8; x++)
+                        {
+                            buffer_print[x - 9] = PRF_rxBuffer[x];                     
+                        }
+                        
+                        for(x = 0; x <= PRF_rxBuffer[8]; x++)
+                        {
+                            write_psoc1(printPortB, buffer_print[x]);
+                        }
+                        
+                        write_psoc1(printPortB,0x0A);                      
+                        for (x = 0; x < 9; x++)
+                        {
+                            RF_Connection_PutChar(buffer_tx[x]);
+                        }
                     }
                     
                     if(PRF_rxBuffer[5] == side.c.dir)
@@ -639,32 +717,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         buffer_tx[7] = side.d.rfState;
                         buffer_tx[8] = 0x03;
                     }
-                    
-                    buffer_tx[8] = verificar_check(buffer_tx,9);
-
-                    if(PRF_rxBuffer[5] == side.a.dir || PRF_rxBuffer[5] == side.c.dir )
-                    {                                        
-                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
-                        {
-                            //buffer_print[x-9] = PRF_rxBuffer[x];
-                            write_psoc1(printPortA, PRF_rxBuffer[x]);
-                        }
-                        write_psoc1(printPortA,0x0A);
-                    }
-                    
-                    if(PRF_rxBuffer[5] == side.b.dir || PRF_rxBuffer[5] == side.d.dir )
-                    {                                        
-                        for(x = 9; x <= PRF_rxBuffer[8] + 8;x++)
-                        {
-                            //buffer_print[x-9] = PRF_rxBuffer[x];
-                            write_psoc1(printPortB, PRF_rxBuffer[x]);
-                        }
-                        write_psoc1(printPortB,0x0A);
-                    }
-                    for (x = 0; x < 9; x++)
-                    {
-                        RF_Connection_PutChar(buffer_tx[x]);
-                    }         
 
                 break;
                 
@@ -813,7 +865,8 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         for(x = 0; x < 10; x++)
                         {
                             side.a.saleNumber[x] = PRF_rxBuffer[x+8];
-                        }                      
+                        }   
+                        IDPrintFlagA = 1;
                     }
                     if(PRF_rxBuffer[5] == side.b.dir)
                     {
@@ -821,6 +874,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         {
                             side.b.saleNumber[x] = PRF_rxBuffer[x+8];
                         }
+                        IDPrintFlagB = 1;
                     }
                     if(PRF_rxBuffer[5] == side.c.dir)
                     {
@@ -836,6 +890,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             side.d.saleNumber[x] = PRF_rxBuffer[x + 8];
                         }
                     }
+                    
                 break;
                 
                              
@@ -1000,7 +1055,34 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             side.a.rfState = RF_IDLE; 
                             return;
                         }
-                    }    
+                    }   
+                    
+                    if(PRF_rxBuffer[5] == side.b.dir && ShiftDone == 0)
+                    {
+                        ShiftDone = 1;
+                        if(PRF_rxBuffer[7] == 0x02)
+                        {                        
+                            SetPicture(2,DISPLAY_PASSWORD_INVALIDO);
+                            vTaskDelay( 900 / portTICK_PERIOD_MS );
+                            flowDisplay2 = 0;
+                            ShiftState = 0;
+                            side.b.rfState = RF_IDLE;
+                            side.b.RFstateReport = 0;
+                        }
+                        else
+                        {
+                            SetPicture(2,DISPLAY_ID_RECONOCIDO);
+                            vTaskDelay( 900 / portTICK_PERIOD_MS );
+                            ShiftState = 0;
+                            lockTurn = PRF_rxBuffer[7];
+                            EEPROM_1_WriteByte(lockTurn,7);
+                            flowDisplay2 = 0;
+                            SetPicture(2,DISPLAY_INICIO0);
+                            side.b.RFstateReport = 0;
+                            side.b.rfState = RF_IDLE; 
+                            return;
+                        }
+                    } 
                break;                
            }                       
         } 
@@ -1047,10 +1129,10 @@ void pollingRFA_Tx(){
         buffer_A[8]   = RF_DELIVERING;                        // Estado de la posicion
         buffer_A[9]   = side.a.activeHose;                    
         buffer_A[10]  = bufferDisplay1.presetType[0] & 0x03; 
-        
+                
         for(x = bufferDisplay1.presetValue[0][0] ; x > 0; x--)
         {
-            tempPreset[bufferDisplay1.presetValue[0][0]-x] = (bufferDisplay1.presetValue[0][x]); 
+            tempPreset[bufferDisplay1.presetValue[0][0] - x] = (bufferDisplay1.presetValue[0][x]); 
         }
         
         for(x = 11; x <= 18; x++)
@@ -1089,7 +1171,7 @@ void pollingRFA_Tx(){
         FlagTotal = 0;
     }            
     ////////////// END SALE - CASH ////////////////////////////////////
-    if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1 )//bufferDisplay1.flagEndSale == true  
+    if(bufferDisplay1.flagEndSale && side.a.RFstateReport == 1) //if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1)
     {        
         buffer_A[0]  = 32;
 		buffer_A[1]  = 0xBC;
@@ -1153,6 +1235,7 @@ void pollingRFA_Tx(){
         side.a.pumpState                = PUMP_IDLE;
         side.a.rfState                  = RF_IDLE;
         bufferDisplay1.flagActiveSale   = false;
+        bufferDisplay1.flagEndSale      = false;
         side.a.RFstateReport            = 0;
         pollTotals                      = 1;
         bufferAready                    = 1;
@@ -1162,9 +1245,12 @@ void pollingRFA_Tx(){
     
     ////////////// SHIFT ////////////////////////////////////
     if(ShiftState == 1  && side.a.RFstateReport == 1){   
-        for(x = 0; x < 100; x++){
+        
+        for(x = 0; x < 100; x++)
+        {
             buffer_A[x] = 0x00;
         }
+        
         buffer_A[0]  = 35;
         buffer_A[1]  = 0xBC;
         buffer_A[2]  = 0xCB;
@@ -1175,47 +1261,20 @@ void pollingRFA_Tx(){
         buffer_A[7]  = 0xE3;
         buffer_A[8]  = RF_WORKSHIFTREQ;
         
-//        buffer_txDisplay[0]  = 0xBC;
-//        buffer_txDisplay[1]  = 0xCB;
-//        buffer_txDisplay[2]  = 0xC8;
-//        buffer_txDisplay[3]  = IDCast[0];
-//        buffer_txDisplay[4]  = IDCast[1];
-//        buffer_txDisplay[5]  = side.a.dir;
-//        buffer_txDisplay[6]  = 0xE3;
-//        buffer_txDisplay[7]  = RF_WORKSHIFTREQ;
-        
-//        for(x = bufferDisplay1.shiftId[0]; x >= 1; x--)
-//        {						   							
-//    		buffer_txDisplay[x+7]= bufferDisplay1.shiftId[x];            
-//    	}
+
         for(x = bufferDisplay1.shiftId[0]; x >= 1; x--)
         {						   							
-    		buffer_A[x+8]= bufferDisplay1.shiftId[x];            
+    		buffer_A[x + 8]= bufferDisplay1.shiftId[x];            
     	}
-//        for(x=8; x<19; x++){
-//            if(buffer_txDisplay[x] ==0x00)
-//                buffer_txDisplay[x]=0x30;
-//        }
+
         for(x = 1; x <= bufferDisplay1.shiftPassword[0] ;x++)
         {						   							
     		buffer_A[x + 19] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
     	}
-//        for(x = 1; x <= bufferDisplay1.shiftPassword[0] ;x++)
-//        {						   							
-//    		buffer_txDisplay[x + 18] = bufferDisplay1.shiftPassword[(bufferDisplay1.shiftPassword[0] + 1) - x];            
-//    	}
-//        for(x=19; x<31; x++){
-//            if(buffer_txDisplay[x] ==0x00)
-//                buffer_txDisplay[x]=0x30;
-//        }
-        buffer_A[33] = verificar_check(buffer_txDisplay,34);
+
+        buffer_A[33] = verificar_check(buffer_A, 34);
         
-//        for (x = 0; x < 33; x++)
-//        {
-//            RF_Connection_PutChar(buffer_txDisplay[x]);
-//        }
-        
-        //side.a.rfState = RF_IDLE;
+
         side.a.RFstateReport = 0;
         ShiftState = 0;
         bufferAready = 1;
@@ -1224,7 +1283,8 @@ void pollingRFA_Tx(){
 
     ////////////// AUTHORIZATION REQUEST ////////////////////////
     if(side.a.pumpState == PUMP_CALLING && side.a.RFstateReport == 1 && CreditAuth == RF_CREDITSALEAUTH && bufferDisplay1.saleType == 2)
-    {   
+    {  
+        uint8 decimal,DecimalFaltante;
 		buffer_A[0]  = 0xBC;
         buffer_A[1]  = 0xCB;
         buffer_A[2]  = 0xC8;
@@ -1249,7 +1309,7 @@ void pollingRFA_Tx(){
                                    
         }
         x = 0;      
-        for(y = 1; y < 17; y+=2)
+        for(y = 1; y < 17; y += 2)
         {
             buffer_A[9 + x] =  ((Temp[y] & 0x0F) << 4) | (Temp[y + 1] & 0x0F);
             x++;
@@ -1278,14 +1338,99 @@ void pollingRFA_Tx(){
         {
             buffer_A[28 + y] = 0x00;
         }
+
         x = 0;
-        
-        for(y = 8; y >= 1; y--)
+
+        if(bufferDisplay1.presetType[0] == 1)
         {
-            buffer_A[28 + x] = bufferDisplay1.presetValue[0][y];
-            x++;
-        }       
+            for(x=0; x<8;x++)
+            {
+                tempPreset[x] = 0x30;
+            }
+
+        for(x = bufferDisplay1.presetValue[0][0] ; x > 0; x--)
+        {
+            tempPreset[bufferDisplay1.presetValue[0][0] - x] = (bufferDisplay1.presetValue[0][x]); 
+        } 
         
+        decimal = 0;
+        
+        for(x = 0; x < 8; x++)
+        {
+            tempPreset2[x] = 0x30;
+        }
+        
+        for(decimal = 0; decimal <= 7; decimal++)
+        {
+            tempPreset2[x] = 0x30;
+            if (tempPreset[decimal] == ',')
+            {
+                break;
+            }
+        }
+        if(decimal >= 7)
+        {
+           for(x = 0; x < 3; x++)
+           {
+            tempPreset2[x] = 0x30;
+           }
+           for(x = 3; x < 8; x++)
+           {
+            tempPreset2[x] = tempPreset[x - 3];
+           }
+        
+        }
+        else{
+            DecimalFaltante = 3 - decimal;
+            for(x = 0; x < DecimalFaltante; x++)
+            {
+                tempPreset2[x] = 0x30;
+            }
+            for(x = 0; x < decimal; x++)
+            {
+                tempPreset2[x + DecimalFaltante] = tempPreset[x];
+            }
+            for(x = 3; x < 8; x++)
+            {
+                
+                tempPreset2[x] = tempPreset[x - DecimalFaltante + 1];
+            
+            }
+        }
+
+            for(x = 28; x <= 35; x++)
+            {
+                buffer_A[x] = tempPreset2[x - 28];
+                
+                if(buffer_A[x]== 0x00)
+                {
+                    buffer_A[x] = 0x30;
+                }
+            }
+        }
+
+        if(bufferDisplay1.presetType[0] == 2)
+        {
+            for(x = 0; x < 8; x++)
+            {
+                tempPreset[x] = 0x30;
+            }
+            
+            for(x = bufferDisplay1.presetValue[0][0]; x > 0; x--)
+            {
+                tempPreset[bufferDisplay1.presetValue[0][0] - x] = (bufferDisplay1.presetValue[0][x]); 
+            }
+            for(x = 28; x <= 35; x++)
+            {
+                buffer_A[x] = tempPreset[x - 28];
+                
+                if(buffer_A[x]== 0x00)
+                {
+                    buffer_A[x] = 0x30;
+                }
+            }
+        }
+
         // CRC
         buffer_A[36] = verificar_check(buffer_A,37);    
         side.a.RFstateReport = 0;
@@ -1378,7 +1523,7 @@ void pollingRFB_Tx(){
     }      
     ////////////// END SALE ////////////////////////////////////
  
-    if ((side.b.pumpState == PUMP_PEOT || side.b.pumpState == PUMP_FEOT) && side.b.RFstateReport == 1)    
+   if (bufferDisplay2.flagEndSale && side.b.RFstateReport == 1)    
     {
         buffer_B[100] = 31;
         buffer_B[0]  = 0xBC;
@@ -1447,6 +1592,7 @@ void pollingRFB_Tx(){
         side.b.pumpState              = PUMP_IDLE;
         side.b.rfState                = RF_IDLE;
         bufferDisplay2.flagActiveSale = false;
+        bufferDisplay2.flagEndSale    = false;
         side.b.RFstateReport          = 0;
         pollTotals                    = 2;        
         bufferAreadyB                 = 1;
@@ -1455,48 +1601,44 @@ void pollingRFB_Tx(){
     }                                               
     ////////////// SHIFT ////////////////////////////////////
     if(ShiftState == 1  && side.b.RFstateReport == 1){                                    
-        buffer_txDisplay[5]  = side.b.dir;
-        buffer_txDisplay[6]  = 0xE3;
-        buffer_txDisplay[7]  = RF_WORKSHIFTREQ;
         
-        for(x = 1; x <= bufferDisplay2.shiftId[0] ;x++)
-        {						   							
-    		buffer_txDisplay[x+7] = bufferDisplay2.shiftId[(bufferDisplay2.shiftId[0] + 1) - x];            
-    	}
-        for(x = 8; x < 19; x++)
+        for(x = 0; x < 100; x++)
         {
-            if(buffer_txDisplay[x] == 0x00)
-            {
-                buffer_txDisplay[x] = 0x30;
-            }
+            buffer_B[x] = 0x00;
         }
+        
+        buffer_B[100]  = 35;
+        buffer_B[0]  = 0xBC;
+        buffer_B[1]  = 0xCB;
+        buffer_B[2]  = 0xC8;
+        buffer_B[3]  = IDCast[0];
+        buffer_B[4]  = IDCast[1];
+        buffer_B[5]  = side.b.dir;
+        buffer_B[6]  = 0xE3;
+        buffer_B[7]  = RF_WORKSHIFTREQ;
+        
+        for(x = bufferDisplay2.shiftId[0]; x >= 1; x--)
+        {						   							
+    		buffer_B[x + 7] = bufferDisplay2.shiftId[x];            
+    	}
+        
         for(x = 1; x <= bufferDisplay2.shiftPassword[0] ;x++)
         {						   							
-    		buffer_txDisplay[x+18] = bufferDisplay2.shiftPassword[(bufferDisplay2.shiftPassword[0] + 1) - x];            
+    		buffer_B[x + 18] = bufferDisplay2.shiftPassword[(bufferDisplay2.shiftPassword[0] + 1) - x];            
     	}
-        for(x = 19; x < 31; x++)
-        {
-            if(buffer_txDisplay[x] == 0x00)
-            {
-                buffer_txDisplay[x] = 0x30;
-            }
-        }
         
-        buffer_txDisplay[32] = verificar_check(buffer_txDisplay,33);
-        
-        for (x = 0; x < 33; x++)
-        {
-            RF_Connection_PutChar(buffer_txDisplay[x]);
-        }
-        
-        side.b.rfState = RF_WORKSHIFTREQ;
+         buffer_B[32] = verificar_check(buffer_B,32);
+      
         side.b.RFstateReport = 0;
         ShiftState = 0;
+        bufferAreadyB = 1;
+        ShiftDone = 0;
     }
     
     ////////////// AUTHORIZATION REQUEST ////////////////////////
     if(side.b.pumpState == PUMP_CALLING && side.b.RFstateReport == 1 && CreditAuth2 == RF_CREDITSALEAUTH && bufferDisplay2.saleType == 2)
     {   
+        uint8 decimal, DecimalFaltante;
         buffer_B[0]  = 0xBC;
         buffer_B[1]  = 0xCB;
         buffer_B[2]  = 0xC8;
@@ -1550,14 +1692,88 @@ void pollingRFB_Tx(){
         {
             buffer_B[28 + y] = 0x00;
         }
-
         x = 0;
-        
-        for(y = bufferDisplay2.presetValue[0][0]; y >= 1; y--)
+        if(bufferDisplay2.presetType[0] == 1)
         {
-            buffer_B[35 - y] = bufferDisplay2.presetValue[0][y];
-            x++;
-        }     
+            for(x=0; x<8;x++){
+                tempPreset[x] = 0x30;
+            }
+
+        for(x = bufferDisplay2.presetValue[0][0] ; x > 0; x--)
+        {
+            tempPreset[bufferDisplay2.presetValue[0][0] - x] = (bufferDisplay2.presetValue[0][x]); 
+        } 
+        
+        decimal = 0;
+        
+        for(x=0; x<8;x++){
+            tempPreset2[x] = 0x30;
+        }
+        
+        for(decimal =0; decimal <= 7; decimal++)
+        {
+            tempPreset2[x] = 0x30;
+            if (tempPreset[decimal]== ',')
+            {
+                break;
+            }
+        }
+        if(decimal >= 7)
+        {
+           for(x=0; x<3;x++){
+            tempPreset2[x]=0x30;
+           }
+           for(x=3; x<8;x++){
+            tempPreset2[x]=tempPreset[x-3];
+           }
+        
+        }
+        else{
+            DecimalFaltante=3-decimal;
+            for(x=0; x<DecimalFaltante;x++){
+                tempPreset2[x]=0x30;
+            }
+            for(x=0; x<decimal;x++){
+                tempPreset2[x+DecimalFaltante]=tempPreset[x];
+            }
+            for(x=3; x<8;x++){
+                
+                tempPreset2[x]=tempPreset[x-DecimalFaltante+1];
+            
+            }
+        }
+
+            for(x = 28; x <= 35; x++)
+            {
+                buffer_B[x] = tempPreset2[x - 28];
+                
+                if(buffer_B[x]== 0x00)
+                {
+                    buffer_B[x] = 0x30;
+                }
+            }
+        }
+        if(bufferDisplay2.presetType[0] == 2)
+        {
+            for(x = 0; x<8; x++)
+            {
+                tempPreset[x] = 0x30;
+            }
+            
+            for(x = bufferDisplay2.presetValue[0][0] ; x > 0; x--)
+            {
+                tempPreset[bufferDisplay2.presetValue[0][0] - x] = (bufferDisplay2.presetValue[0][x]); 
+            }
+            for(x = 28; x <= 35; x++)
+            {
+                buffer_B[x] = tempPreset[x - 28];
+                
+                if(buffer_B[x]== 0x00)
+                {
+                    buffer_B[x] = 0x30;
+                }
+            }
+        }    
  
         // CRC
         buffer_B[36] = verificar_check(buffer_B,37);

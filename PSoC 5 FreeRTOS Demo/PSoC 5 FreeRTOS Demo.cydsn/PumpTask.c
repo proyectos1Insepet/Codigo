@@ -35,6 +35,10 @@ char mensaje[] = {"OPERACION"};
 char mensaje2[] = {"RECHAZADA"};
 char mensaje3[] = {"MANGUERA"};
 char mensaje4[] = {"INCORRECTA"};
+uint8 producto2[13] = "CORRIENTE    ";
+uint8 producto1[13] = "ACPM         ";
+uint8 producto3[13] = "EXTRA        ";
+uint8 producto4[13] = "             ";
 
 /* Drivers */
 #include "PumpTask.h"
@@ -62,10 +66,7 @@ void InitDisplay1(){
     uint8_t DisplayMode[10]    = "6-6-4     ";
     uint8_t DisplayMode2[10]   = "7-7-5     ";
     uint8_t DisplayMode3[10]   = "8-7-5     ";
-    uint8 producto2[13] = "CORRIENTE    ";
-    uint8 producto1[13] = "ACPM         ";
-    uint8 producto3[13] = "EXTRA        ";
-    uint8 producto4[13] = "             ";
+    
     
     for(x = 0; x < 13; x++)
     {
@@ -200,6 +201,7 @@ void InitDisplay2(){
     if(NumPositions == 2){        
         SetPicture(2,DISPLAY_INICIO0);  
         flowDisplay2 = 0;
+        Display2_ClearRxBuffer();
     }
     if(NumPositions == 4){
         SetPicture(2,DISPLAY_SELECCIONE_POSICION);         
@@ -256,66 +258,46 @@ void PrintTest(){
 */
 
 void PollingDisplay1(void){    
-    uint8 x, y;     
+    uint8 x, y;
+    uint32 cont;
     switch(flowDisplay1){
         case 0:
             InitDisplay1();
-            flowDisplay1 = 1;                     
+            flowDisplay1 = 1;
+            count_protector = 0;            
             bufferDisplay1.flagEndSale = false;  
             side.a.RFstateReport = 0;
-            SetPicture(1, DISPLAY_INICIO0);                        
+            SetPicture(1, DISPLAY_INICIO0);
+            Display1_ClearRxBuffer();
+                   
             if(bufferDisplay1.flagPrint == 1)
             {    
-                vTaskDelay( 700 / portTICK_PERIOD_MS );
+
+                vTaskDelay( 2000 / portTICK_PERIOD_MS );
                 imprimir(printPortA, side.a.dir);
                 bufferDisplay1.flagPrint = 0;
                 bufferDisplay1.saleType = 0;
+                IDPrintFlagA = 0;
+                for(x = 0; x < 10; x++)                                         //NUMERO DE VENTA
+                {   										    							
+    		        side.a.saleNumber[x] = 0x00;
+    	        }
+               
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         break;
-        case 1: //Menu   
+        case 1: //Menu
+   
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
                 {                                             
                     flowDisplay1 = 2;                               //Pantalla forma de pago                      
-                    SetPicture(1, DISPLAY_FORMA_PAGO_DESEADA);                                                                                                  
+                    SetPicture(1, DISPLAY_FORMA_PAGO_DESEADA);
+                    //vTaskDelay( 10 / portTICK_PERIOD_MS );
+                    Display2_ClearRxBuffer();
                 }  
        
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
-                Display1_ClearRxBuffer();
             }
         break;
         case 2:  //Pantalla forma de pago
@@ -338,13 +320,21 @@ void PollingDisplay1(void){
                                 flowDisplay1 = 0;                                                                
                             }
                         break;
-                        case 0x0E:  //Pantalla credito  
+                        case 0x0E:  //Pantalla credito 
+                            for(x = 0; x < 10; x++)
+                            {                                
+                                bufferDisplay1.CreditpresetValue[0][x] = 0x00;
+                                bufferDisplay1.CreditpresetValue[1][x] = 0x00;
+                                
+                            }
                             if(lockTurn == 1)
                             {
                                 flowDisplay1 = 10;
-                                bufferDisplay1.saleType = 2;                                
+                                bufferDisplay1.saleType = 2;
+                                count_protector = 0;
                                 SetPicture(1, DISPLAY_ID_DIGITAL);
                                 AuthType = 1;
+                                Display1_ClearRxBuffer();
                             }else
                             {
                                 SetPicture(1, DISPLAY_CANCELADO_X_PC);
@@ -357,6 +347,7 @@ void PollingDisplay1(void){
                             flowDisplay1 = 12;                            
                             SetPicture(1,  DISPLAY_OPERACIONES);
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                             
                         case 0x94:  //Pantalla Inicial 
@@ -364,6 +355,7 @@ void PollingDisplay1(void){
                             flowDisplay1 = 0;
                             SetPicture(1, DISPLAY_INICIO0);   
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                         
                         case 0x7E:  //Pantalla Inicial 
@@ -371,6 +363,7 @@ void PollingDisplay1(void){
                             flowDisplay1 = 0;
                             SetPicture(1, DISPLAY_INICIO0);
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                     }
                 }  
@@ -381,6 +374,12 @@ void PollingDisplay1(void){
         break;
             
         case 3: //Pantalla ingreso de valores
+            for(x = 0; x <10; x++)
+            {
+                bufferDisplay1.presetValue[0][x] = 0x00;
+                bufferDisplay1.presetValue[1][x] = 0x00;
+            }
+            Credit_Auth_OK = 0;
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -393,14 +392,16 @@ void PollingDisplay1(void){
                             bufferDisplay1.presetType[1] = 'D';
                             numberKeys1 = 0;
                             SetPicture(1, DISPLAY_INTRODUZCA_VALOR);   
-                            WriteLCD(1, '$', 3, 2, 1, 0x0000, 'N');                            
+                            WriteLCD(1, '$', 3, 2, 1, 0x0000, 'N');
+                            
                             if(MoneyDec > 0)
                             {
                                 flagPoint1 = 0;
                             }else
                             {
                                 flagPoint1 = 1;
-                            }                           
+                            }
+                            Display1_ClearRxBuffer();
                         break; 
                         case 0x10:  //Preset volumen                 
                             flowDisplay1 = 4;                            
@@ -408,22 +409,26 @@ void PollingDisplay1(void){
                             bufferDisplay1.presetType[1] = 'V';
                             numberKeys1 = 0;                            
                             SetPicture(1, DISPLAY_INTRODUZCA_VOLUMEN);                            
-                            WriteLCD(1, 'G', 3, 2, 1, 0x0000, 'N');                            
+                            WriteLCD(1, 'G', 3, 2, 1, 0x0000, 'N');
+                            
                             if(VolDec > 0)
                             {
                                 flagPoint1 = 0;
                             }else
                             {
                                 flagPoint1 = 1;
-                            }                                                       
+                            }
+                            Display1_ClearRxBuffer();
                         break;
                         case 0x43:     //Preset full 
-                            bufferDisplay1.presetType[0] = 2;
-                            bufferDisplay1.presetType[1] = 'F';                            
+                            bufferDisplay1.presetType[0] = 3;
+                            bufferDisplay1.presetType[1] = 'F';
+                            
                             for(x = 1; x <(digits - 1); x++)
                             {
                                 bufferDisplay1.presetValue[0][x] = '9';
-                            }                            
+                            }
+                            
                             bufferDisplay1.presetValue[0][x] = '0';
                             bufferDisplay1.presetValue[0][x + 1] = '0';
                             bufferDisplay1.presetValue[0][0] = digits;
@@ -435,18 +440,20 @@ void PollingDisplay1(void){
                             
                             flowDisplay1 = 5;
                             SetPicture(1,DISPLAY_SELECCIONE_PRODUCTO4);
-                          
+                            Display1_ClearRxBuffer();
                         break;
                         case 0x94:  //Retroceso
                             bufferDisplay1.flagPrint =  0;
                             flowDisplay1 = 0;
                             SetPicture(1,DISPLAY_INICIO0);
+                            Display1_ClearRxBuffer();
                         break;
                         case 0x3B:  //Pantalla Inicial  
                             AuthType = 0;                        
                             flowDisplay1 = 0;
                             SetPicture(1,DISPLAY_INICIO0);
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                         case 0x7E:  //Pantalla Inicial  
                             AuthType = 0;
@@ -454,11 +461,12 @@ void PollingDisplay1(void){
                             flowDisplay1 = 0;
                             SetPicture(1,DISPLAY_INICIO0); 
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                     }
                 }  
                 //CyDelay(10);
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+                //vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
                 Display1_ClearRxBuffer();
             }
         break;
@@ -468,7 +476,8 @@ void PollingDisplay1(void){
             {
                 case 0:  //Pantalla Inicial    
                     flowDisplay1 = 0;
-                    SetPicture(1,DISPLAY_INICIO0);                            
+                    SetPicture(1,DISPLAY_INICIO0); 
+                    Display1_ClearRxBuffer();
                 break;
                     
                 case 1: //Enter
@@ -479,6 +488,7 @@ void PollingDisplay1(void){
                     }  
                     flowDisplay1 = 5;//caso para seleccion de producto
                     SetPicture(1, DISPLAY_SELECCIONE_PRODUCTO4);
+                    Display1_ClearRxBuffer();
                 break;
             }
         break;
@@ -489,7 +499,7 @@ void PollingDisplay1(void){
             {
                 for(x = 0; x < 10; x++)
                 {
-                    WriteMessage(1, producto[side.a.GradesHose[0]-1][x],11,7+x,2,0xFFFF,'Y');
+                   WriteMessage(1, producto1[x],11,7+x,2,0xFFFF,'Y'); //WriteMessage(1, producto[side.a.GradesHose[0]-1][x],11,7+x,2,0xFFFF,'Y');
                 } 
             }
             if(side.a.GradesHose[1] !=0)
@@ -537,7 +547,7 @@ void PollingDisplay1(void){
                                 bufferDisplay1.flagKeyboard = 2;
                                 SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             }
-                            
+                            Display1_ClearRxBuffer();
                         break;
                             
                         case 0x81:  //Grado 2 
@@ -557,7 +567,7 @@ void PollingDisplay1(void){
                                 bufferDisplay1.flagKeyboard = 2;
                                 SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             }
-                            
+                            Display1_ClearRxBuffer(); 
                         break;
                             
                         case 0x7F:  //Grado 3
@@ -577,7 +587,7 @@ void PollingDisplay1(void){
                                 bufferDisplay1.flagKeyboard = 2;
                                 SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             }
-                            
+                            Display1_ClearRxBuffer();
                         break;   
                         
                         case 0xB8:  //Grado 4 
@@ -597,13 +607,14 @@ void PollingDisplay1(void){
                                 bufferDisplay1.flagKeyboard = 2;
                                 SetPicture(1, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             } 
-                            
+                            Display1_ClearRxBuffer();
                         break;
                             
                         case 0x94:  //Retroceso
                             bufferDisplay1.flagPrint =  0;
                             flowDisplay1 = 0;
-                            SetPicture(1,DISPLAY_INICIO0); 
+                            SetPicture(1,DISPLAY_INICIO0);
+                            Display1_ClearRxBuffer();
                         break;
                             
                         case 0x7E:  //Pantalla Inicial
@@ -611,6 +622,7 @@ void PollingDisplay1(void){
                             SetPicture(1,DISPLAY_INICIO0);
                             flowDisplay1 = 0;
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                     }                    
                 }
@@ -633,7 +645,8 @@ void PollingDisplay1(void){
                             bufferDisplay1.flagPrint =  1;
                             PrintON = 1;
                             
-                            SetPicture(1, DISPLAY_SUBA_MANIJA);                            
+                            SetPicture(1, DISPLAY_SUBA_MANIJA);  
+                            Display1_ClearRxBuffer();
                         break; 
                         case 0x38:  //No Print 
                             if(bufferDisplay1.flagEndSale)
@@ -648,6 +661,7 @@ void PollingDisplay1(void){
                                 count_protector = 0;
                                
                                 SetPicture(1, DISPLAY_SUBA_MANIJA);
+                                Display1_ClearRxBuffer();
                             } 
                         break;
                         case 0x7E:  //Return to initial screen                                                                                    
@@ -656,11 +670,12 @@ void PollingDisplay1(void){
                             SetPicture(1,DISPLAY_INICIO0);
                             bufferDisplay1.flagPrint =  0;
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                     }                    
                 }
                
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              // 10mS delay
+                //vTaskDelay( 10 / portTICK_PERIOD_MS );              // 10mS delay
                 Display1_ClearRxBuffer();
             }
             if(count_protector >= 30)
@@ -689,6 +704,9 @@ void PollingDisplay1(void){
                             PresetFlag = 0;
                             iButtonFlag = 0;
                             AuthType = 0;
+                            side.a.rfState = RF_ZERO_SALE;
+                            vTaskDelay( 50 / portTICK_PERIOD_MS );
+                            Display1_ClearRxBuffer();
                         break;
                         
                         case 0x94:  //Cancel Button                                                        
@@ -698,13 +716,15 @@ void PollingDisplay1(void){
                             PresetFlag = 0;
                             iButtonFlag = 0;
                             AuthType = 0;
+                            side.a.rfState = RF_ZERO_SALE;
+                            vTaskDelay( 50 / portTICK_PERIOD_MS );
+                            Display1_ClearRxBuffer();
                         break;
                     }                    
                 }
                 
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+               Display1_ClearRxBuffer();
             }
-            Display1_ClearRxBuffer();
            
         break;
             
@@ -712,7 +732,7 @@ void PollingDisplay1(void){
         case 8:
                           
            //Pump Busy...
-                        
+           vTaskDelay( 10 / portTICK_PERIOD_MS );              
         break;
             
         case 9: //Keyboard           
@@ -728,13 +748,15 @@ void PollingDisplay1(void){
                             }
                             flowDisplay1 = 0; 
                             SetPicture(1, DISPLAY_INICIO0);
+                            Display1_ClearRxBuffer();
                         break;
                         
                         case 2://Mileage
                             for(x = 0; x <= 10; x++)
                             {
                                 bufferDisplay1.mileageSale[x] = 0;
-                            }                                                                                                                                       
+                            }        
+                            Display1_ClearRxBuffer();
                         break;
                         
                         case 3://CC/NIT
@@ -742,6 +764,7 @@ void PollingDisplay1(void){
                             {
                                 bufferDisplay1.identySale[x] = 0;
                             }
+                            Display1_ClearRxBuffer();
                         break;
                             
                         case 4://ID
@@ -749,6 +772,7 @@ void PollingDisplay1(void){
                             {
                                 bufferDisplay1.shiftId[x] = 0;
                             }
+                            Display1_ClearRxBuffer();
                         break;
                     }                    
                     Display1_ClearRxBuffer();
@@ -758,6 +782,11 @@ void PollingDisplay1(void){
                     switch(bufferDisplay1.flagKeyboard)
                     {
                         case 1://License plate
+                            for(x = 0; x <= 10; x++)
+                            {
+                                bufferDisplay1.licenceSale[x] = 0x00;
+                            }
+                            Display1_ClearRxBuffer();
                             for(x = 0; x <= bufferDisplay1.valueKeys[0]; x++)
                             {
                                 bufferDisplay1.licenceSale[x] = bufferDisplay1.valueKeys[x];
@@ -771,10 +800,14 @@ void PollingDisplay1(void){
                                 flowDisplay1 = 6;
                                 SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO);                                 
                             }
+                            Display1_ClearRxBuffer();
                         break;
                         
                         case 2:// mileage
-                                                     
+                            for(x = 0; x <= 10; x++)
+                            {
+                                bufferDisplay1.mileageSale[x] = 0;
+                            }                         
                             for(x = 0; x <= bufferDisplay1.valueKeys[0]; x++)
                             {
                                 bufferDisplay1.mileageSale[x] = bufferDisplay1.valueKeys[x];
@@ -792,7 +825,7 @@ void PollingDisplay1(void){
                                 flowDisplay1 = 6;       
                                 SetPicture(1, DISPLAY_DESEA_IMPRIMIR_RECIBO);
                             }                                               
-                                                       
+                            Display1_ClearRxBuffer();                           
                         break;
                         
                         case 3:     //CC/NIT
@@ -801,6 +834,7 @@ void PollingDisplay1(void){
                             {
                                 bufferDisplay1.identySale[x] = bufferDisplay1.valueKeys[x];
                             }
+                            Display1_ClearRxBuffer();
                         break;
                         case 4:     //ID
                             
@@ -815,10 +849,10 @@ void PollingDisplay1(void){
                             controlChar = '*';
                             bufferDisplay1.flagKeyboard = 3;
                             SetPicture(1,DISPLAY_INGRESE_PASSWORD);
-
+                            Display1_ClearRxBuffer();
                         break;
                     }                    
-                    Display1_ClearRxBuffer();
+                    //Display1_ClearRxBuffer();
                 break;
             }  
             Display1_ClearRxBuffer();
@@ -858,7 +892,7 @@ void PollingDisplay1(void){
                     }                    
                 }
              
-                vTaskDelay( 10 / portTICK_PERIOD_MS );
+                //vTaskDelay( 10 / portTICK_PERIOD_MS );
                 Display1_ClearRxBuffer();
             }                        
         break;
@@ -904,7 +938,7 @@ void PollingDisplay1(void){
                         
                         // Authorization request
                         SetPicture(1,DISPLAY_ID_RECONOCIDO);                                                                 
-                        vTaskDelay( 200 / portTICK_PERIOD_MS );                       
+                        vTaskDelay( 700 / portTICK_PERIOD_MS );                       
                         iButtonFlag = 1;
                         SetPicture(1, DISPLAY_FORMA_PROGRAMACION);
                         flowDisplay1 = 3;
@@ -915,7 +949,7 @@ void PollingDisplay1(void){
                     {
                         SetPicture(1,DISPLAY_ID_NO_RECONOCIDO);                                           
                         Display1_ClearRxBuffer();
-                        vTaskDelay( 200 / portTICK_PERIOD_MS );    
+                        vTaskDelay( 700 / portTICK_PERIOD_MS );    
                         SetPicture(1, DISPLAY_INICIO0);
                         flowDisplay1 = 0;
                         bufferDisplay1.flagPrint =  0;
@@ -940,6 +974,7 @@ void PollingDisplay1(void){
                             PresetFlag = 0;
                             iButtonFlag = 0;
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                         
                         case 0x94:  //Cancel Button                                                        
@@ -949,13 +984,14 @@ void PollingDisplay1(void){
                             PresetFlag = 0;
                             iButtonFlag = 0;
                             AuthType = 0;
+                            Display1_ClearRxBuffer();
                         break;
                     }                    
                 }
                 
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+                Display1_ClearRxBuffer();
             }
-            Display1_ClearRxBuffer();
+          
                                     
         break;    
     ///////////////FIN CASOS PARA CRÉDITO  /////////////////////  
@@ -1004,20 +1040,22 @@ void PollingDisplay1(void){
                         
                         case 0x3B:  //Pantalla Inicial    
                             flowDisplay1 = 0;
-                            SetPicture(1,DISPLAY_INICIO0);                            
+                            SetPicture(1,DISPLAY_INICIO0);
+                            Display1_ClearRxBuffer();
                         break;
                             
                         case 0x94:  //Pantalla Inicial
                             bufferDisplay1.flagPrint =  0;
                             flowDisplay1 = 0;
-                            SetPicture(1,DISPLAY_INICIO0);                            
+                            SetPicture(1,DISPLAY_INICIO0); 
+                            Display1_ClearRxBuffer();
                         break;
                         
                         case 0x7E:  //Pantalla Inicial
                             bufferDisplay1.flagPrint =  0;
                             flowDisplay1 = 0;
                             SetPicture(1,DISPLAY_INICIO0);
-                            
+                            Display1_ClearRxBuffer();
                         break;
                     }
                 }  
@@ -1442,7 +1480,7 @@ void PollingDisplay1(void){
         case 21:
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint = 0;
+            bufferDisplay1.flagPrint == 0;
             for(x = 0; x < 9; x++)
             {
                 WriteMessage(1, mensaje[x],17,1 + x,4,0x0000,'Y');
@@ -1459,7 +1497,7 @@ void PollingDisplay1(void){
         case 22:
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint = 0;
+            bufferDisplay1.flagPrint == 0;
 
             for(x = 0; x < 8; x++)
             {
@@ -1492,34 +1530,50 @@ void PollingDisplay1(void){
 *********************************************************************************************************
 */
 void PollingDisplay2(void){    
-    uint8 x,y;     
+    uint8 x,y;  
+    uint32 cont;
     switch(flowDisplay2){
         case 0:
 			InitDisplay2();
-            flowDisplay2 = 1;            
-            bufferDisplay2.flagEndSale = false;  
-			side.b.RFstateReport = 0;
-            SetPicture(2, DISPLAY_INICIO0);            
+            flowDisplay2 = 1;
+            count_protector2 = 0;
+            //bufferDisplay2.flagEndSale = false;  
+			//side.b.RFstateReport = 0;
+            SetPicture(2, DISPLAY_INICIO0);
+            Display2_ClearRxBuffer();
+
+
             if(bufferDisplay2.flagPrint == 1)
             {    
-                vTaskDelay( 200 / portTICK_PERIOD_MS );
+
+                vTaskDelay( 2000 / portTICK_PERIOD_MS );
                 imprimir(printPortB, side.b.dir);
                 bufferDisplay2.flagPrint = 0;
-                bufferDisplay2.saleType = 0;               
+                bufferDisplay2.saleType = 0; 
+                IDPrintFlagB = 0;
+                for(x = 0; x < 10; x++)                                         //NUMERO DE VENTA
+                {   										    							
+    		        side.b.saleNumber[x] = 0x00;
+    	        }
             }
+            
         break;
-        case 1: //Menu                        
+        case 1: //Menu
+            
+            
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
                 {                                             
                     flowDisplay2 = 2;                          //Pantalla forma de pago                      
-                    SetPicture(2,DISPLAY_FORMA_PAGO_DESEADA);                                                                                                  
+                    SetPicture(2,DISPLAY_FORMA_PAGO_DESEADA);   
+                    //vTaskDelay( 10 / portTICK_PERIOD_MS );
+                    Display2_ClearRxBuffer();
                 }  
 
-                vTaskDelay( 10 / portTICK_PERIOD_MS );
-                Display2_ClearRxBuffer();
+               
             }
+            
         break;
         case 2:
             if(Display2_GetRxBufferSize() == 8)
@@ -1535,24 +1589,36 @@ void PollingDisplay2(void){
                                 bufferDisplay2.saleType = 1;
                                 SetPicture(2,DISPLAY_FORMA_PROGRAMACION);
                                 AuthType2 = 2;
+                                Display2_ClearRxBuffer();
                             }else{
                                 SetPicture(2, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
-                                flowDisplay2 = 0;                                                                
+                                flowDisplay2 = 0; 
+                                Display2_ClearRxBuffer();                                                               
                             }
                         break;
-                        case 0x0E:  //Pantalla credito  
+                        case 0x0E:  //Pantalla credito 
+                            for(x = 0; x < 10; x++)
+                            {                                
+                                bufferDisplay2.CreditpresetValue[0][x] = 0x00;
+                                bufferDisplay2.CreditpresetValue[1][x] = 0x00;
+                                
+                            }
+                            
                             if(lockTurn == 1)
                             {
                                 flowDisplay2 = 10;
-                                bufferDisplay2.saleType = 2;                                
+                                bufferDisplay2.saleType = 2;
+                                count_protector2 = 0;
                                 SetPicture(2, DISPLAY_ID_DIGITAL);
                                 AuthType2 = 1;
+                                Display2_ClearRxBuffer();
                             }else
                             {
                                 SetPicture(2, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
-                                flowDisplay2 = 0;                                                                
+                                flowDisplay2 = 0;  
+                                 Display2_ClearRxBuffer();                                                             
                             }
                             
                         break;
@@ -1560,6 +1626,7 @@ void PollingDisplay2(void){
                             flowDisplay2 = 12;                            
                             SetPicture(2,DISPLAY_OPERACIONES); 
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                             
                         case 0x94:  //Pantalla Inicial
@@ -1567,6 +1634,7 @@ void PollingDisplay2(void){
                             flowDisplay2 = 0;
                             SetPicture(2,DISPLAY_INICIO0);
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 0x7E:  //Pantalla Inicial 
@@ -1574,16 +1642,23 @@ void PollingDisplay2(void){
                             flowDisplay2 = 0;
                             SetPicture(2,DISPLAY_INICIO0);
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                     }
-                }  
-               
+                } 
                 vTaskDelay( 10 / portTICK_PERIOD_MS );
-                Display2_ClearRxBuffer();
+                Display2_ClearRxBuffer();                
             }
+            
         break;
             
         case 3: 
+            for(x = 0; x <10; x++)
+            {
+                bufferDisplay2.presetValue[0][x] = 0x00;
+                bufferDisplay2.presetValue[1][x] = 0x00;
+            }
+            Credit_Auth_OK2 = 0;
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -1596,7 +1671,8 @@ void PollingDisplay2(void){
                             bufferDisplay2.presetType[1] = 'D';
                             numberKeys2 = 0;
                             SetPicture(2,DISPLAY_INTRODUZCA_VALOR);   
-                            WriteLCD(2,'$',3,2,1,0x0000,'N');							
+                            WriteLCD(2,'$',3,2,1,0x0000,'N');
+							
                             if(MoneyDec > 0)
                             {
                                 flagPoint2 = 0;
@@ -1604,6 +1680,7 @@ void PollingDisplay2(void){
                             {
                                 flagPoint2 = 1;
                             }
+                            Display2_ClearRxBuffer();
                         break; 
                         case 0x10:  //Preset volumen                 
                             flowDisplay2 = 4;                            
@@ -1611,7 +1688,8 @@ void PollingDisplay2(void){
                             bufferDisplay2.presetType[1] = 'V';
                             numberKeys2 = 0;                            
                             SetPicture(2,DISPLAY_INTRODUZCA_VOLUMEN);                            
-                            WriteLCD(2,'G',3,2,1,0x0000,'N');                            							
+                            WriteLCD(2,'G',3,2,1,0x0000,'N');                            
+							
                             if(VolDec > 0)
                             {
                                 flagPoint2 = 0;
@@ -1619,14 +1697,17 @@ void PollingDisplay2(void){
                             {
                                 flagPoint2 = 1;
                             }
+                            Display2_ClearRxBuffer();
                         break;
                         case 0x43:  //Preset full 
-                            bufferDisplay2.presetType[0] = 2;
-                            bufferDisplay2.presetType[1] = 'F';                            
+                            bufferDisplay2.presetType[0] = 3;
+                            bufferDisplay2.presetType[1] = 'F';
+                            
                             for(x = 1; x <(digits - 1); x++)
                             {
                                 bufferDisplay2.presetValue[0][x] = '9';
-                            }                            
+                            }
+                            
                             bufferDisplay2.presetValue[0][x] = '0';
                             bufferDisplay2.presetValue[0][x + 1] = '0';
                             bufferDisplay2.presetValue[0][0] = digits;
@@ -1635,30 +1716,35 @@ void PollingDisplay2(void){
                                 bufferDisplay2.presetValue[1][x] = bufferDisplay2.presetValue[0][x];
                             }
                             flowDisplay2 = 5;
-                            SetPicture(2,DISPLAY_SELECCIONE_PRODUCTO4);                          
+                            SetPicture(2,DISPLAY_SELECCIONE_PRODUCTO4); 
+                            Display2_ClearRxBuffer();                         
                         break;
                         case 0x94:  //Retroceso 
                             bufferDisplay2.flagPrint =  0;
                             flowDisplay2 = 0;
-                            SetPicture(2,DISPLAY_INICIO0);                                                        
+                            SetPicture(2,DISPLAY_INICIO0); 
+                            Display2_ClearRxBuffer();                                                       
                         break;
                         case 0x3B:  //Pantalla Inicial    
                             flowDisplay2 = 0;
                             SetPicture(2,DISPLAY_INICIO0);
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                         case 0x7E:  //Pantalla Inicial 
                             bufferDisplay2.flagPrint =  0;
                             flowDisplay2 = 0;
                             SetPicture(2,DISPLAY_INICIO0);
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                     }
                 }  
                 
-                vTaskDelay( 10 / portTICK_PERIOD_MS );
+                //vTaskDelay( 10 / portTICK_PERIOD_MS );
                 Display2_ClearRxBuffer();
             }
+           
         break;
         
         case 4:            
@@ -1666,7 +1752,8 @@ void PollingDisplay2(void){
             {
                 case 0:  //Pantalla Inicial    
                     flowDisplay2 = 0;
-                    SetPicture(2,DISPLAY_INICIO0);                            
+                    SetPicture(2,DISPLAY_INICIO0);
+                    Display2_ClearRxBuffer();                            
                 break;
                     
                 case 1: //Enter
@@ -1677,8 +1764,10 @@ void PollingDisplay2(void){
                     }  
                     flowDisplay2 = 5;       //caso para seleccion de producto
                     SetPicture(2,DISPLAY_SELECCIONE_PRODUCTO4);
+                    Display2_ClearRxBuffer();
                 break;
             }
+
         break;
             
         case 5:
@@ -1733,6 +1822,7 @@ void PollingDisplay2(void){
                                 bufferDisplay2.flagKeyboard = 2;
                                 SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             }
+                            Display2_ClearRxBuffer();
                         break;        
                         case 0x81:  //Grado 2 
                             numberKeys2 = 0;
@@ -1751,6 +1841,7 @@ void PollingDisplay2(void){
                                 bufferDisplay2.flagKeyboard = 2;
                                 SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             }
+                            Display2_ClearRxBuffer();
                         break;
                             
                         case 0x7F:  //Grado 3
@@ -1770,6 +1861,7 @@ void PollingDisplay2(void){
                                 bufferDisplay2.flagKeyboard = 2;
                                 SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             }
+                            Display2_ClearRxBuffer();
                         break;   
                         
                         case 0xB8:  //Grado 4 
@@ -1789,12 +1881,14 @@ void PollingDisplay2(void){
                                 bufferDisplay2.flagKeyboard = 2;
                                 SetPicture(2, DISPLAY_INTRODUZCA_KILOMETRAJE);                            
                             }
+                            Display2_ClearRxBuffer();
                         break;
                             
                         case 0x94:  //Retroceso
                             bufferDisplay2.flagPrint =  0;
                             flowDisplay2 = 0;
-                            SetPicture(2,DISPLAY_INICIO0);                                                        
+                            SetPicture(2,DISPLAY_INICIO0);    
+                            Display2_ClearRxBuffer();                                                    
                         break;
                             
                         case 0x7E:  //Pantalla Inicial    
@@ -1802,13 +1896,14 @@ void PollingDisplay2(void){
                             SetPicture(2,DISPLAY_INICIO0);
                             flowDisplay2 = 0;
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                     }                    
                 }
-                
                 vTaskDelay( 10 / portTICK_PERIOD_MS );
-                Display2_ClearRxBuffer();
+                Display2_ClearRxBuffer();               
             }
+            
         break;
                     
         case 6:
@@ -1824,7 +1919,8 @@ void PollingDisplay2(void){
                             numberKeys2 = 0;
                             bufferDisplay2.flagPrint =  1;
                             
-                            SetPicture(2,DISPLAY_SUBA_MANIJA);                            
+                            SetPicture(2,DISPLAY_SUBA_MANIJA); 
+                            Display2_ClearRxBuffer();                           
                         break; 
                         case 0x38:  //No imprimir 
                             if(bufferDisplay2.flagEndSale)
@@ -1832,6 +1928,7 @@ void PollingDisplay2(void){
                                 bufferDisplay2.flagPrint = 0;
                                 flowDisplay2 = 0;
                                 SetPicture(2,DISPLAY_INICIO0);
+                                Display2_ClearRxBuffer();
                             }else
                             {
                                 flowDisplay2 = 7;//Esperando estado del dispensador 
@@ -1839,6 +1936,7 @@ void PollingDisplay2(void){
                                 count_protector = 0;
                                 
                                 SetPicture(2,DISPLAY_SUBA_MANIJA);
+                                Display2_ClearRxBuffer();
                             }
                         break;
                         case 0x7E:  //Pantalla Inicial                                                                                    
@@ -1847,13 +1945,14 @@ void PollingDisplay2(void){
                             SetPicture(2,DISPLAY_INICIO0);
                             bufferDisplay2.flagPrint = 0;
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                     }                    
-                }
-         
-                vTaskDelay( 10 / portTICK_PERIOD_MS );
-                Display2_ClearRxBuffer();
+                } 
+                //vTaskDelay( 10 / portTICK_PERIOD_MS );
+                Display2_ClearRxBuffer();             
             }
+            
             if(count_protector >= 30)
             {
                 flowDisplay2 = 0;	
@@ -1864,6 +1963,7 @@ void PollingDisplay2(void){
         case 7:
 
             PresetFlag2 = 1;      
+            
             //Touch for return to init display
             if(Display2_GetRxBufferSize() == 8)
             {
@@ -1878,6 +1978,9 @@ void PollingDisplay2(void){
                             PresetFlag2 = 0;
                             iButtonFlag2 = 0;
                             AuthType2 = 0;
+                            side.b.rfState = RF_ZERO_SALE;
+                            vTaskDelay( 50 / portTICK_PERIOD_MS );
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 0x94:  //Cancel Button                                                        
@@ -1887,20 +1990,22 @@ void PollingDisplay2(void){
                             PresetFlag2 = 0;
                             iButtonFlag2 = 0;
                             AuthType2 = 0;
+                            side.b.rfState = RF_ZERO_SALE;
+                            vTaskDelay( 50 / portTICK_PERIOD_MS );
+                            Display2_ClearRxBuffer();
                         break;
                     }                    
-                }
-                
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+                }                
+                Display2_ClearRxBuffer();                
             }
-            Display1_ClearRxBuffer();
+            
                        
         break;
             
         case 8:       
             
             //Pump Busy...
-            
+            vTaskDelay( 10 / portTICK_PERIOD_MS );
         break;
             
         case 9: // Keyboard           
@@ -1916,6 +2021,7 @@ void PollingDisplay2(void){
                             }
                             flowDisplay2 = 0;
                             SetPicture(2,DISPLAY_INICIO0);
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 2://Mileage
@@ -1923,6 +2029,7 @@ void PollingDisplay2(void){
                             {
                                 bufferDisplay2.mileageSale[x] = 0;
                             }
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 3://CC/NIT
@@ -1930,12 +2037,14 @@ void PollingDisplay2(void){
                             {
                                 bufferDisplay2.identySale[x] = 0;
                             }
+                            Display2_ClearRxBuffer();
                         break;
                         case 4://ID
                             for(x = 0; x < 11; x++)
                             {
                                 bufferDisplay2.shiftId[x] = 0;
                             }
+                            Display2_ClearRxBuffer();
                         break;
                     }                    
                     Display2_ClearRxBuffer();
@@ -1945,6 +2054,11 @@ void PollingDisplay2(void){
                     switch(bufferDisplay2.flagKeyboard)
                     {
                         case 1://Licence plate
+                            for(x = 0; x < 10; x++)
+                            {
+                                bufferDisplay2.licenceSale[x] = 0x00;
+                            }
+                            Display2_ClearRxBuffer();
                             for(x = 0; x <= bufferDisplay2.valueKeys[0]; x++)
                             {
                                 bufferDisplay2.licenceSale[x] = bufferDisplay2.valueKeys[x];
@@ -1959,9 +2073,14 @@ void PollingDisplay2(void){
                                 flowDisplay2 = 6;   
                                 SetPicture(2, DISPLAY_DESEA_IMPRIMIR_RECIBO);                              
                             }
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 2:  //Mileage
+                            for(x = 0; x < 10; x++)
+                            {
+                                bufferDisplay2.mileageSale[x] = 0x00;
+                            }
                             for(x = 0; x <= bufferDisplay2.valueKeys[0]; x++)
                             {
                                 bufferDisplay2.mileageSale[x] = bufferDisplay2.valueKeys[x];
@@ -1978,7 +2097,7 @@ void PollingDisplay2(void){
                                 flowDisplay2 = 6;      
                                 SetPicture(2,DISPLAY_DESEA_IMPRIMIR_RECIBO);
                             }
-                            
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 3://CC/NIT
@@ -1986,6 +2105,7 @@ void PollingDisplay2(void){
                             {
                                 bufferDisplay2.identySale[x] = bufferDisplay2.valueKeys[x];
                             }
+                            Display2_ClearRxBuffer();
                         case 4://ID
                             for(x = 0; x <= 10; x++)
                             {
@@ -1997,11 +2117,14 @@ void PollingDisplay2(void){
                             controlChar ='*';
                             bufferDisplay2.flagKeyboard = 3;
                             SetPicture(2,DISPLAY_INGRESE_PASSWORD);
+                            Display2_ClearRxBuffer();
                         break;
                     }                    
-                    Display2_ClearRxBuffer();
+                //Display2_ClearRxBuffer();    
                 break;
-            }            
+
+            }  
+            Display2_ClearRxBuffer();           
         break;    
     ////////////////// CASOS PARA CRÉDITO  /////////////////////
         case 10:
@@ -2039,9 +2162,10 @@ void PollingDisplay2(void){
                     }                    
                 }
                 
-                vTaskDelay( 10 / portTICK_PERIOD_MS ); 
+                //vTaskDelay( 10 / portTICK_PERIOD_MS ); 
                 Display2_ClearRxBuffer();
-            }                        
+            } 
+                                  
         break;
         
         case 11:
@@ -2098,6 +2222,7 @@ void PollingDisplay2(void){
                     PresetFlag2 = 0;
                     iButtonFlag2 = 0;
                     AuthType2 = 0;
+                    Display2_ClearRxBuffer();
                 }
 			}
            //Touch for return to init display
@@ -2114,6 +2239,7 @@ void PollingDisplay2(void){
                             PresetFlag2 = 0;
                             iButtonFlag2 = 0;
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 0x94:  //Cancel Button                                                        
@@ -2123,14 +2249,16 @@ void PollingDisplay2(void){
                             PresetFlag2 = 0;
                             iButtonFlag2 = 0;
                             AuthType2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                     }                    
                 }
                 
-                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+                //vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+                Display2_ClearRxBuffer();
             }
-            Display2_ClearRxBuffer();
-                                    
+           
+                                 
         break;    
     ///////////////FIN CASOS PARA CRÉDITO  /////////////////////  
     
@@ -2150,7 +2278,8 @@ void PollingDisplay2(void){
                             }else
                             {
                                 SetPicture(2,DISPLAY_ABRIR_TURNO);
-                            }                            
+                            } 
+                            Display2_ClearRxBuffer();
                         break;
                         case 0x55:  //Configurar módulo 
                             flowDisplay2 = 14;
@@ -2158,7 +2287,8 @@ void PollingDisplay2(void){
                             numberKeys2 = 0;
                             hiddenKeys = 5;
                             controlChar ='*';
-                            SetPicture(2,DISPLAY_INGRESE_PASSWORD);                           
+                            SetPicture(2,DISPLAY_INGRESE_PASSWORD); 
+                            Display2_ClearRxBuffer();
                         break;
                             
                         case 0xB5:  //Copia de recibo 
@@ -2169,29 +2299,34 @@ void PollingDisplay2(void){
                                 SetPicture(2,DISPLAY_IMPRIMIENDO_RECIBO); 
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
                                 flowDisplay2  = 0;
+                                Display2_ClearRxBuffer();
                             }else
                             {
                                 SetPicture(2, DISPLAY_CANCELADO_X_PC);
                                 vTaskDelay( 900 / portTICK_PERIOD_MS );
-                                flowDisplay2 = 0;                                                                
+                                flowDisplay2 = 0; 
+                                Display2_ClearRxBuffer();
                             }
                         break;
                         
                         case 0x3B:  //Pantalla Inicial    
                             flowDisplay2 = 0;
-                            SetPicture(2,DISPLAY_INICIO0);                            
+                            SetPicture(2,DISPLAY_INICIO0); 
+                            Display2_ClearRxBuffer();
                         break;
                             
                         case 0x94:  //Pantalla Inicial
                             bufferDisplay2.flagPrint =  0;
                             flowDisplay2 = 0;
-                            SetPicture(2,DISPLAY_INICIO0);                            
+                            SetPicture(2,DISPLAY_INICIO0);
+                            Display2_ClearRxBuffer();
                         break;
                         
                         case 0x7E:  //Pantalla Inicial
                              bufferDisplay2.flagPrint =  0;
                             flowDisplay2 = 0;
-                            SetPicture(2,DISPLAY_INICIO0);                            
+                            SetPicture(2,DISPLAY_INICIO0);
+                            Display2_ClearRxBuffer();
                         break;
                     }
                 }  
@@ -2212,23 +2347,27 @@ void PollingDisplay2(void){
                             flowDisplay2 = 9;
                             numberKeys2 = 0;    
                             bufferDisplay2.flagKeyboard = 4;
-                            SetPicture(2,DISPLAY_INTRODUZCA_CEDULA);                            
+                            SetPicture(2,DISPLAY_INTRODUZCA_CEDULA); 
+                            Display2_ClearRxBuffer();
                         break;
                         case 0x48:  //Cambio de turno: Cerrar 
                             flowDisplay2 = 9;
                             numberKeys2 = 0;   
                             bufferDisplay2.flagKeyboard = 4;
-                            SetPicture(2,DISPLAY_INTRODUZCA_CEDULA);                           
+                            SetPicture(2,DISPLAY_INTRODUZCA_CEDULA);  
+                            Display2_ClearRxBuffer();
                         break;                         
                         case 0x7E:  //Pantalla Inicial 
                              bufferDisplay2.flagPrint =  0;
                             SetPicture(2,DISPLAY_INICIO0);
                             flowDisplay2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                         case 0x94:  //Pantalla Inicial 
                             bufferDisplay2.flagPrint =  0;
                             SetPicture(2,DISPLAY_INICIO0);
                             flowDisplay2 = 0;
+                            Display2_ClearRxBuffer();
                         break;
                     }                    
                 }
@@ -2336,6 +2475,8 @@ void PollingDisplay2(void){
                             }
                             
                             flowDisplay2 = 19;
+                            ShiftState = 1;
+                            side.b.RFstateReport = 1;
                             SetPicture(2,DISPLAY_POR_FAVOR_ESPERE);
                         break;
                         case 5://Pass
@@ -2396,8 +2537,7 @@ void PollingDisplay2(void){
                             flowDisplay2 = 16; 
                             PrintTest();
                             SetPicture(2,DISPLAY_AMBAS_IMPRESORAS_FUNCIONANDO);                           
-                        break;
-                        
+                        break;                        
                         case 0x5A:  //Umbral 
                             flowDisplay2 = 14;
                             numberKeys2 = 0;
@@ -2417,7 +2557,6 @@ void PollingDisplay2(void){
                              bufferDisplay2.flagPrint =  0;
                             SetPicture(2,DISPLAY_INICIO0);
                             flowDisplay2 = 0;
-
                         break;
                         case 0x94:  //Pantalla Inicial   
                             bufferDisplay2.flagPrint =  0;
@@ -2570,8 +2709,36 @@ void PollingDisplay2(void){
         break;
             
         case 19:            
-            side.b.RFstateReport = 1;
-            ShiftState =1;
+            if(Display2_GetRxBufferSize() == 8)
+            {
+                if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
+                {
+                    switch(Display2_rxBuffer[3])
+                    {                        
+                        case 0x7E:  //Init Screen                                                        
+                            SetPicture(2, DISPLAY_INICIO0);
+                            flowDisplay2 = 0;
+                            bufferDisplay2.flagPrint =  0;
+                            PresetFlag2 = 0;
+                            iButtonFlag2 = 0;
+                            ShiftState = 0;
+                        break;
+                        
+                        case 0x94:  //Cancel Button                                                        
+                            SetPicture(2, DISPLAY_INICIO0);
+                            flowDisplay2 = 0;
+                            bufferDisplay2.flagPrint =  0;
+                            PresetFlag2 = 0;
+                            iButtonFlag2 = 0;
+                            ShiftState = 0;
+                        break;
+                    }                    
+                }
+                
+                vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
+            }
+            Display2_ClearRxBuffer();
+            
         break;
             
          // Credit NOT authorized
@@ -2594,7 +2761,7 @@ void PollingDisplay2(void){
             
             SetPicture(2, DISPLAY_AUTORIZACION_RECHAZADA);
             bufferDisplay2.flagPrint = 0;
-
+            
             for(x = 0; x < 8; x++)
             {                
                 WriteMessage(2, mensaje3[x],17,1 + x,4,0x0000,'Y');                    
@@ -2637,7 +2804,7 @@ void PresetAuthorize(uint8 Position)
                 priceChange(side.a.dir, side.a.grade, ppuiButtonA);
                 
                 // PRESET
-                if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.presetValue[0], bufferDisplay1.presetType[0] & 0x03) == 1)
+                if(PresetData(side.a.dir, side.a.activeHose, bufferDisplay1.CreditpresetValue[0], bufferDisplay1.CreditpresetType[0] & 0x03) == 1)
                 {                                     
                     get_state(side.a.dir);
               
@@ -2647,12 +2814,13 @@ void PresetAuthorize(uint8 Position)
                     count_protector = 0;                    
                     bufferDisplay1.flagActiveSale = true;
                     SetPicture(1, DISPLAY_DESPACHANDO);   
-                    ShowMessage(1, (bufferDisplay1.presetValue[1]), 18);
+                    ShowMessage(1, (bufferDisplay1.CreditpresetValue[1]), 18);
                     flowDisplay1 = 8;
                     PresetFlag = 0;
                     AuthType = 0;
                     Credit_Auth_OK = 0;
-                    
+
+                                        
                 }else
                 {
                     flowDisplay1 = 0;
@@ -2679,6 +2847,7 @@ void PresetAuthorize(uint8 Position)
             //Grade selected  =  Grade pump handle
             if (side.a.activeHose == side.a.hose)
             {   
+                    ReadPPUFromEEprom();
                     priceChange(side.a.dir, side.a.activeHose, side.a.ppuAuthorized[side.a.grade]);
                     
                     // PRESET
@@ -2739,7 +2908,7 @@ void PresetAuthorize(uint8 Position)
             {   
                 priceChange(side.b.dir, side.b.grade, ppuiButtonB);
                 
-                if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
+                if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.CreditpresetValue[0], bufferDisplay2.CreditpresetType[0] & 0x03) == 1)
                 {                    
                     get_state(side.b.dir);
 
@@ -2750,9 +2919,10 @@ void PresetAuthorize(uint8 Position)
     				bufferDisplay2.flagActiveSale = true;					
                     SetPicture(2, DISPLAY_DESPACHANDO);
                     flowDisplay2 = 8;
-                    ShowMessage(2,(bufferDisplay2.presetValue[0]),18);
+                    ShowMessage(2,(bufferDisplay2.CreditpresetValue[0]),18);
                     PresetFlag2 = 0;
                     AuthType2 = 0;
+
                     return;
                     
                 }else
@@ -2782,7 +2952,8 @@ void PresetAuthorize(uint8 Position)
         {   
             //Grade selected  =  Grade pump handle                   
             if (side.b.activeHose == side.b.hose)
-            {                
+            {   
+                ReadPPUFromEEprom();             
                 priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
                 
                 if(PresetData(side.b.dir, side.b.activeHose, bufferDisplay2.presetValue[0], bufferDisplay2.presetType[0] & 0x03) == 1)
@@ -2929,14 +3100,14 @@ void PumpAction(uint8 PositionPump, uint8 State)
                 bufferDisplay1.flagActiveSale = true;
                 bufferDisplay1.flagEndSale = false;
                 side.a.rfState = RF_DELIVERING;
-                ShowMessage(PositionPump,(bufferDisplay1.presetValue[1]),18);
+                
             }
             if(PositionPump == side.b.dir)
             {
                 bufferDisplay2.flagActiveSale = true;
                 bufferDisplay2.flagEndSale = false;
                 side.b.rfState = RF_DELIVERING;
-                ShowMessage(PositionPump,(bufferDisplay2.presetValue[1]),18);
+                
             }
                     
         break;
@@ -2949,7 +3120,8 @@ void PumpAction(uint8 PositionPump, uint8 State)
                     flowDisplay1 = 0;
                     SetPicture(1, DISPLAY_INICIO0);
                     bufferDisplay1.flagActiveSale = false;
-                    side.a.RFstateReport = 1;  
+                    bufferDisplay1.flagEndSale = true;
+                    side.a.RFstateReport = 1;                     
                     priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                }
                
@@ -2958,6 +3130,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
                     flowDisplay2 = 0;
                     SetPicture(2,DISPLAY_INICIO0);
                     bufferDisplay2.flagActiveSale = false;
+                    bufferDisplay2.flagEndSale = true;
                     side.b.RFstateReport = 1;
                     priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
                 }                              
@@ -2971,11 +3144,11 @@ void PumpAction(uint8 PositionPump, uint8 State)
             if(getSale(PositionPump))
             {
                 if(PositionPump == side.a.dir)
-                {
-                   
+                {        
                     flowDisplay1 = 0;
-                    SetPicture(1,DISPLAY_INICIO0);
+                    SetPicture(1, DISPLAY_INICIO0);
                     bufferDisplay1.flagActiveSale = false;
+                    bufferDisplay1.flagEndSale = true;
                     side.a.RFstateReport = 1;   
                     priceChange(side.a.dir, side.a.grade, side.a.ppuAuthorized[side.a.grade]);
                }
@@ -2984,6 +3157,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
                     flowDisplay2 = 0;
                     SetPicture(2,DISPLAY_INICIO0);
                     bufferDisplay2.flagActiveSale = false;
+                    bufferDisplay2.flagEndSale = true;
                     side.b.RFstateReport = 1;
                     priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
                 }
@@ -3018,11 +3192,7 @@ bool LoopOpen(void)
         case 2:
             if(StatePosition[0] != 0 && StatePosition[1] != 0)
             {
-<<<<<<< HEAD
                
-=======
-               //StatePosition[0]=0; //???????????????
->>>>>>> bfd87ee02d9d2ccafddafcca97492ea302cb088e
                 return true;
             }
             else
