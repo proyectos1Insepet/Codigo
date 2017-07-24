@@ -1030,7 +1030,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                 
                 case 0xE4:               //Turno  
                     
-                    if(PRF_rxBuffer[5] == side.a.dir && ShiftDone == 0)
+                    if(PRF_rxBuffer[5] == side.a.dir)//if(PRF_rxBuffer[5] == side.a.dir && ShiftDone == 0)
                     {
                         ShiftDone = 1;
                         if(PRF_rxBuffer[7] == 0x02)
@@ -1057,7 +1057,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         }
                     }   
                     
-                    if(PRF_rxBuffer[5] == side.b.dir && ShiftDone == 0)
+                    if(PRF_rxBuffer[5] == side.b.dir) //if(PRF_rxBuffer[5] == side.b.dir && ShiftDone == 0)
                     {
                         ShiftDone = 1;
                         if(PRF_rxBuffer[7] == 0x02)
