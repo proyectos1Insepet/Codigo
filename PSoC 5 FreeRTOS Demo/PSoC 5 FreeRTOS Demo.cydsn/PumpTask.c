@@ -260,7 +260,7 @@ void PrintTest(){
 
 void PollingDisplay1(void){    
     uint8 x, y;
-    uint32 cont;
+    
     switch(flowDisplay1){
         case 0:
             InitDisplay1();
@@ -269,11 +269,14 @@ void PollingDisplay1(void){
             bufferDisplay1.flagEndSale = false;  
             side.a.RFstateReport = 0;
             SetPicture(1, DISPLAY_INICIO0);
-              
+            
+            // Impresion de tiquete
             if(bufferDisplay1.flagPrint == 1)
             {    
-
+                //Retardo para espera de datos del tiquete desde el mux
                 vTaskDelay( 5000 / portTICK_PERIOD_MS );
+                
+                //Impresion
                 imprimir(printPortA, side.a.dir);
                 bufferDisplay1.flagPrint = 0;
                 bufferDisplay1.saleType = 0;
@@ -300,9 +303,7 @@ void PollingDisplay1(void){
                     vTaskDelay( 10 / portTICK_PERIOD_MS );
                     Display1_ClearRxBuffer();
                 }  
-            
-            }
-            
+            }         
         break;
         case 2:  //Pantalla forma de pago
             if(Display1_GetRxBufferSize() == 8)
@@ -492,14 +493,14 @@ void PollingDisplay1(void){
                         bufferDisplay1.presetValue[0][x] = bufferDisplay1.valueKeys[x];
                         bufferDisplay1.presetValue[1][x] = bufferDisplay1.valueKeys[x];
                     }  
-                    flowDisplay1 = 5;//caso para seleccion de producto
+                    flowDisplay1 = 5;   //caso para seleccion de producto
                     SetPicture(1, DISPLAY_SELECCIONE_PRODUCTO4);
                     Display1_ClearRxBuffer();
                 break;
             }
         break;
             
-        case 5:
+        case 5: //Seleccion de producto
             
             if(side.a.GradesHose[0] !=0)
             {
@@ -952,7 +953,7 @@ void PollingDisplay1(void){
                                                 
 					}
 				}else
-                    {
+                    {   // iButton Error
                         SetPicture(1,DISPLAY_ID_NO_RECONOCIDO);                                           
                         Display1_ClearRxBuffer();
                         vTaskDelay( 700 / portTICK_PERIOD_MS );    
@@ -1228,7 +1229,7 @@ void PollingDisplay1(void){
             }            
         break;
             
-        case 15:
+        case 15: //Menu de configuraciones
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -1281,7 +1282,7 @@ void PollingDisplay1(void){
             }                        
         break; 
             
-        case 16:
+        case 16: //Menu de configuraciones de impresoras 1
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -1318,7 +1319,7 @@ void PollingDisplay1(void){
             }                        
         break;
             
-        case 17:
+        case 17: //Menu de configuraciones de impresoras 2
             if(Display1_GetRxBufferSize() == 8)
             {
                 if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
@@ -1370,7 +1371,7 @@ void PollingDisplay1(void){
             }                        
         break;
             
-        case 18:
+        case 18: //Menu configuracion manual de fecha y hora
             if(leer_hora() == 1)
             {
                 WriteLCD(1,(((timeDownHandle[1] & 0x10) >> 4) + 48),13,8,1,0x0000,'N');
@@ -1414,7 +1415,7 @@ void PollingDisplay1(void){
             }                        
         break;
             
-        case 19:            
+        case 19:             
            
             if(Display1_GetRxBufferSize() == 8)
             {
@@ -1448,7 +1449,7 @@ void PollingDisplay1(void){
             
         break;
             
-        case 20:
+        case 20: //pantalla de espera de autorizacion
             SetPicture(1, DISPLAY_ESPERANDO_AUTORIZACION);
             //Touch for return to init display
             if(Display1_GetRxBufferSize() == 8)
@@ -1482,11 +1483,11 @@ void PollingDisplay1(void){
             
         break;
             
-            // Credit NOT authorized
-        case 21:
+            
+        case 21: //Pantalla de credito no autorizado
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint == 0;
+            bufferDisplay1.flagPrint = 0;
             for(x = 0; x < 9; x++)
             {
                 WriteMessage(1, mensaje[x],17,1 + x,4,0x0000,'Y');
@@ -1499,11 +1500,11 @@ void PollingDisplay1(void){
             SetPicture(1, DISPLAY_INICIO0);
         break;
             
-        // Wrong Grade handle
+        // Pantalla de Manguera equivocada
         case 22:
             
             SetPicture(1, DISPLAY_AUTORIZACION_RECHAZADA);
-            bufferDisplay1.flagPrint == 0;
+            bufferDisplay1.flagPrint = 0;
 
             for(x = 0; x < 8; x++)
             {
@@ -1521,8 +1522,7 @@ void PollingDisplay1(void){
             vTaskDelay( 2000 / portTICK_PERIOD_MS );
             flowDisplay1 = 0;
             SetPicture(1, DISPLAY_INICIO0);
-        break;
-            
+        break;            
     }    
 }
 
@@ -1537,7 +1537,7 @@ void PollingDisplay1(void){
 */
 void PollingDisplay2(void){    
     uint8 x,y;  
-    uint32 cont;
+    
     switch(flowDisplay2){
         case 0:
 			InitDisplay2();
@@ -1581,7 +1581,7 @@ void PollingDisplay2(void){
             }
             
         break;
-        case 2:
+        case 2: //Menu de metodo de pago
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -1658,7 +1658,7 @@ void PollingDisplay2(void){
             
         break;
             
-        case 3: 
+        case 3:  //Menu de tipo de preset
             for(x = 0; x <10; x++)
             {
                 bufferDisplay2.presetValue[0][x] = 0x00;
@@ -1753,7 +1753,7 @@ void PollingDisplay2(void){
            
         break;
         
-        case 4:            
+        case 4:    // Teclado general      
             switch (alphanumeric_keyboard2(digits + 1,0))
             {
                 case 0:  //Pantalla Inicial    
@@ -1777,7 +1777,7 @@ void PollingDisplay2(void){
 
         break;
             
-        case 5:
+        case 5: //Menu de seleccion de producto
             if(side.b.GradesHose[0] !=0)
             {
                 for(x = 0; x < 10; x++)
@@ -1899,7 +1899,7 @@ void PollingDisplay2(void){
                         break;
                             
                         case 0x7E:  //Pantalla Inicial    
-                             bufferDisplay2.flagPrint =  0;
+                            bufferDisplay2.flagPrint =  0;
                             SetPicture(2,DISPLAY_INICIO0);
                             flowDisplay2 = 0;
                             AuthType2 = 0;
@@ -1913,7 +1913,7 @@ void PollingDisplay2(void){
             
         break;
                     
-        case 6:
+        case 6: //Pantalla de impresion SI/NO
 
             if(Display2_GetRxBufferSize() == 8)
             {
@@ -1925,7 +1925,6 @@ void PollingDisplay2(void){
                             flowDisplay2 = 7;
                             numberKeys2 = 0;
                             bufferDisplay2.flagPrint =  1;
-                            
                             SetPicture(2,DISPLAY_SUBA_MANIJA); 
                             Display2_ClearRxBuffer();                           
                         break; 
@@ -1967,7 +1966,7 @@ void PollingDisplay2(void){
                 SetPicture(2,DISPLAY_INICIO0);
     		}
         break;                                             
-        case 7:
+        case 7: //Preset ON y espera descuelgue de manguera
 
             PresetFlag2 = 1;      
             
@@ -2004,15 +2003,14 @@ void PollingDisplay2(void){
                     }                    
                 }                
                 Display2_ClearRxBuffer();                
-            }
-            
-                       
+            }                      
         break;
             
         case 8:       
-            
+    
             //Pump Busy...
-            vTaskDelay( 10 / portTICK_PERIOD_MS );
+            vTaskDelay( 10 / portTICK_PERIOD_MS ); 
+            
         break;
             
         case 9: // Keyboard           
@@ -2175,7 +2173,7 @@ void PollingDisplay2(void){
                                   
         break;
         
-        case 11:
+        case 11: //Lectura del iButton 
             
             if(touch_present(2) == 1)
             {
@@ -2218,7 +2216,7 @@ void PollingDisplay2(void){
                         flowDisplay2 = 3;
 					}                                     
 				}
-                else
+                else //iButton Error
                 {
                     SetPicture(2,DISPLAY_ID_NO_RECONOCIDO);                                           
                     Display2_ClearRxBuffer();
@@ -2343,7 +2341,7 @@ void PollingDisplay2(void){
             }
         break;
 
-        case 13:
+        case 13:  //Pantalla de apertura/Cierre de turno
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -2525,7 +2523,7 @@ void PollingDisplay2(void){
             }            
         break;
             
-        case 15:
+        case 15: // Menu de configuraciones
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -2579,7 +2577,7 @@ void PollingDisplay2(void){
             }                        
         break; 
             
-        case 16:
+        case 16:  //Menu de impresoras 1
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -2617,7 +2615,7 @@ void PollingDisplay2(void){
             }                        
         break;
             
-        case 17:
+        case 17:  //Menu de impresoras 2
             if(Display2_GetRxBufferSize() == 8)
             {
                 if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
@@ -2663,32 +2661,31 @@ void PollingDisplay2(void){
 
                         break;
                     }                    
-                }
-                
+                }                
                 vTaskDelay( 10 / portTICK_PERIOD_MS );
                 Display2_ClearRxBuffer();
             }                        
         break;
             
-        case 18:
+        case 18:  //Pantalla de ocnfiguracion de fecha y hora
             if(leer_hora() == 1)
             {
-                WriteLCD(2,(((timeDownHandle[1]&0x10)>>4)+48),13,8,1,0x0000,'N');
-                WriteLCD(2,((timeDownHandle[1]&0x0F)+48),13,9,1,0x0000,'N');
-                WriteLCD(2,':',13,10,1,0x0000,'N');
-                WriteLCD(2,(((timeDownHandle[0]&0xF0)>>4)+48),13,11,1,0x0000,'N');
-                WriteLCD(2,((timeDownHandle[0]&0x0F)+48),13,12,1,0x0000,'N');               
+                WriteLCD(2,(((timeDownHandle[1] & 0x10) >> 4) + 48), 13, 8, 1, 0x0000, 'N');
+                WriteLCD(2,((timeDownHandle[1] & 0x0F) + 48), 13, 9, 1, 0x0000, 'N');
+                WriteLCD(2, ':', 13, 10, 1, 0x0000, 'N');
+                WriteLCD(2,(((timeDownHandle[0] & 0xF0) >> 4) + 48), 13, 11, 1, 0x0000, 'N');
+                WriteLCD(2,((timeDownHandle[0] & 0x0F) + 48), 13, 12, 1, 0x0000, 'N');               
             }
             if(leer_fecha() == 1)
             {                
-                WriteLCD(2,(((dateDownHandle[0]&0x30)>>4)+48),21,8,1,0x0000,'N');
-                WriteLCD(2,((dateDownHandle[0]&0x0F)+48),21,9,1,0x0000,'N');
-                WriteLCD(2,'/',21,10,1,0x0000,'N');
-                WriteLCD(2,(((dateDownHandle[1]&0x10)>>4)+48),21,11,1,0x0000,'N');
-                WriteLCD(2,((dateDownHandle[1]&0x0F)+48),21,12,1,0x0000,'N');
-                WriteLCD(2,'/',21,13,1,0x0000,'N');
-                WriteLCD(2,(((dateDownHandle[2]&0xF0)>>4)+48),21,14,1,0x0000,'N');
-                WriteLCD(2,((dateDownHandle[2]&0x0F)+48),21,15,1,0x0000,'N');
+                WriteLCD(2,(((dateDownHandle[0] & 0x30) >> 4) + 48), 21, 8, 1, 0x0000, 'N');
+                WriteLCD(2,((dateDownHandle[0] & 0x0F) + 48), 21, 9, 1, 0x0000, 'N');
+                WriteLCD(2, '/', 21, 10, 1, 0x0000, 'N');
+                WriteLCD(2,(((dateDownHandle[1] & 0x10) >> 4) + 48), 21, 11, 1, 0x0000, 'N');
+                WriteLCD(2,((dateDownHandle[1] & 0x0F) + 48), 21, 12, 1, 0x0000, 'N');
+                WriteLCD(2, '/', 21, 13, 1, 0x0000, 'N');
+                WriteLCD(2,(((dateDownHandle[2] & 0xF0) >> 4) + 48), 21, 14, 1, 0x0000, 'N');
+                WriteLCD(2,((dateDownHandle[2] & 0x0F) + 48), 21, 15, 1, 0x0000, 'N');
             }
             if(Display2_GetRxBufferSize() == 8)
             {
@@ -2755,8 +2752,8 @@ void PollingDisplay2(void){
             bufferDisplay2.flagPrint = 0;
             for(x = 0; x < 9; x++)
             {
-                WriteMessage(2, mensaje[x],17,1 + x,3,0x0000,'Y');
-                WriteMessage(2, mensaje2[x],21,1 + x,3,0x0000,'Y');
+                WriteMessage(2, mensaje[x], 17, 1 + x, 3, 0x0000, 'Y');
+                WriteMessage(2, mensaje2[x], 21, 1 + x, 3, 0x0000, 'Y');
                     
             }
             vTaskDelay( 2000 / portTICK_PERIOD_MS );
@@ -2771,11 +2768,11 @@ void PollingDisplay2(void){
             
             for(x = 0; x < 8; x++)
             {                
-                WriteMessage(2, mensaje3[x],17,1 + x,4,0x0000,'Y');                    
+                WriteMessage(2, mensaje3[x], 17, 1 + x, 4, 0x0000, 'Y');                    
             }
             for(x = 0; x < 10; x++)
             {                
-                WriteMessage(2, mensaje4[x],21,1 + x,4,0x0000,'Y');       
+                WriteMessage(2, mensaje4[x], 21, 1 + x, 4, 0x0000, 'Y');       
             }
              
             vTaskDelay( 2000 / portTICK_PERIOD_MS );
@@ -2786,16 +2783,98 @@ void PollingDisplay2(void){
     }    
 }
 
+
+/*
+ * Actualiza los precios con los valores almacenados en la memoria
+ */
+void ReadPPUFromEEprom(void)
+{
+    uint8 i, x;
+                               
+    //PPU recovery from EEprom
+        for(i = 0; i <  side.a.hoseNumber; i++)
+        {   
+            if(i == 0)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[0][x] =  EEPROM_1_ReadByte(20 + x); //PPU to EEprom
+                }
+            }
+            
+            if(i == 1)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[1][x] =  EEPROM_1_ReadByte(25 + x); //PPU to EEprom
+                }
+            }
+            if(i == 2)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[2][x] =  EEPROM_1_ReadByte(30 + x); //PPU to EEprom
+                }
+            }
+            if(i == 3)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.a.ppuAuthorized[3][x] =  EEPROM_1_ReadByte(35 + x); //PPU to EEprom
+                }
+            }
+                    
+        }
+        
+        for(i = 0; i <  side.b.hoseNumber; i++)
+        {   
+            if(i == 0)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[0][x] =  EEPROM_1_ReadByte(40 + x); //PPU to EEprom
+                }
+            }
+            
+            if(i == 1)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[1][x] =  EEPROM_1_ReadByte(45 + x); //PPU to EEprom
+                }
+            }
+            if(i == 2)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[2][x] =  EEPROM_1_ReadByte(50 + x); //PPU to EEprom
+                }
+            }
+            if(i == 3)
+            {
+                for(x = 0; x < 5 ; x++ )
+                {
+                    side.b.ppuAuthorized[3][x] =  EEPROM_1_ReadByte(55 + x); //PPU to EEprom
+                }
+            }
+                    
+        }
+}
+
+/*
+ * Realiza el preset tanto en credito como en efectivo
+ */
 void PresetAuthorize(uint8 Position)
 {
-    uint8 x;
+
     if(Position == side.a.dir)
     {
     if(PresetFlag == 1)
     {
-        // pump handle detect 
+        //Detecta la manija subida 
         side.a.activeHose = PumpHoseActiveState(side.a.dir);
                 
+        //Habilita consulta de credito con el servidor
         if(iButtonFlag == 1 && side.a.activeHose == side.a.hose) 
         {
             CreditAuth = RF_CREDITSALEAUTH;
@@ -2804,11 +2883,12 @@ void PresetAuthorize(uint8 Position)
             
         }
         
-        //iButton Authorized
+        //iButton Autorizado
         if(Credit_Auth_OK == 1 && AuthType == 1)
         {
             if (side.a.activeHose == side.a.hose)
             {   
+                //Cambia precio segun el nivel
                 priceChange(side.a.dir, side.a.grade, ppuiButtonA);
                 
                 // PRESET
@@ -2816,7 +2896,7 @@ void PresetAuthorize(uint8 Position)
                 {                                     
                     get_state(side.a.dir);
               
-                    //Authorize
+                    //Authoriza
                     Authorization(side.a.dir);                                                         
                     side.a.RFstateReport = 1;
                     count_protector = 0;                    
@@ -2840,21 +2920,16 @@ void PresetAuthorize(uint8 Position)
                     Credit_Auth_OK = 0;
                     
                 }
-            }else
-            {
-               // flowDisplay1 = 22;
-               // Credit_Auth_OK = 0;
-               // AuthType = 0;
-               // PresetFlag = 0;            
             }
         }
     
-       // Cash Sale
+       //Venta en efectivo
         if(AuthType == 2)
         {       
             //Grade selected  =  Grade pump handle
             if (side.a.activeHose == side.a.hose)
             {   
+                    //Actualiza precios por el almacenado en la memoria
                     ReadPPUFromEEprom();
                     priceChange(side.a.dir, side.a.activeHose, side.a.ppuAuthorized[side.a.grade]);
                     
@@ -2885,17 +2960,12 @@ void PresetAuthorize(uint8 Position)
                         return;                  
                         
                     }
-            }else
-            {
-                //flowDisplay1 = 22;
-                //PresetFlag = 0;
-                //AuthType = 0;                               
-                return;             
             }
         }
     }
     }
     
+    // Producto 2
     if(Position == side.b.dir)
     {
     if(PresetFlag2 == 1)
@@ -2945,13 +3015,6 @@ void PresetAuthorize(uint8 Position)
                     return;
                     
                 }
-            }else
-            {
-                //flowDisplay2 = 22;
-                //Credit_Auth_OK2 = 0;
-                //AuthType2 = 0;
-                //PresetFlag2 = 0;
-                             
             }
         }
         
@@ -2989,13 +3052,6 @@ void PresetAuthorize(uint8 Position)
                     return;                 
                     
                 }
-            }else
-            {
-                //flowDisplay2 = 22;
-                //PresetFlag2  = 0;
-                //AuthType2    = 0; 
-                
-                return;                           
             }
         }
     }
@@ -3004,7 +3060,7 @@ void PresetAuthorize(uint8 Position)
 }  
 
 
-/* Total Task */
+/* Display Task */
 void Display_Task(void *arg)
 {
    TickType_t xLastWakeTime;
@@ -3168,8 +3224,7 @@ void PumpAction(uint8 PositionPump, uint8 State)
                     bufferDisplay2.flagEndSale = true;
                     side.b.RFstateReport = 1;
                     priceChange(side.b.dir, side.b.grade, side.b.ppuAuthorized[side.b.grade]);
-                }
-                              
+                }                       
             }
             iButtonFlag = 0;
          
@@ -3327,89 +3382,17 @@ void SetPPU(void)
     side.b.changePPU = false;
 }
 
-void ReadPPUFromEEprom(void)
-{
-    uint8 i, x;
-                               
-    //PPU recovery from EEprom
-        for(i = 0; i <  side.a.hoseNumber; i++)
-        {   
-            if(i == 0)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.a.ppuAuthorized[0][x] =  EEPROM_1_ReadByte(20 + x); //PPU to EEprom
-                }
-            }
-            
-            if(i == 1)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.a.ppuAuthorized[1][x] =  EEPROM_1_ReadByte(25 + x); //PPU to EEprom
-                }
-            }
-            if(i == 2)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.a.ppuAuthorized[2][x] =  EEPROM_1_ReadByte(30 + x); //PPU to EEprom
-                }
-            }
-            if(i == 3)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.a.ppuAuthorized[3][x] =  EEPROM_1_ReadByte(35 + x); //PPU to EEprom
-                }
-            }
-                    
-        }
-        
-        for(i = 0; i <  side.b.hoseNumber; i++)
-        {   
-            if(i == 0)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.b.ppuAuthorized[0][x] =  EEPROM_1_ReadByte(40 + x); //PPU to EEprom
-                }
-            }
-            
-            if(i == 1)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.b.ppuAuthorized[1][x] =  EEPROM_1_ReadByte(45 + x); //PPU to EEprom
-                }
-            }
-            if(i == 2)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.b.ppuAuthorized[2][x] =  EEPROM_1_ReadByte(50 + x); //PPU to EEprom
-                }
-            }
-            if(i == 3)
-            {
-                for(x = 0; x < 5 ; x++ )
-                {
-                    side.b.ppuAuthorized[3][x] =  EEPROM_1_ReadByte(55 + x); //PPU to EEprom
-                }
-            }
-                    
-        }
-}
+
 
 
 /* Pump Task */
 void Pump_Task(void *arg)
 {
-    TickType_t xLastWakeTime;
-    const TickType_t xFrequency = 1;
+    //TickType_t xLastWakeTime;
+    //const TickType_t xFrequency = 1;
     uint8 i;
     
-    xLastWakeTime = xTaskGetTickCount();
+    //xLastWakeTime = xTaskGetTickCount();
     
     // Vector State Init
     for(i = 0; i < 8; i++)

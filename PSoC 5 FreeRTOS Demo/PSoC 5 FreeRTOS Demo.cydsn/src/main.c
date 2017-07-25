@@ -38,9 +38,10 @@
 
 xSemaphoreHandle g_pUARTSemaphore;
       
-//CY_ISR(animacion2);
-//CY_ISR(animacion);
 
+/*
+ * Inicializa los perifiericos del sistema
+ */
 void GlobalInitializer(){
     EEPROM_1_Start();
     Pump_Start(); 
@@ -49,8 +50,7 @@ void GlobalInitializer(){
     Printer_Start();   
     I2C_Bus_Start();
     RF_Connection_Start();
-//    isr_3_StartEx(animacion);
-//    isr_4_StartEx(animacion2);    
+   
 }
 
 /* 
@@ -93,6 +93,11 @@ void loadConfiguration(){
     side.d.dir = EEPROM_1_ReadByte(15); //Cuarta posicion
     PrinterType = 1; // Tipo de impresora
 }
+
+/* 
+ * Funcion que pone el surtidor en modo consola para configuracion
+ * Esta funcion se debe habilitar solo cuando sea requerida
+ */
 void console(void)
 {
     Pump_PutChar(0x10 | 0x03);
@@ -167,33 +172,6 @@ void InitPump(){
             }
         }        
     }
-}
-/*
-*********************************************************************************************************
-*                                         CY_ISR(animacion)
-*
-* Description : Interrupcion que temporiza las imagenes informativas que aparecen en la pantalla 1
-*               
-*
-*********************************************************************************************************
-*/
-CY_ISR(animacion){
-    Timer_Animacion_ReadStatusRegister();    					
-    count_protector++; 							//Incrementa el contador 
-}
-
-/*
-*********************************************************************************************************
-*                                         CY_ISR(animacion2)
-*
-* Description : Interrupcion que temporiza las imagenes informativas que aparecen en la pantalla 2
-*               
-*
-*********************************************************************************************************
-*/
-CY_ISR(animacion2){
-    Timer_Animacion2_ReadStatusRegister();
-    count_protector2++;
 }
 
 
