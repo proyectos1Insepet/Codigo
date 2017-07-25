@@ -841,11 +841,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             for(x = side.b.volumeSale[0]; x >= 1 ;x--)
             {						   							
                 write_psoc1(val,side.b.volumeSale[side.b.volumeSale[0]+ 1 - x]);
-<<<<<<< HEAD
                 if(x == VolDec+1)
-=======
-                if(x == VolDec)
->>>>>>> refs/remotes/capantoja/master
                     write_psoc1(val,'.');
         	}
         }else{

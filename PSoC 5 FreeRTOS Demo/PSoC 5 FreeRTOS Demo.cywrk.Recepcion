@@ -466,10 +466,8 @@
 <OpenDocs>
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\main.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\PumpTask.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\protocol.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\variables.h" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\RFPoll.c" />
+<name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\Printing.c" />
 </OpenDocs>
 <config v="" />

@@ -1228,20 +1228,14 @@ void pollingRFA_Tx(){
     }            
     ////////////// END SALE - CASH ////////////////////////////////////
     if(bufferDisplay1.flagEndSale && side.a.RFstateReport == 1) //if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1)
-<<<<<<< HEAD
     {
-        for(x = 0; x< 32; x++)
-        {
-            buffer_A[x] = 0x00;
-        }
-=======
-    {        
+            
         for(x = 0; x < 255; x++)
         {
             buffer_A[x] = 0x00;
         }
         
->>>>>>> refs/remotes/capantoja/master
+
         buffer_A[0]  = 32;
 		buffer_A[1]  = 0xBC;
         buffer_A[2]  = 0xCB;
@@ -1594,18 +1588,10 @@ void pollingRFB_Tx(){
  
    if (bufferDisplay2.flagEndSale && side.b.RFstateReport == 1)    
     {
-<<<<<<< HEAD
-        for(x = 0; x< 32; x++)
-        {
-            buffer_B[x] = 0x00;
-        }
-=======
         for(x = 0; x < 255; x++)
         {
             buffer_B[x] = 0x00;
-        }
-        
->>>>>>> refs/remotes/capantoja/master
+        }        
         buffer_B[100] = 31;
         buffer_B[0]  = 0xBC;
         buffer_B[1]  = 0xCB;
