@@ -155,16 +155,27 @@
     uint16 LongEsperada;
     uint8 buffer_i2c[64];													//Buffer de lectura del i2c 
     uint8 LicensePlate[9];
+    uint8 LicensePlate2[9];
     uint8 BalanceA[11];
+    uint8 BalanceB[11];
     uint8 Company[21];
+    uint8 CompanyB[21];
     uint8 CountID[21];
+    uint8 CountIDB[21];
     uint8 DayVisit;
+    uint8 DayVisitB;
     uint8 WeekVisit;
+    uint8 WeekVisitB;
     uint8 MonthVisit;
+    uint8 MonthVisitB;
     uint8 VolumeDay[8];
+    uint8 VolumeDayB[8];
     uint8 VolumeWeek[8];
+    uint8 VolumeWeekB[8];
     uint8 VolumeMonth[8];
+    uint8 VolumeMonthB[8];
     uint8 CountType[17];
+    uint8 CountTypeB[17];
     uint8 ControlType;
     uint8 IDPrintFlagA;
     uint8 IDPrintFlagB;

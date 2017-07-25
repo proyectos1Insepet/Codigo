@@ -391,7 +391,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             PresetFlag = 0;
                             iButtonFlag = 0;                           
                             AckFlag = 1;
-                            AuthType = 0;
                             CreditAuth = 0;
                             Credit_Auth_OK = 0;
                             bufferAready = 0;
@@ -487,7 +486,6 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                             CreditAuth2 = 0;
                             Credit_Auth_OK2 = 0;
                             bufferAreadyB = 0;
-                            AuthType2 = 0;
                             bufferDisplay2.flagPrint = 0;
                             buffer_B[0]  = 0xBC;
                             buffer_B[1]  = 0xCB;
@@ -724,31 +722,55 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {   
+                        for(x = 0; x < 10; x++)
+                        {
+                            side.a.saleNumber[x] = 0x00;
+                        }
+                        
                         // Id transaction
                         for(x = 0; x < 10; x++)
                         {
                             side.a.saleNumber[x] = PRF_rxBuffer[x + 8];
                         }   
-
-                        //Licese plate
+                         
+                        for(x = 0; x < 8; x++)
+                        {
+                            LicensePlate[x] = 0x00; 
+                        }
+                        
+                        // Licese plate
                         for(x = 0; x < 8; x++)
                         {
                             LicensePlate[x] = PRF_rxBuffer[x + 18]; 
                         }                                                  
 
-                        //Balance
+                        for(x = 0; x < 10; x++)
+                        {
+                            BalanceA[x] = 0x00; 
+                        }
+                        
+                        // Balance
                         for(x = 0; x < 10; x++)
                         {
                             BalanceA[x] = PRF_rxBuffer[x + 26]; 
-                        }                
-                            
-                        //Company
+                        }
+                        
+                        for(x = 0; x < 20; x++)
+                        {
+                            Company[x] = 0x00; 
+                        }   
+                        // Company
                         for(x = 0; x < 20; x++)
                         {
                             Company[x] = PRF_rxBuffer[x + 36]; 
                         }   
 
-                        //Count ID
+                        for(x = 0; x < 20; x++)
+                        {
+                            CountID[x] = 0x00; 
+
+                        }
+                        // Count ID
                         for(x = 0; x < 20; x++)
                         {
                             CountID[x] = PRF_rxBuffer[x + 36]; 
@@ -758,18 +780,33 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         WeekVisit = PRF_rxBuffer[77] + 0x30;
                         MonthVisit = PRF_rxBuffer[78] + 0x30;
 
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeDay[x] = 0x00; 
+                        }
+                        
                         //Volume for day
                         for(x = 0; x < 7; x++)
                         {
                             VolumeDay[x] = PRF_rxBuffer[x + 79]; 
                         } 
 
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeWeek[x] = 0x00; 
+                        }
+                        
                         //Volume for Week
                         for(x = 0; x < 7; x++)
                         {
                             VolumeWeek[x] = PRF_rxBuffer[x + 86]; 
                         }
                          
+                        for(x = 0; x < 7; x++)
+                        {
+                            VolumeMonth[x] = 0x00; 
+                        }
+                        
                          //Volume for Month
                         for(x = 0; x < 7; x++)
                         {
@@ -777,6 +814,11 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                         }
                        
 
+                        for(x = 0; x < 16; x++)
+                        {
+                            CountType[x] = 0x00; 
+                        }
+                        
                         //Count type
                         for(x = 0; x < 16; x++)
                         {
@@ -791,68 +833,82 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
 
                     if(PRF_rxBuffer[5] == side.b.dir)
                     {
+                        for(x = 0; x < 10; x++)
+                        {
+                            side.b.saleNumber[x] = 0x00;
+                        }
+                        
                         // Id transaction
                         for(x = 0; x < 10; x++)
                         {
                             side.b.saleNumber[x] = PRF_rxBuffer[x + 8];
                         }   
-
+                        
                         //Licese plate
                         for(x = 0; x < 8; x++)
                         {
-                            LicensePlate[x] = PRF_rxBuffer[x + 18]; 
+                            LicensePlate2[x] = 0x00; 
+                        }
+                        
+                        for(x = 0; x < 8; x++)
+                        {
+                            LicensePlate2[x] = PRF_rxBuffer[x + 18]; 
                         }                                                  
-
+                        
                         //Balance
                         for(x = 0; x < 10; x++)
                         {
-                            BalanceA[x] = PRF_rxBuffer[x + 26]; 
+                            BalanceB[x] = 0x00; 
+                        }
+                        
+                        for(x = 0; x < 10; x++)
+                        {
+                            BalanceB[x] = PRF_rxBuffer[x + 26]; 
                         }                
                             
                         //Company
                         for(x = 0; x < 20; x++)
                         {
-                            Company[x] = PRF_rxBuffer[x + 36]; 
+                            CompanyB[x] = PRF_rxBuffer[x + 36]; 
                         }   
 
                         //Count ID
                         for(x = 0; x < 20; x++)
                         {
-                            CountID[x] = PRF_rxBuffer[x + 36]; 
+                            CountIDB[x] = PRF_rxBuffer[x + 36]; 
                         }  
-
-                        DayVisit = PRF_rxBuffer[76] + 0x30;
-                        WeekVisit = PRF_rxBuffer[77] + 0x30;
-                        MonthVisit = PRF_rxBuffer[78] + 0x30;
+                                                
+                        DayVisitB = PRF_rxBuffer[76] + 0x30;
+                        WeekVisitB = PRF_rxBuffer[77] + 0x30;
+                        MonthVisitB = PRF_rxBuffer[78] + 0x30;
 
                         //Volume for day
                         for(x = 0; x < 7; x++)
                         {
-                            VolumeDay[x] = PRF_rxBuffer[x + 79]; 
+                            VolumeDayB[x] = PRF_rxBuffer[x + 79]; 
                         } 
 
                         //Volume for Week
                         for(x = 0; x < 7; x++)
                         {
-                            VolumeWeek[x] = PRF_rxBuffer[x + 86]; 
+                            VolumeWeekB[x] = PRF_rxBuffer[x + 86]; 
                         }
                          
                          //Volume for Month
                         for(x = 0; x < 7; x++)
                         {
-                            VolumeMonth[x] = PRF_rxBuffer[x + 93]; 
+                            VolumeMonthB[x] = PRF_rxBuffer[x + 93]; 
                         }
                        
 
                         //Count type
                         for(x = 0; x < 16; x++)
                         {
-                            CountType[x] = PRF_rxBuffer[x + 100]; 
+                            CountTypeB[x] = PRF_rxBuffer[x + 100]; 
                         }
                         
                         ControlType = PRF_rxBuffer[116];
-                        
-                                            
+                                                                 
                         return;
                     }
 
@@ -1173,6 +1229,11 @@ void pollingRFA_Tx(){
     ////////////// END SALE - CASH ////////////////////////////////////
     if(bufferDisplay1.flagEndSale && side.a.RFstateReport == 1) //if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1)
     {        
+        for(x = 0; x < 255; x++)
+        {
+            buffer_A[x] = 0x00;
+        }
+        
         buffer_A[0]  = 32;
 		buffer_A[1]  = 0xBC;
         buffer_A[2]  = 0xCB;
@@ -1525,6 +1586,11 @@ void pollingRFB_Tx(){
  
    if (bufferDisplay2.flagEndSale && side.b.RFstateReport == 1)    
     {
+        for(x = 0; x < 255; x++)
+        {
+            buffer_B[x] = 0x00;
+        }
+        
         buffer_B[100] = 31;
         buffer_B[0]  = 0xBC;
         buffer_B[1]  = 0xCB;
