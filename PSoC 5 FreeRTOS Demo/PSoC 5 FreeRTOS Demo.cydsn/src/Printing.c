@@ -532,7 +532,11 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             for(x = side.a.volumeSale[0]; x >= 1 ;x--)
             {						   							
                 write_psoc1(val,side.a.volumeSale[side.a.volumeSale[0]+ 1 - x]);
+<<<<<<< HEAD
                 if(x == VolDec+1)
+=======
+                if(x == VolDec + 1)
+>>>>>>> refs/remotes/capantoja/master
                     write_psoc1(val,'.');
         	}
         }else{
@@ -841,7 +845,11 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             for(x = side.b.volumeSale[0]; x >= 1 ;x--)
             {						   							
                 write_psoc1(val,side.b.volumeSale[side.b.volumeSale[0]+ 1 - x]);
+<<<<<<< HEAD
                 if(x == VolDec+1)
+=======
+                if(x == VolDec + 1)
+>>>>>>> refs/remotes/capantoja/master
                     write_psoc1(val,'.');
         	}
         }else{
