@@ -193,8 +193,7 @@ uint8 verificar_check(uint8 *datos, uint16 size){
 
 void pollingRF_Rx(uint8 PRF_rxBuffer[])
 {
-    uint16 i, x, y, j, contEscape;  
-    uint8 buffer_rfTMP;
+    uint16 i, x, y;      
     uint8 EEpromGradeAddress;
    
     ActiveRF = 1;
