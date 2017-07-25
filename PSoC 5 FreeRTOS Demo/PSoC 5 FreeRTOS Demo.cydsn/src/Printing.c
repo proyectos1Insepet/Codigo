@@ -665,10 +665,14 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             {																		
 				write_psoc1(val, msn_placa[x]);
 			} 
+            
+            
 			for(x = 0; x < 8; x++)
             {
 				write_psoc1(val, LicensePlate[x]);	// variable placa
 			}
+            
+            
             write_psoc1(val,10);
             
             for(x = 0; x < 13; x++)
@@ -837,7 +841,11 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             for(x = side.b.volumeSale[0]; x >= 1 ;x--)
             {						   							
                 write_psoc1(val,side.b.volumeSale[side.b.volumeSale[0]+ 1 - x]);
+<<<<<<< HEAD
                 if(x == VolDec+1)
+=======
+                if(x == VolDec)
+>>>>>>> refs/remotes/capantoja/master
                     write_psoc1(val,'.');
         	}
         }else{
@@ -855,7 +863,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
             for(x = side.b.volumeSale[0]; x >= 1 ;x--)
             {						   							
                 write_psoc1(val,side.b.volumeSale[side.b.volumeSale[0]+ 1 - x]);
-                if(x == VolDec+1)
+                if(x == VolDec)
                     write_psoc1(val,'.');
         	}
         }
@@ -973,7 +981,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 8; x++)
             {
-				write_psoc1(val, LicensePlate[x]);	// variable placa
+				write_psoc1(val, LicensePlate2[x]);	// variable placa
 			}
             write_psoc1(val,10);
             
@@ -983,7 +991,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 10; x++)
             {
-				write_psoc1(val,BalanceA[x]); // variable saldo	
+				write_psoc1(val,BalanceB[x]); // variable saldo	
 			}
             write_psoc1(val,10);
             
@@ -993,7 +1001,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 20; x++)
             {
-				write_psoc1(val,Company[x]);	//  variable compañia
+				write_psoc1(val,CompanyB[x]);	//  variable compañia
 			}
             write_psoc1(val,10);
             
@@ -1003,7 +1011,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 20; x++)
             {
-				write_psoc1(val,CountID[x]);	//variable cuenta
+				write_psoc1(val,CountIDB[x]);	//variable cuenta
 			}
             write_psoc1(val,10);
 			
@@ -1012,7 +1020,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 				write_psoc1(val,PRN_VISITSDAY[x]);
 			} 
 			
-			write_psoc1(val, DayVisit);	
+			write_psoc1(val, DayVisitB);	
 			
             write_psoc1(val,10);
             
@@ -1021,7 +1029,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 				write_psoc1(val,PRN_VISITSWEEK[x]);
 			} 
 			
-			write_psoc1(val,WeekVisit);				
+			write_psoc1(val,WeekVisitB);				
             write_psoc1(val,10);
             
             for(x = 0;x < 13; x++)
@@ -1029,7 +1037,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 				write_psoc1(val,PRN_VISITSMONTH[x]);
 			} 
 			
-			write_psoc1(val, MonthVisit);		
+			write_psoc1(val, MonthVisitB);		
             write_psoc1(val,10);
             
             for(x = 0; x < 13; x++)
@@ -1038,7 +1046,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 7; x++)
             {
-				write_psoc1(val,VolumeDay[x]);	
+				write_psoc1(val,VolumeDayB[x]);	
 			}
             write_psoc1(val,10);
             
@@ -1048,7 +1056,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 7; x++)
             {
-				write_psoc1(val, VolumeWeek[x]);	
+				write_psoc1(val, VolumeWeekB[x]);	
 			}
             write_psoc1(val,10);
             
@@ -1058,7 +1066,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 7; x++)
             {
-				write_psoc1(val,VolumeMonth[x]);	
+				write_psoc1(val,VolumeMonthB[x]);	
 			}
             write_psoc1(val,10);
             
@@ -1068,7 +1076,7 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
 			} 
 			for(x = 0; x < 16; x++)
             {
-				write_psoc1(val,CountType[x]);	
+				write_psoc1(val,CountTypeB[x]);	
 			}
             write_psoc1(val,10);
             write_psoc1(val,10);

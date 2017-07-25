@@ -184,7 +184,8 @@ void InitDisplay1(){
     if(NumPositions < 2)
     {
         SetPicture(1,DISPLAY_ERROR);        
-    }         
+    }      
+   
 }
 
 /*
@@ -268,12 +269,11 @@ void PollingDisplay1(void){
             bufferDisplay1.flagEndSale = false;  
             side.a.RFstateReport = 0;
             SetPicture(1, DISPLAY_INICIO0);
-            Display1_ClearRxBuffer();
-                   
+              
             if(bufferDisplay1.flagPrint == 1)
             {    
 
-                vTaskDelay( 2000 / portTICK_PERIOD_MS );
+                vTaskDelay( 5000 / portTICK_PERIOD_MS );
                 imprimir(printPortA, side.a.dir);
                 bufferDisplay1.flagPrint = 0;
                 bufferDisplay1.saleType = 0;
@@ -284,6 +284,9 @@ void PollingDisplay1(void){
     	        }
                
             }
+            
+            vTaskDelay( 10 / portTICK_PERIOD_MS );
+            Display1_ClearRxBuffer();
 
         break;
         case 1: //Menu
@@ -294,11 +297,12 @@ void PollingDisplay1(void){
                 {                                             
                     flowDisplay1 = 2;                               //Pantalla forma de pago                      
                     SetPicture(1, DISPLAY_FORMA_PAGO_DESEADA);
-                    //vTaskDelay( 10 / portTICK_PERIOD_MS );
-                    Display2_ClearRxBuffer();
+                    vTaskDelay( 10 / portTICK_PERIOD_MS );
+                    Display1_ClearRxBuffer();
                 }  
-       
+            
             }
+            
         break;
         case 2:  //Pantalla forma de pago
             if(Display1_GetRxBufferSize() == 8)
@@ -355,6 +359,7 @@ void PollingDisplay1(void){
                             flowDisplay1 = 0;
                             SetPicture(1, DISPLAY_INICIO0);   
                             AuthType = 0;
+                            vTaskDelay( 10 / portTICK_PERIOD_MS );
                             Display1_ClearRxBuffer();
                         break;
                         
@@ -363,11 +368,12 @@ void PollingDisplay1(void){
                             flowDisplay1 = 0;
                             SetPicture(1, DISPLAY_INICIO0);
                             AuthType = 0;
+                            vTaskDelay( 10 / portTICK_PERIOD_MS );
                             Display1_ClearRxBuffer();
                         break;
                     }
                 }  
-                //CyDelay(10);
+                
                 vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
                 Display1_ClearRxBuffer();
             }
@@ -703,9 +709,9 @@ void PollingDisplay1(void){
                             bufferDisplay1.flagPrint =  0;
                             PresetFlag = 0;
                             iButtonFlag = 0;
-                            AuthType = 0;
+                            AuthType = 0;     
                             side.a.rfState = RF_ZERO_SALE;
-                            vTaskDelay( 50 / portTICK_PERIOD_MS );
+                            vTaskDelay( 50 / portTICK_PERIOD_MS );                      
                             Display1_ClearRxBuffer();
                         break;
                         
@@ -1546,7 +1552,7 @@ void PollingDisplay2(void){
             if(bufferDisplay2.flagPrint == 1)
             {    
 
-                vTaskDelay( 2000 / portTICK_PERIOD_MS );
+                vTaskDelay( 5000 / portTICK_PERIOD_MS );
                 imprimir(printPortB, side.b.dir);
                 bufferDisplay2.flagPrint = 0;
                 bufferDisplay2.saleType = 0; 
@@ -1567,7 +1573,7 @@ void PollingDisplay2(void){
                 {                                             
                     flowDisplay2 = 2;                          //Pantalla forma de pago                      
                     SetPicture(2,DISPLAY_FORMA_PAGO_DESEADA);   
-                    //vTaskDelay( 10 / portTICK_PERIOD_MS );
+                    vTaskDelay( 10 / portTICK_PERIOD_MS );
                     Display2_ClearRxBuffer();
                 }  
 
@@ -1765,6 +1771,7 @@ void PollingDisplay2(void){
                     flowDisplay2 = 5;       //caso para seleccion de producto
                     SetPicture(2,DISPLAY_SELECCIONE_PRODUCTO4);
                     Display2_ClearRxBuffer();
+                    vTaskDelay( 10 / portTICK_PERIOD_MS );
                 break;
             }
 
@@ -2058,7 +2065,7 @@ void PollingDisplay2(void){
                             {
                                 bufferDisplay2.licenceSale[x] = 0x00;
                             }
-                            Display2_ClearRxBuffer();
+                            
                             for(x = 0; x <= bufferDisplay2.valueKeys[0]; x++)
                             {
                                 bufferDisplay2.licenceSale[x] = bufferDisplay2.valueKeys[x];
@@ -2073,7 +2080,7 @@ void PollingDisplay2(void){
                                 flowDisplay2 = 6;   
                                 SetPicture(2, DISPLAY_DESEA_IMPRIMIR_RECIBO);                              
                             }
-                            Display2_ClearRxBuffer();
+                            
                         break;
                         
                         case 2:  //Mileage
@@ -2789,11 +2796,12 @@ void PresetAuthorize(uint8 Position)
         // pump handle detect 
         side.a.activeHose = PumpHoseActiveState(side.a.dir);
                 
-        if(iButtonFlag == 1) 
+        if(iButtonFlag == 1 && side.a.activeHose == side.a.hose) 
         {
             CreditAuth = RF_CREDITSALEAUTH;
             side.a.RFstateReport = 1;
             iButtonFlag = 0;
+            
         }
         
         //iButton Authorized
@@ -2894,7 +2902,7 @@ void PresetAuthorize(uint8 Position)
     {
         side.b.activeHose = PumpHoseActiveState(side.b.dir);  
         
-        if(iButtonFlag2 == 1)
+        if(iButtonFlag2 == 1 && side.b.activeHose == side.b.hose)
         {
             CreditAuth2 = RF_CREDITSALEAUTH;
             side.b.RFstateReport = 1;
