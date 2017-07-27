@@ -1294,7 +1294,7 @@ void pollingRFA_Tx(){
         }
         buffer_A[31]                    = verificar_check(buffer_A,32);                          
         side.a.pumpState                = PUMP_IDLE;
-        side.a.rfState                  = RF_IDLE;
+        //side.a.rfState                  = RF_IDLE;
         bufferDisplay1.flagActiveSale   = false;
         bufferDisplay1.flagEndSale      = false;
         side.a.RFstateReport            = 0;
@@ -1656,7 +1656,7 @@ void pollingRFB_Tx(){
         
         buffer_B[30]              = verificar_check(buffer_B, 31);        
         side.b.pumpState              = PUMP_IDLE;
-        side.b.rfState                = RF_IDLE;
+        //side.b.rfState                = RF_IDLE;
         bufferDisplay2.flagActiveSale = false;
         bufferDisplay2.flagEndSale    = false;
         side.b.RFstateReport          = 0;

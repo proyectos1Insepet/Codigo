@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\keyboard.c">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo\Source - 1 Application Layer\RFPoll.c">
 <ExpandedNodeIds>
 <v>PSoC 5 FreeRTOS Demo</v>
 <v>PSoC 5 FreeRTOS Demo\PSoC 5 FreeRTOS Demo</v>
@@ -432,10 +432,9 @@
 <OpenDocs>
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\main.c" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\PumpTask.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\protocol.c" />
-<name v=".\PSoC 5 FreeRTOS Demo.cydsn\inc\variables.h" />
 <name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\RFPoll.c" />
+<name v=".\PSoC 5 FreeRTOS Demo.cydsn\RFtask.c" />
+<name v=".\PSoC 5 FreeRTOS Demo.cydsn\src\Printing.c" />
 </OpenDocs>
 <config v="" />
 <AutoUpdate v="true" />
