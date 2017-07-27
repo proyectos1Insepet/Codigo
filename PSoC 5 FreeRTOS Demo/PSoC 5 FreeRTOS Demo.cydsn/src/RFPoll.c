@@ -193,7 +193,8 @@ uint8 verificar_check(uint8 *datos, uint16 size){
 
 void pollingRF_Rx(uint8 PRF_rxBuffer[])
 {
-    uint16 i, x, y;      
+    uint16 i, x, y, j, contEscape;  
+    uint8 buffer_rfTMP;
     uint8 EEpromGradeAddress;
    
     ActiveRF = 1;
@@ -1227,14 +1228,12 @@ void pollingRFA_Tx(){
     }            
     ////////////// END SALE - CASH ////////////////////////////////////
     if(bufferDisplay1.flagEndSale && side.a.RFstateReport == 1) //if((side.a.pumpState == PUMP_PEOT || side.a.pumpState == PUMP_FEOT) && side.a.RFstateReport == 1)
-    {
-            
+    {        
         for(x = 0; x < 255; x++)
         {
             buffer_A[x] = 0x00;
         }
         
-
         buffer_A[0]  = 32;
 		buffer_A[1]  = 0xBC;
         buffer_A[2]  = 0xCB;
@@ -1295,7 +1294,7 @@ void pollingRFA_Tx(){
         }
         buffer_A[31]                    = verificar_check(buffer_A,32);                          
         side.a.pumpState                = PUMP_IDLE;
-        side.a.rfState                  = RF_IDLE;
+        //side.a.rfState                  = RF_IDLE;
         bufferDisplay1.flagActiveSale   = false;
         bufferDisplay1.flagEndSale      = false;
         side.a.RFstateReport            = 0;
@@ -1590,7 +1589,8 @@ void pollingRFB_Tx(){
         for(x = 0; x < 255; x++)
         {
             buffer_B[x] = 0x00;
-        }        
+        }
+        
         buffer_B[100] = 31;
         buffer_B[0]  = 0xBC;
         buffer_B[1]  = 0xCB;
@@ -1656,7 +1656,7 @@ void pollingRFB_Tx(){
         
         buffer_B[30]              = verificar_check(buffer_B, 31);        
         side.b.pumpState              = PUMP_IDLE;
-        side.b.rfState                = RF_IDLE;
+        //side.b.rfState                = RF_IDLE;
         bufferDisplay2.flagActiveSale = false;
         bufferDisplay2.flagEndSale    = false;
         side.b.RFstateReport          = 0;

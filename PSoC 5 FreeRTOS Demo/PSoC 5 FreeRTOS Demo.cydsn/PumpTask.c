@@ -1494,7 +1494,7 @@ void PollingDisplay1(void){
                 WriteMessage(1, mensaje2[x],21,1 + x,4,0x0000,'Y');
                     
             }
-             
+            side.a.rfState = RF_IDLE;
             vTaskDelay( 2000 / portTICK_PERIOD_MS );
             flowDisplay1 = 0;
             SetPicture(1, DISPLAY_INICIO0);
@@ -2756,6 +2756,7 @@ void PollingDisplay2(void){
                 WriteMessage(2, mensaje2[x], 21, 1 + x, 3, 0x0000, 'Y');
                     
             }
+            side.b.rfState = RF_IDLE;
             vTaskDelay( 2000 / portTICK_PERIOD_MS );
             flowDisplay2 = 0;
             SetPicture(2, DISPLAY_INICIO0);
@@ -2880,6 +2881,7 @@ void PresetAuthorize(uint8 Position)
             CreditAuth = RF_CREDITSALEAUTH;
             side.a.RFstateReport = 1;
             iButtonFlag = 0;
+            side.a.rfState = RF_CREDITSALEAUTH;
             
         }
         
@@ -2977,6 +2979,7 @@ void PresetAuthorize(uint8 Position)
             CreditAuth2 = RF_CREDITSALEAUTH;
             side.b.RFstateReport = 1;
             iButtonFlag2 = 0;
+            side.b.rfState = RF_CREDITSALEAUTH;
         }
         
         //iButton Authorized Credit
