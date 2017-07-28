@@ -20,6 +20,8 @@
 	
 uint8 alphanumeric_keyboard (uint8 maxNumberKeys, uint8 character);
 uint8 alphanumeric_keyboard2(uint8 maxNumberKeys, uint8 character);
+uint8 alphanumeric_keyboard3(uint8 maxNumberKeys, uint8 character);
+uint8 alphanumeric_keyboard4(uint8 maxNumberKeys, uint8 character);
 
 #endif
 
