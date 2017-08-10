@@ -90,8 +90,11 @@ uint8 get_state(uint8 pos){
     
     Pump_PutChar(pos);
     Pump_ClearRxBuffer();
-    CyDelay(60);
-    
+    if(OSonline){
+        vTaskDelay( 70 / portTICK_PERIOD_MS );
+    }else{
+        CyDelay(60);
+    }        
     if(Pump_GetRxBufferSize() > 0)
     {
         state = (Pump_ReadRxData() & 0xF0) >> 4;
@@ -170,17 +173,26 @@ uint8 get_position(void){
            side.d.dir = x;
            InitState[3] = (Pump_ReadRxData() & 0xF0) >> 4;
            Pump_ClearRxBuffer();
-        }                    
+        }  
+        TempPos[0] = side.a.dir;
+        TempPos[1] = side.b.dir;
+        TempPos[2] = side.c.dir;
+        TempPos[3] = side.d.dir;
     }
     
     // Retorna el numero de posiciones
-    if((side.a.dir!=0xff)&&(side.b.dir!=0xff)&&(side.c.dir!=0xff)&&(side.d.dir!=0xff))
-    {
-        return 4;
-    }
     if((side.a.dir!=0xff) && (side.b.dir!=0xff))
     {
-        return 2;
+        if((side.a.dir!=0xff)&&(side.b.dir!=0xff)&&(side.c.dir!=0xff)&&(side.d.dir!=0xff))
+        {
+             //side.b.dir = TempPos[2];
+             //side.c.dir = TempPos[1];
+            return 4;            
+        }
+        else
+        {    
+            return 2;
+        }
     }
     else{
         if((side.a.dir!=0xff)||(side.b.dir!=0xff))
@@ -270,7 +282,8 @@ uint8 getTotals(uint8 pos){
                 }
                 Pump_ClearRxBuffer();
                 return gradeHandle;
-            }else{
+            }
+            if(pos == side.b.dir){
                 for(x = 0; x < 4; x++)
                 {
                     for(y = 0; y < 3; y++)
@@ -314,6 +327,98 @@ uint8 getTotals(uint8 pos){
                 Pump_ClearRxBuffer();
                 return gradeHandle;
             }
+            
+            if(pos == side.c.dir){
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.c.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 8; z++)
+                        {
+                            side.c.totalsHandle[x][y][9-z] = (Pump_rxBuffer[w+4]&0x0F) + 0x30;
+                            w++;
+                            if((y == 2)&&(z == 4))
+                            {
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 7;
+                    for(z = 4; z >= 1; z--)
+                    {
+                        side.c.totalsHandle[x][2][z] = side.c.totalsHandle[x][2][z+4];
+                    }
+                    side.c.totalsHandle[x][0][0] = 8;
+                    side.c.totalsHandle[x][1][0] = 8;
+                    side.c.totalsHandle[x][2][0] = 4;
+                    if(ppux10 == 1)
+                    {
+                        side.c.totalsHandle[x][2][0] = 5;
+                        side.c.totalsHandle[x][2][5] = 0;
+                    }
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+            
+            if(pos == side.d.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.d.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 8; z++)
+                        {
+                            side.d.totalsHandle[x][y][9-z] = (Pump_rxBuffer[w+4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2) && (z == 4))
+                            {
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 7;
+                    for(z = 4; z >= 1; z--)
+                    {
+                        side.d.totalsHandle[x][2][z] = side.d.totalsHandle[x][2][z+4];
+                    }
+                    side.d.totalsHandle[x][0][0] = 8;
+                    side.d.totalsHandle[x][1][0] = 8;
+                    side.d.totalsHandle[x][2][0] = 4;
+                    if(ppux10 == 1)
+                    {
+                        side.d.totalsHandle[x][2][0] = 5;
+                        side.d.totalsHandle[x][2][5] = 0;
+                    }
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+            
         }else{
             Pump_ClearRxBuffer();
             return 0;
@@ -361,7 +466,8 @@ uint8 getTotals(uint8 pos){
                 }
                 Pump_ClearRxBuffer();
                 return gradeHandle;
-            }else
+            }
+            if(pos == side.b.dir)
             {
                 for(x = 0; x < 4; x++)
                 {
@@ -397,6 +503,84 @@ uint8 getTotals(uint8 pos){
                     side.b.totalsHandle[x][0][0] = 12;
                     side.b.totalsHandle[x][1][0] = 12;
                     side.b.totalsHandle[x][2][0] = 6;
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+            if(pos == side.c.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.c.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 12; z++)
+                        {
+                            side.c.totalsHandle[x][y][13 - z] = (Pump_rxBuffer[w + 4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2)&&(z == 6)){
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 9;
+                    for(z = 6; z >= 1; z--)
+                    {
+                        side.c.totalsHandle[x][2][z] = side.c.totalsHandle[x][2][z + 6];
+                    }
+                    side.c.totalsHandle[x][0][0] = 12;
+                    side.c.totalsHandle[x][1][0] = 12;
+                    side.c.totalsHandle[x][2][0] = 6;
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+            if(pos == side.d.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.d.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 12; z++)
+                        {
+                            side.d.totalsHandle[x][y][13 - z] = (Pump_rxBuffer[w + 4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2)&&(z == 6)){
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 9;
+                    for(z = 6; z >= 1; z--)
+                    {
+                        side.d.totalsHandle[x][2][z] = side.d.totalsHandle[x][2][z + 6];
+                    }
+                    side.d.totalsHandle[x][0][0] = 12;
+                    side.d.totalsHandle[x][1][0] = 12;
+                    side.d.totalsHandle[x][2][0] = 6;
                 }
                 Pump_ClearRxBuffer();
                 return gradeHandle;
@@ -579,6 +763,10 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
     }
     
     state = get_state(sideR);
+    while(state == 0)
+    {
+        state = get_state(sideR);
+    }
     if(state == 0x06 || state == 0x07)
     {
         Pump_PutChar(0x20 | sideR);
@@ -595,7 +783,14 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
         SendComand[x] = 0xE1; x++;
         if(sideR == side.a.dir)
         {
-            SendComand[x] = 0xF0 | (preset & 0x0F); x++;
+            if(preset == 0x03)
+            {
+                SendComand[x] = 0xF0 | (0x02 & 0x0F); x++;
+            }
+            else
+            {
+                SendComand[x] = 0xF0 | (preset & 0x0F); x++;
+            }
             SendComand[x] = 0xF6; x++;
             SendComand[x] = 0xE0 | ((grade - 1) & 0x0F); x++;
             SendComand[x] = PRDn; x++;
@@ -712,7 +907,260 @@ uint8 PresetData(uint8 sideR, char8 grade, uint8 *value, uint8 preset){
         // Lado B
         if(sideR == side.b.dir)
         {
-            SendComand[x] = 0xF0 | (preset & 0x0F); x++;
+            if(preset == 0x03)
+            {
+                SendComand[x] = 0xF0 | (0x02 & 0x0F); x++;
+            }
+            else
+            {
+                SendComand[x] = 0xF0 | (preset & 0x0F); x++;
+            }
+            SendComand[x] = 0xF6; x++;
+            SendComand[x] = 0xE0 | ((grade - 1) & 0x0F); x++;
+            SendComand[x] = PRDn; x++;
+            if(preset == 0x03)
+            {
+                for(y = x; y < digits + x; y++ )
+                {
+                    SendComand[y] = 0xE9;                    
+                }                
+                x = y;
+                for(y = x; y < 14; y ++ )
+                {
+                    SendComand[y] = 0xE0;
+                    x++;
+                }                
+            }
+            if(preset == 0x02)
+            {
+                z = value[0];
+                for(y = x; y < value[0] + x; y++)
+                {
+                    SendComand[y] = 0xE0|(value[z] & 0x0F); z--;                    
+                }                
+                x = y;
+                for(y = x; y < 14; y ++ )
+                {
+                    SendComand[y] = 0xE0;
+                    x++;
+                }                
+            }
+            if(preset == 0x01)
+            {
+                if(digits != 7)
+                {
+                    if(decimal > (VolDec - 1))
+                    {
+                        for(w = value[0]; w > 1; w--)
+                        {
+                            value[w] = value[w - 1];
+                        }
+                        value[1] = '0';
+                    }else if(decimal < (VolDec - 1))
+                    {
+                        v = (VolDec - 1) - (decimal);
+                        for(w = 1; w <= value[0]; w++)
+                        {
+                            value[w] = value[v + w];
+                            if((w + v) == value[0])
+                            {
+                                for(v = 1; v <= (value[0] - w); v++)
+                                {
+                                    value[w + v]= '0';
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }else{
+                    if(decimal > 1)
+                    {
+                        v = VolDec - decimal;
+                        for(w = 1; w <= value[0]; w++)
+                        {
+                            value[w] = value[v + w];
+                            if((w + v) == value[0])
+                            {
+                                for(v = 1; v <= (value[0] - w); v++)
+                                {
+                                    value[w + v] = '0';
+                                }
+                                break;
+                            }
+                        }
+                    }else{
+                        v = VolDec - decimal;
+                        for(w = 1; w <= value[0]; w++)
+                        {
+                            value[w] = value[v + w];
+                            if((w + v) == value[0])
+                            {
+                                for(v = 1; v <= (value[0] - w); v++)
+                                {
+                                    value[w + v] = '0';
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }                    
+                z = value[0];
+                for(y = x; y < value[0] + x; y ++ )
+                {
+                    SendComand[y] = 0xE0 |(value[z] & 0x0F); z--;                    
+                }                
+                x = y;
+                for(y = x; y < 14; y ++ )
+                {
+                    SendComand[y] = 0xE0;
+                    x++;
+                }                
+            }
+            SendComand[x] = 0xFB;  x++;
+            SendComand[x] = GetLRC(SendComand);  x++;
+            SendComand[x] = (EOM);
+            for(y = 0; y <= x; y++)
+            {
+                Pump_PutChar(SendComand[y]);
+            } 
+            //CyDelay(50);
+            vTaskDelay( 50 / portTICK_PERIOD_MS );
+            return 1;
+        }
+        // Lado C
+        if(sideR == side.c.dir)
+        {
+            if(preset == 0x03)
+            {
+                SendComand[x] = 0xF0 | (0x02 & 0x0F); x++;
+            }
+            else
+            {
+                SendComand[x] = 0xF0 | (preset & 0x0F); x++;
+            }
+            SendComand[x] = 0xF6; x++;
+            SendComand[x] = 0xE0 | ((grade - 1) & 0x0F); x++;
+            SendComand[x] = PRDn; x++;
+            if(preset == 0x03)
+            {
+                for(y = x; y < digits + x; y++ )
+                {
+                    SendComand[y] = 0xE9;                    
+                }                
+                x = y;
+                for(y = x; y < 14; y ++ )
+                {
+                    SendComand[y] = 0xE0;
+                    x++;
+                }                
+            }
+            if(preset == 0x02)
+            {
+                z = value[0];
+                for(y = x; y < value[0] + x; y++)
+                {
+                    SendComand[y] = 0xE0|(value[z] & 0x0F); z--;                    
+                }                
+                x = y;
+                for(y = x; y < 14; y ++ )
+                {
+                    SendComand[y] = 0xE0;
+                    x++;
+                }                
+            }
+            if(preset == 0x01)
+            {
+                if(digits != 7)
+                {
+                    if(decimal > (VolDec - 1))
+                    {
+                        for(w = value[0]; w > 1; w--)
+                        {
+                            value[w] = value[w - 1];
+                        }
+                        value[1] = '0';
+                    }else if(decimal < (VolDec - 1))
+                    {
+                        v = (VolDec - 1) - (decimal);
+                        for(w = 1; w <= value[0]; w++)
+                        {
+                            value[w] = value[v + w];
+                            if((w + v) == value[0])
+                            {
+                                for(v = 1; v <= (value[0] - w); v++)
+                                {
+                                    value[w + v]= '0';
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }else{
+                    if(decimal > 1)
+                    {
+                        v = VolDec - decimal;
+                        for(w = 1; w <= value[0]; w++)
+                        {
+                            value[w] = value[v + w];
+                            if((w + v) == value[0])
+                            {
+                                for(v = 1; v <= (value[0] - w); v++)
+                                {
+                                    value[w + v] = '0';
+                                }
+                                break;
+                            }
+                        }
+                    }else{
+                        v = VolDec - decimal;
+                        for(w = 1; w <= value[0]; w++)
+                        {
+                            value[w] = value[v + w];
+                            if((w + v) == value[0])
+                            {
+                                for(v = 1; v <= (value[0] - w); v++)
+                                {
+                                    value[w + v] = '0';
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }                    
+                z = value[0];
+                for(y = x; y < value[0] + x; y ++ )
+                {
+                    SendComand[y] = 0xE0 |(value[z] & 0x0F); z--;                    
+                }                
+                x = y;
+                for(y = x; y < 14; y ++ )
+                {
+                    SendComand[y] = 0xE0;
+                    x++;
+                }                
+            }
+            SendComand[x] = 0xFB;  x++;
+            SendComand[x] = GetLRC(SendComand);  x++;
+            SendComand[x] = (EOM);
+            for(y = 0; y <= x; y++)
+            {
+                Pump_PutChar(SendComand[y]);
+            } 
+            //CyDelay(50);
+            vTaskDelay( 50 / portTICK_PERIOD_MS );
+            return 1;
+        }
+        // Lado D
+        if(sideR == side.d.dir)
+        {
+            if(preset == 0x03)
+            {
+                SendComand[x] = 0xF0 | (0x02 & 0x0F); x++;
+            }
+            else
+            {
+                SendComand[x] = 0xF0 | (preset & 0x0F); x++;
+            }
             SendComand[x] = 0xF6; x++;
             SendComand[x] = 0xE0 | ((grade - 1) & 0x0F); x++;
             SendComand[x] = PRDn; x++;
@@ -1022,8 +1470,15 @@ uint8 getSale(uint8 pos){
 	uint8 x;    
 	Pump_ClearRxBuffer();
 	Pump_PutChar(0x40 | pos);
-    //CyDelay(250);
-    vTaskDelay(250 / portTICK_PERIOD_MS);
+    if(OSonline)
+    {
+        vTaskDelay(250 / portTICK_PERIOD_MS);
+    }
+    else
+    {
+        CyDelay(250);
+    }
+    
     //CyWdtClear();
     
     //6 Digits
@@ -1063,7 +1518,8 @@ uint8 getSale(uint8 pos){
                 }
                 side.a.moneySale[0] = 6;
 			}
-			else{
+			if(pos == side.b.dir)
+            {
 				side.b.productSale = ((Pump_rxBuffer[9] & 0x0F) + 1) + 0x30;
 				for(x = 1; x <= 4; x++)
                 {
@@ -1089,6 +1545,71 @@ uint8 getSale(uint8 pos){
                 }
                 side.b.moneySale[0]=6;
 			}
+            if(pos == side.c.dir)
+            {
+				side.c.productSale = ((Pump_rxBuffer[9] & 0x0F) + 1) + 0x30;
+				for(x = 1; x <= 4; x++)
+                {
+					side.c.ppuSale[5 - x]=((Pump_rxBuffer[x + 11] & 0x0F) + 0x30);
+				}
+                side.c.ppuSale[0] = 4;
+                if(ppux10 == 1)
+                {
+                    side.a.ppuSale[0] = 5;
+                    side.a.ppuSale[5] = '0';
+                }
+				for(x = 1; x <= 6; x++)
+                {
+					side.c.volumeSale[7 - x] = ((Pump_rxBuffer[x + 16] & 0x0F) + 0x30);
+				}		
+                side.c.volumeSale[0] = 6;                
+				for(x = 1; x <= 6; x++)
+                {
+					side.c.moneySale[7 - x] = ((Pump_rxBuffer[x + 23] & 0x0F) + 0x30);
+				}
+                if(digits == 5)
+                {
+                    for(x = 6; x > 1; x--)
+                    {
+                        side.c.moneySale[x] = side.c.moneySale[x - 1];
+                    }
+                    side.c.moneySale[1] = '0';
+                }
+                side.c.moneySale[0] = 6;
+			}
+            if(pos == side.d.dir)
+            {
+				side.d.productSale = ((Pump_rxBuffer[9] & 0x0F) + 1) + 0x30;
+				for(x = 1; x <= 4; x++)
+                {
+					side.d.ppuSale[5 - x]=((Pump_rxBuffer[x + 11] & 0x0F) + 0x30);
+				}
+                side.d.ppuSale[0] = 4;
+                if(ppux10 == 1)
+                {
+                    side.d.ppuSale[0] = 5;
+                    side.d.ppuSale[5] = '0';
+                }
+				for(x = 1; x <= 6; x++)
+                {
+					side.d.volumeSale[7 - x] = ((Pump_rxBuffer[x + 16] & 0x0F) + 0x30);
+				}		
+                side.d.volumeSale[0] = 6;                
+				for(x = 1; x <= 6; x++)
+                {
+					side.d.moneySale[7 - x] = ((Pump_rxBuffer[x + 23] & 0x0F) + 0x30);
+				}
+                if(digits == 5)
+                {
+                    for(x = 6; x > 1; x--)
+                    {
+                        side.d.moneySale[x] = side.d.moneySale[x - 1];
+                    }
+                    side.d.moneySale[1] = '0';
+                }
+                side.d.moneySale[0] = 6;
+			}
+            
 			return 1;
 		}
 		else{
@@ -1120,7 +1641,8 @@ uint8 getSale(uint8 pos){
                 side.a.moneySale[1] = '0';
                 side.a.moneySale[0] = 8;
 			}
-			else{
+			if(pos == side.b.dir)
+            {
 				side.b.productSale=((Pump_rxBuffer[9]&0x0F)+1)+0x30;
 				for(x=1;x<=6;x++){
 					side.b.ppuSale[7-x]=((Pump_rxBuffer[x+11]&0x0F)+0x30);
@@ -1135,6 +1657,47 @@ uint8 getSale(uint8 pos){
 				}	
                 side.b.moneySale[1]='0';
                 side.b.moneySale[0]=8;
+			}
+            if(pos == side.c.dir)
+            {
+				side.c.productSale = ((Pump_rxBuffer[9] & 0x0F) + 1) + 0x30;
+				for(x = 1; x <= 6; x++)
+                {
+					side.c.ppuSale[7 - x] = ((Pump_rxBuffer[x + 11] & 0x0F) + 0x30);
+				}
+                side.c.ppuSale[0] = 6;
+				for(x = 1; x <= 8; x++)
+                {
+					side.c.volumeSale[9 - x] = ((Pump_rxBuffer[x + 18] & 0x0F) + 0x30);
+				}		
+                side.c.volumeSale[0] = 8;
+				for(x = 1; x <= 7; x++)
+                {
+					side.c.moneySale[9 - x] = ((Pump_rxBuffer[x + 28] & 0x0F) + 0x30);
+				}
+                side.c.moneySale[1] = '0';
+                side.c.moneySale[0] = 8;
+			}
+            
+            if(pos == side.d.dir)
+            {
+				side.d.productSale = ((Pump_rxBuffer[9] & 0x0F) + 1) + 0x30;
+				for(x = 1; x <= 6; x++)
+                {
+					side.d.ppuSale[7 - x] = ((Pump_rxBuffer[x + 11] & 0x0F) + 0x30);
+				}
+                side.d.ppuSale[0] = 6;
+				for(x = 1; x <= 8; x++)
+                {
+					side.d.volumeSale[9 - x] = ((Pump_rxBuffer[x + 18] & 0x0F) + 0x30);
+				}		
+                side.d.volumeSale[0] = 8;
+				for(x = 1; x <= 7; x++)
+                {
+					side.d.moneySale[9 - x] = ((Pump_rxBuffer[x + 28] & 0x0F) + 0x30);
+				}
+                side.d.moneySale[1] = '0';
+                side.d.moneySale[0] = 8;
 			}
 			return 1;
 		}
@@ -1180,3 +1743,337 @@ void Authorization(uint8 pos){
     Pump_PutChar(0x10 | pos);
    
 }
+
+/*
+*********************************************************************************************************
+*                                    uint8 get_totals(uint8 pos)
+*
+* Description : 
+*               
+*
+* Argument(s) : none
+*
+* Return(s)   : none
+*
+* Caller(s)   : 
+*
+* Note(s)     : none.
+*********************************************************************************************************
+*/
+uint8 getTotalsInit(uint8 pos){
+    uint8 x,y,z,w,gradeHandle;
+    
+    Pump_ClearRxBuffer();
+    Pump_PutChar(0x50|pos);
+    CyWdtClear();
+    CyDelay(900);
+    //vTaskDelay( 900 / portTICK_PERIOD_MS );
+    CyWdtClear();
+    
+    x = Pump_GetRxBufferSize();
+    
+    if((x == 34) || (x == 64) || (x == 94) || (x == 124))  // Version 5 ó 6 digitos
+    {           
+        if((Pump_rxBuffer[0] == 0xFF) && (Pump_rxBuffer[1] == 0xF6) && (Pump_rxBuffer[3] == 0xF9))
+        {
+            gradeHandle = (x / 30) & 0x07;                    //Identificando cantidad de mangueras en el surtidor
+            if(pos == side.a.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.a.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 8; z++)
+                        {
+                            side.a.totalsHandle[x][y][9-z] = (Pump_rxBuffer[w+4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2) && (z == 4))
+                            {
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 7;
+                    for(z = 4; z >= 1; z--)
+                    {
+                        side.a.totalsHandle[x][2][z] = side.a.totalsHandle[x][2][z+4];
+                    }
+                    side.a.totalsHandle[x][0][0] = 8;
+                    side.a.totalsHandle[x][1][0] = 8;
+                    side.a.totalsHandle[x][2][0] = 4;
+                    if(ppux10 == 1)
+                    {
+                        side.a.totalsHandle[x][2][0] = 5;
+                        side.a.totalsHandle[x][2][5] = 0;
+                    }
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }else{
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.b.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 8; z++)
+                        {
+                            side.b.totalsHandle[x][y][9-z] = (Pump_rxBuffer[w+4]&0x0F) + 0x30;
+                            w++;
+                            if((y == 2)&&(z == 4))
+                            {
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 7;
+                    for(z = 4; z >= 1; z--)
+                    {
+                        side.b.totalsHandle[x][2][z] = side.b.totalsHandle[x][2][z+4];
+                    }
+                    side.b.totalsHandle[x][0][0] = 8;
+                    side.b.totalsHandle[x][1][0] = 8;
+                    side.b.totalsHandle[x][2][0] = 4;
+                    if(ppux10 == 1)
+                    {
+                        side.b.totalsHandle[x][2][0] = 5;
+                        side.b.totalsHandle[x][2][5] = 0;
+                    }
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+        }else{
+            Pump_ClearRxBuffer();
+            return 0;
+        }
+    }else if((x == 46)||(x == 88)||(x == 130)||(x == 172))
+    {     // Version 7 digitos
+        if((Pump_rxBuffer[0] == 0xFF) && (Pump_rxBuffer[1] == 0xF6) && (Pump_rxBuffer[3] == 0xF9))
+        {
+            gradeHandle = (x/40) & 0x07;                        // Identificando cantidad de mangueras en el surtidor
+            if(pos == side.a.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.a.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                for(y = 0; y < 3; y ++)
+                {
+                    for(z = 0; z < 6; z++)
+                    {
+                        side.a.ppuAuthorized[y][z] = Pump_rxBuffer[(30 + (42 * y)) + z] & 0x0F;
+                        EEPROM_1_WriteByte(side.a.ppuAuthorized[y][z],(20 + (y * 5)) + z); //PPU to EEprom
+                    }                   
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 12; z++)
+                        {
+                            side.a.totalsHandle[x][y][13 - z] = (Pump_rxBuffer[w + 4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2)&&(z == 6)){
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 9;
+                    for(z = 6; z >= 1; z--)
+                    {
+                        side.a.totalsHandle[x][2][z] = side.a.totalsHandle[x][2][z + 6];
+                    }
+                    side.a.totalsHandle[x][0][0] = 12;
+                    side.a.totalsHandle[x][1][0] = 12;
+                    side.a.totalsHandle[x][2][0] = 6;
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+            if(pos == side.b.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.b.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                for(y = 0; y < 3; y ++)
+                {
+                    for(z = 0; z < 6; z++)
+                    {
+                        side.b.ppuAuthorized[y][z] = Pump_rxBuffer[(30 + (42 * y)) + z] & 0x0F;
+                        EEPROM_1_WriteByte(side.b.ppuAuthorized[y][z],(40 + (y * 5)) + z); //PPU to EEprom
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 12; z++)
+                        {
+                            side.b.totalsHandle[x][y][13-z] = (Pump_rxBuffer[w+4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2)&&(z == 6))
+                            {
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 9;
+                    for(z = 6;z >= 1; z--)
+                    {
+                        side.b.totalsHandle[x][2][z] = side.b.totalsHandle[x][2][z+6];
+                    }
+                    side.b.totalsHandle[x][0][0] = 12;
+                    side.b.totalsHandle[x][1][0] = 12;
+                    side.b.totalsHandle[x][2][0] = 6;
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+            if(pos == side.c.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.c.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                for(y = 0; y < 3; y ++)
+                {
+                    for(z = 0; z < 6; z++)
+                    {
+                        side.c.ppuAuthorized[y][z] = Pump_rxBuffer[(30 + (42 * y)) + z] & 0x0F;
+                        EEPROM_1_WriteByte(side.c.ppuAuthorized[y][z],(60 + (y * 5)) + z); //PPU to EEprom
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 12; z++)
+                        {
+                            side.c.totalsHandle[x][y][13 - z] = (Pump_rxBuffer[w + 4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2) && (z == 6))
+                            {
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 9;
+                    for(z = 6;z >= 1; z--)
+                    {
+                        side.c.totalsHandle[x][2][z] = side.c.totalsHandle[x][2][z+6];
+                    }
+                    side.c.totalsHandle[x][0][0] = 12;
+                    side.c.totalsHandle[x][1][0] = 12;
+                    side.c.totalsHandle[x][2][0] = 6;
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+            if(pos == side.d.dir)
+            {
+                for(x = 0; x < 4; x++)
+                {
+                    for(y = 0; y < 3; y++)
+                    {
+                        for(z = 0; z < 14; z++)
+                        {
+                            side.d.totalsHandle[x][y][z] = 0;
+                        }
+                    }
+                }
+                for(y = 0; y < 3; y ++)
+                {
+                    for(z = 0; z < 6; z++)
+                    {
+                        side.d.ppuAuthorized[y][z] = Pump_rxBuffer[(30 + (42 * y)) + z] & 0x0F;
+                        EEPROM_1_WriteByte(side.d.ppuAuthorized[y][z],(80 + (y * 5)) + z); //PPU to EEprom
+                    }
+                }
+                w = 0;
+                for(x = 0; x < gradeHandle; x++)
+                {
+                    for(y = 0; y <= 2; y++)
+                    {
+                        for(z = 1; z <= 12; z++)
+                        {
+                            side.d.totalsHandle[x][y][13-z] = (Pump_rxBuffer[w+4] & 0x0F) + 0x30;
+                            w++;
+                            if((y == 2)&&(z == 6))
+                            {
+                                break;
+                            }
+                        }
+                        w++;
+                    }
+                    w = w + 9;
+                    for(z = 6;z >= 1; z--)
+                    {
+                        side.d.totalsHandle[x][2][z] = side.d.totalsHandle[x][2][z+6];
+                    }
+                    side.d.totalsHandle[x][0][0] = 12;
+                    side.d.totalsHandle[x][1][0] = 12;
+                    side.d.totalsHandle[x][2][0] = 6;
+                }
+                Pump_ClearRxBuffer();
+                return gradeHandle;
+            }
+        }else{
+            Pump_ClearRxBuffer();
+            return 0;
+        }
+    }else{
+        Pump_ClearRxBuffer();
+        return 0;
+    }
+    Pump_ClearRxBuffer();
+    return 0;
+}
+

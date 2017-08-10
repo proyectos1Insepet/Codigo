@@ -39,7 +39,8 @@ void RF_Task(void *arg)
     xLastWakeTime = xTaskGetTickCount();
     uint16 i,x,y,contEscape;  
     uint8 buffer_rfTMP;
-    uint8 RFOnline = 0;
+    uint8 GeneralConfig;
+    
     //uint8 EEpromGradeAddress;
     
     //setup();
@@ -49,8 +50,8 @@ void RF_Task(void *arg)
         while(RF_Connection_GetRxBufferSize() > 0)  //&& (RF_Connection_RX_STS_FIFO_NOTEMPTY)
         {
             
-            buffer_rfTMP = RF_Connection_ReadRxData();
-        
+            buffer_rfTMP  = RF_Connection_ReadRxData();
+            GeneralConfig = 0;
             if (buffer_rfTMP == 0xBC)
             {
                 i = 0;
@@ -103,7 +104,8 @@ void RF_Task(void *arg)
             // big config
             else if ( buffer_rf[6] == 0xE1)
             {
-                LongEsperada = 337;
+                LongEsperada   = 337;
+                GeneralConfig  = 1;
             }
             
             else if ( buffer_rf[6] == 0xE2)
@@ -127,7 +129,7 @@ void RF_Task(void *arg)
             {                
                 RF_Connection_ClearRxBuffer();
                 
-                if(buffer_rf[5] == side.a.dir || buffer_rf[5] == side.b.dir)
+                if(buffer_rf[5] == side.a.dir || buffer_rf[5] == side.b.dir || buffer_rf[5] == side.c.dir|| buffer_rf[5] == side.d.dir || GeneralConfig == 1)
                 {
                    pollingRF_Rx(buffer_rf);
                    RFOnline = 1; 
@@ -139,8 +141,7 @@ void RF_Task(void *arg)
                 
                 buffer_rf[6] = 0xFF;
                 RF_Connection_ClearRxBuffer();
-                
-                
+                          
                 
                 break;
             }
@@ -152,6 +153,11 @@ void RF_Task(void *arg)
         {
             pollingRFA_Tx();           
             pollingRFB_Tx();
+            if(NumPositions > 2)
+            {
+                pollingRFC_Tx();
+                pollingRFD_Tx();
+            }
         }
         vTaskDelayUntil(&xLastWakeTime, xFrequency);    
         

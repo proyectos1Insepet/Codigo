@@ -53,17 +53,16 @@
     volatile uint32 flowDisplay4;    //Flujo pantalla 4    
     volatile uint8 numberKeys1;      //Cantidad de digitos a digitar en los teclados numericos para pantalla 1
     volatile uint8 numberKeys2;      //Cantidad de digitos a digitar en los teclados numericos para pantalla 1
+    volatile uint8 numberKeys3;      //Cantidad de digitos a digitar en los teclados numericos para pantalla 1
+    volatile uint8 numberKeys4;      //Cantidad de digitos a digitar en los teclados numericos para pantalla 1
     volatile uint8 flagPoint1;       //Bandera que indica si ya se digito una coma en el teclado numerico de la pantalla 1 
     volatile uint8 flagPoint2;       //Bandera que indica si ya se digito una coma en el teclado numerico de la pantalla 2 
+    volatile uint8 flagPoint3;       //Bandera que indica si ya se digito una coma en el teclado numerico de la pantalla 2 
+    volatile uint8 flagPoint4;       //Bandera que indica si ya se digito una coma en el teclado numerico de la pantalla 2 
     volatile uint8 productNumber;    //Numero de productos que tiene el surtidor
-    volatile uint32 delayPicture1;   //Tiempo que demora una imagen informativa en el caso 0 del polling_Display1
-    volatile uint32 delayPicture2;   //Tiempo que demora una imagen informativa en el caso 0 del polling_Display2
-    volatile uint8 ppux10;           //ppu por 10, 1=Habilitado 0=Inhabilitado
     volatile uint8 symbols[2];       //Simbolos visualizados en Teclado Numerico [0]=Dinero[1]=Volumen
     volatile uint8 time[3];          //Hora 
-    volatile uint8 date[3];          //Fecha
-    volatile uint8 screen[2];        //Pantallas 0:Inhabilitada 1:Habilitada => [0]Tipo de vehiculo [1]Ingrese N° Venta Forma
-    volatile uint8 residue[14];      //Residuo de operacion resta         
+    volatile uint8 date[3];          //Fecha         
     volatile uint8 idSeller[25];     //Identificacion de vendedor
     volatile uint8 typeIdSeller;     //Tipo de identificacion del vendedor
     volatile uint8 passwordSeller[8];//Contraseña Vendedor
@@ -84,7 +83,18 @@
     volatile uint8 sizeSendB;
     volatile uint8 bufferAready;
     volatile uint8 bufferAreadyB;
+    volatile uint8 bufferAreadyC;
+    volatile uint8 bufferAreadyD;
     volatile uint8 ShiftDone;
+    volatile uint8 selectPos;
+    volatile uint8 selectPosB;
+    volatile uint8 flowPos;
+    volatile uint8 flowPosB;
+    volatile uint8 flowPosC;
+    volatile uint8 flowPosD;
+    volatile uint8 TempPos[4];
+    volatile uint8 RFOnline;
+    volatile uint8 OSonline;
   
     
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +120,8 @@
     uint8 buffer_txTotals[512];
     uint8 buffer_A[255];
     uint8 buffer_B[255];
+    uint8 buffer_C[255];
+    uint8 buffer_D[255];
     char8 buffer_print[250];
     uint8 buffer_txPreset[60];
     uint8 buffer_txEOT[60];
@@ -130,23 +142,35 @@
     uint8 CopiasCredito;        
     uint8 FlagTotal;
     uint8 FlagTotalB;
+    uint8 FlagTotalC;
+    uint8 FlagTotalD;
     uint8 StatePosition[8];
     uint8 ActualState[20];
     uint8 InitState[4];
     uint8 PresetFlag;
     uint8 PresetFlag2;
+    uint8 PresetFlag3;
+    uint8 PresetFlag4;
     uint8 PrintON;
     uint8 NewPPU;
     uint8 AuthType;
     uint8 AuthType2;
+    uint8 AuthType3;
+    uint8 AuthType4;
     uint8 AckFlag;
     uint8 AckFlag2;
     uint8 iButtonFlag;
     uint8 iButtonFlag2;
+    uint8 iButtonFlag3;
+    uint8 iButtonFlag4;
     uint8 CreditAuth;
     uint8 CreditAuth2;
+    uint8 CreditAuth3;
+    uint8 CreditAuth4;
     uint8 Credit_Auth_OK;
     uint8 Credit_Auth_OK2;
+    uint8 Credit_Auth_OK3;
+    uint8 Credit_Auth_OK4;
     uint8 Temp[20];
     uint8 producto [4][13];    
     uint8 ppuiButtonA[5];
@@ -179,6 +203,9 @@
     uint8 ControlType;
     uint8 IDPrintFlagA;
     uint8 IDPrintFlagB;
+    uint8 IDPrintFlagC;
+    uint8 IDPrintFlagD;
+    uint8 ppux10;
     
     
 /*
@@ -221,11 +248,6 @@ struct buffer{
     uint8 flagPayment;              //Bandera que habilita que imagen de formas de pago se esta visualizando (1-4) 
     uint8 flagLiftHandle;           //Bandera para indicar el estado de sube manija
     uint8 flagEndSale;              //Bandera que indica que la venta finalizo, se valida en introducir placa
-    uint8 moneyQuota[10];           //Cupo de dinero autorizado para ventas credito
-    uint8 volumeQuota[10];          //Cupo de volumen autorizado para ventas credito
-    uint8 ppuQuota[10];             //PPU autorizado para ventas credito
-    uint8 priceConsign[15];         //Precio a consignar
-    uint8 printers[2];              //Impresoras seleccionadas para imprimir
     uint8 flagChangePPU;            //Bandera que habilita cambiar PPUs cuando los envie el beagle
     uint8 flagPrint;                //Bandera de impresion de recibo
     uint8 flagActiveSale;           //Bandera de venta activa
@@ -233,6 +255,8 @@ struct buffer{
     uint8 shiftPassword[11];
     uint8 CreditpresetValue[2][10];
     uint8 CreditpresetType[2];            //Tipo de programacion, 1V=Volumen 2D=Dinero 2F=Lleno 21=P1 22=P2 23=P3
+    uint8 PrintFlagEOT;
+    uint8 zeroSend;
 };
 
 struct buffer bufferDisplay1;
@@ -261,12 +285,14 @@ struct position{
     uint8 hose;
     uint8 hoseNumber;
     uint8 rfState;
+    uint8 rfStateCopy;
     uint8 pumpState;
     uint8 changePPU;
     uint8 grade;
     uint8 RFstateReport;
     uint8 saleNumber[10];
     uint8 GradesHose[5];
+    uint8 BusyChange;
 };
 
 struct pump{

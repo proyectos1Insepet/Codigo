@@ -35,6 +35,7 @@
 /* Task includes */
 #include "RFtask.h"
 #include "PumpTask.h"
+#include "PrinterTask.h"
 
 xSemaphoreHandle g_pUARTSemaphore;
       
@@ -80,7 +81,8 @@ void loadConfiguration(){
     PPUDec     = EEPROM_1_ReadByte(4);  //Punto decimal PPU
     DDMode     = EEPROM_1_ReadByte(5);  //Punto decimal 
     digits     = EEPROM_1_ReadByte(6);  //Digitos
-    lockTurn   = EEPROM_1_ReadByte(7);  //Fijo turno abierto para pruebas
+    lockTurn   = EEPROM_1_ReadByte(7);  
+    //lockTurn   = 1;                   //Fijo turno abierto para pruebas
     printPortA = EEPROM_1_ReadByte(8);  //Puertos de impresion
     printPortB = EEPROM_1_ReadByte(9);  //Puertos de impresion
     IDCast[0]  = EEPROM_1_ReadByte(10); //ID Estacion1
@@ -98,32 +100,20 @@ void loadConfiguration(){
  * Funcion que pone el surtidor en modo consola para configuracion
  * Esta funcion se debe habilitar solo cuando sea requerida
  */
-void console(void)
+void console(uint8 position)
 {
-    Pump_PutChar(0x10 | 0x03);
+    Pump_PutChar(0x10 | position);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x03);
+    Pump_PutChar(0x30 | position);
     CyDelay(100);
-    Pump_PutChar(0x10 | 0x03);
+    Pump_PutChar(0x10 | position);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x03);
+    Pump_PutChar(0x30 | position);
     CyDelay(100);
-    Pump_PutChar(0x10 | 0x03);
+    Pump_PutChar(0x10 | position);
     CyDelay(100);
-    Pump_PutChar(0x30 | 0x03);
-    CyDelay(100);
-    Pump_PutChar(0x10 | 0x03);
-    CyDelay(100);
-    Pump_PutChar(0x30 | 0x03);
-    CyDelay(100);
-    Pump_PutChar(0x10 | 0x03);
-    CyDelay(100);
-    Pump_PutChar(0x30 | 0x03);
-    CyDelay(100);
-    Pump_PutChar(0x10 | 0x03);
-    CyDelay(100);
-    Pump_PutChar(0x30 | 0x03);
-    CyDelay(100);
+    Pump_PutChar(0x30 | position);
+    
 }
 /*
 *********************************************************************************************************
@@ -159,8 +149,46 @@ void InitPump(){
         if(PumpIsInValidState(get_state(side.a.dir)) && PumpIsInValidState(get_state(side.b.dir)))
         {      
             NumPositions = get_position();
+            if(NumPositions <= 2)
+            {
+              if(get_state(side.a.dir) == PUMP_PEOT || 
+                 get_state(side.a.dir) == PUMP_FEOT)
+                {
+                    getSale(side.a.dir);
+                }
+                if(get_state(side.b.dir) == PUMP_PEOT || 
+                   get_state(side.b.dir) == PUMP_FEOT)
+                { 
+                    getSale(side.b.dir);
+                }
+            }
             
-            if(get_state(side.a.dir) == 0x06 && get_state(side.b.dir) == 0x06)
+            if(NumPositions > 2)
+            {
+                if(get_state(side.a.dir) == PUMP_PEOT || 
+                   get_state(side.a.dir) == PUMP_FEOT)
+                {
+                    getSale(side.a.dir);
+                }
+                if(get_state(side.b.dir) == PUMP_PEOT || 
+                   get_state(side.b.dir) == PUMP_FEOT)
+                  {
+                    getSale(side.b.dir);
+                  }
+                if(get_state(side.c.dir) == PUMP_PEOT || 
+                   get_state(side.c.dir) == PUMP_FEOT)
+                  {
+                     getSale(side.c.dir);
+                  }
+                if(get_state(side.d.dir) == PUMP_PEOT || 
+                   get_state(side.d.dir) == PUMP_FEOT)
+                 {
+                    getSale(side.d.dir);
+                 }
+            }
+                    
+                
+            if(get_state(side.a.dir) == 0x06 && get_state(side.b.dir) == 0x06 )
             {
                 PumpCompleteConfiguration(side.a.dir);
                 StoreConfiguration();
@@ -192,23 +220,42 @@ int main()
     /* Init Pump                                                                        */       
     InitPump(); 
     loadConfiguration();
+    if(NumPositions == 2){
+        getTotalsInit(side.a.dir);
+        getTotalsInit(side.b.dir);
+    }
+    if(NumPositions == 4){
+        getTotalsInit(side.a.dir);
+        get_state(side.b.dir);        
+        getTotalsInit(side.b.dir);
+        get_state(side.c.dir);
+        getTotalsInit(side.c.dir);
+        get_state(side.d.dir);
+        getTotalsInit(side.d.dir);
+        
+    }
+    console(side.a.dir);
+    OSonline = 0;
     
     /* OS Init                                                                          */
     osInit();                               /* Initialize all thread related tasks      */
+    
     prvHardwareSetup();                     /* FreeRTOS setup                           */
 	vTaskStartScheduler();                  /* Start the scheduler                      */
     
     g_pUARTSemaphore = xSemaphoreCreateMutex();  /* Initialize the UARTg Mutex          */
-        
+       
+    
 	return 1;
 }
 
 int osInit(void)
 {
-    /*  tasks  */
+    /*  tasks  */    
     xTaskCreate(RF_Task, "RFTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);            /* RF TASK         */
     xTaskCreate(Pump_Task, "PumpTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);        /* PUMP TASK       */
     xTaskCreate(Display_Task, "DisplayTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);  /* DISPLAY TASK    */
+    xTaskCreate(PrinterTask, "PrinterTask", (configMINIMAL_STACK_SIZE), NULL, tskIDLE_PRIORITY + 2, NULL);  /* PRINTER TASK    */
     
     return 1;// All went well
 }

@@ -177,7 +177,7 @@ void ShowRectangle(uint8 lcd, uint8 coordinate)
 
 void ShowMessage(uint8 lcd,uint8 *msg,uint8 posx){
     uint8 x;
-    for(x=0;x<10;x++){
+    for(x=1;x<10;x++){
         WriteMessage(lcd,msg[x],31,posx + x,1,0x0000,'N');
     }
 }

@@ -35,6 +35,7 @@ uint8 get_state(uint8 pos);
 uint8 get_position(void);
 uint8 get_handle(uint8 pos);
 uint8 getTotals(uint8 pos);
+uint8 getTotalsInit(uint8 pos);
 uint8 priceChange(uint8 pos,uint8 handle,uint8 *value);
 uint8 preset_data(uint8 pos, uint8 grade, uint8 *value, uint8 preset);
 uint8 get_sale(uint8 pos);
