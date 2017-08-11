@@ -48,7 +48,7 @@ void GlobalInitializer(){
     Pump_Start(); 
     Display1_Start();
     Display2_Start();    
-    Printer_Start();   
+    Tag_Start();   
     I2C_Bus_Start();
     RF_Connection_Start();
    
@@ -82,7 +82,7 @@ void loadConfiguration(){
     DDMode     = EEPROM_1_ReadByte(5);  //Punto decimal 
     digits     = EEPROM_1_ReadByte(6);  //Digitos
     lockTurn   = EEPROM_1_ReadByte(7);  
-    //lockTurn   = 1;                   //Fijo turno abierto para pruebas
+    lockTurn   = 1;                   //Fijo turno abierto para pruebas
     printPortA = EEPROM_1_ReadByte(8);  //Puertos de impresion
     printPortB = EEPROM_1_ReadByte(9);  //Puertos de impresion
     IDCast[0]  = EEPROM_1_ReadByte(10); //ID Estacion1

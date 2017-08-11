@@ -21,6 +21,7 @@
 #include <protocol.h>
 #include <variables.h>
 #include <keyboard.h>
+#include <codetag.h>
 #include <ibutton.h>
 #include <RFPoll.h>
 #include <LCD.h>
@@ -890,10 +891,17 @@ void PollingDisplay1(void){
                             bufferDisplay1.flagPrint =  1;
                             SetPicture(1, DISPLAY_ESPERANDO_ID);                            
                         break; 
-                        case 0xB7:  //ID Number
-                            bufferDisplay1.flagKeyboard = 0;
-                            flowDisplay1 = 7;
-                            SetPicture(1,DISPLAY_SUBA_MANIJA);                            
+                        case 0xB7:  //ID Number                            
+                            flowDisplay1 = 23;
+                            numberKeys1 = 0;                            
+                            bufferDisplay1.flagPrint =  1;
+                            Tag_ClearRxBuffer();
+                            Tag_ClearTxBuffer();
+                            Tag_PutChar('O');
+                            Tag_PutChar('K');
+                            Tag_PutChar(0x01);
+                            vTaskDelay( 100 / portTICK_PERIOD_MS );
+                            SetPicture(1, DISPLAY_ESPERANDO_ID);                           
                         break;
                         case 0x94:  //Pantalla Inicial
                             bufferDisplay1.flagPrint =  0;
@@ -1011,10 +1019,73 @@ void PollingDisplay1(void){
                 }
                 
                 Display1_ClearRxBuffer();
+            }                                              
+        break;
+            
+        case 23:
+            for(x=0;x<=29;x++){
+                temporal[x]=0x00;
             }
-          
-                                    
-        break;    
+            if(serial_codetag(1)==1){
+                for(x=0;x<=temporal[0];x++){
+                    bufferDisplay1.idSerial[x]=temporal[x];
+                }
+                bufferDisplay1.idSerial[0]=16;
+				y=16;
+				for(x=1;x<=8;x++){
+					if((temporal[x]&0x0F)>=10){
+						bufferDisplay1.idSerial[y]=(temporal[x]&0x0F)+55;
+					}else{
+						bufferDisplay1.idSerial[y]=(temporal[x]&0x0F)+48;				
+					}
+                    y--;
+					if(((temporal[x]>>4)&0x0F)>=10){
+						bufferDisplay1.idSerial[y]=((temporal[x]>>4)&0x0F)+55;
+					}else{
+						bufferDisplay1.idSerial[y]=((temporal[x]>>4)&0x0F)+48;				
+					}
+                    y--;
+				}
+                
+                // Authorization request
+                SetPicture(1,DISPLAY_ID_RECONOCIDO);                                                                 
+                vTaskDelay( 500 / portTICK_PERIOD_MS );                       
+                iButtonFlag = 1;
+                SetPicture(1, DISPLAY_FORMA_PROGRAMACION);
+                flowDisplay1 = 3;
+            }
+            //Touch for return to init display
+            if(Display1_GetRxBufferSize() == 8)
+            {
+                if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
+                {
+                    switch(Display1_rxBuffer[3])
+                    {                        
+                        case 0x7E:  //Init Screen                                                        
+                            SetPicture(1, DISPLAY_INICIO0);
+                            flowDisplay1 = 0;
+                            bufferDisplay1.flagPrint =  0;
+                            PresetFlag = 0;
+                            iButtonFlag = 0;
+                            AuthType = 0;
+                            Display1_ClearRxBuffer();
+                        break;
+                        
+                        case 0x94:  //Cancel Button                                                        
+                            SetPicture(1, DISPLAY_INICIO0);
+                            flowDisplay1 = 0;
+                            bufferDisplay1.flagPrint =  0;
+                            PresetFlag = 0;
+                            iButtonFlag = 0;
+                            AuthType = 0;
+                            Display1_ClearRxBuffer();
+                        break;
+                    }                    
+                }
+                
+                Display1_ClearRxBuffer();
+            } 
+        break;
     ///////////////FIN CASOS PARA CRÉDITO  /////////////////////  
     
     //////////// CASOS PARA CONFIGURACIONES  ///////////////////
@@ -2277,10 +2348,72 @@ void PollingDisplay2(void){
                 
                 //vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
                 Display2_ClearRxBuffer();
-            }
-           
-                                 
+            }                                            
         break;    
+            
+        case 23:
+            for(x=0;x<=29;x++){
+                temporal[x]=0x00;
+            }
+            if(serial_codetag(2)==1){
+                for(x=0;x<=temporal[0];x++){
+                    bufferDisplay2.idSerial[x]=temporal[x];
+                }
+                bufferDisplay2.idSerial[0]=16;
+				y=16;
+				for(x=1;x<=8;x++){
+					if((temporal[x]&0x0F)>=10){
+						bufferDisplay2.idSerial[y]=(temporal[x]&0x0F)+55;
+					}else{
+						bufferDisplay2.idSerial[y]=(temporal[x]&0x0F)+48;				
+					}
+                    y--;
+					if(((temporal[x]>>4)&0x0F)>=10){
+						bufferDisplay2.idSerial[y]=((temporal[x]>>4)&0x0F)+55;
+					}else{
+						bufferDisplay2.idSerial[y]=((temporal[x]>>4)&0x0F)+48;				
+					}
+                    y--;
+				}                
+                // Authorization request
+                SetPicture(2,DISPLAY_ID_RECONOCIDO);                                                                 
+                vTaskDelay( 500 / portTICK_PERIOD_MS );                       
+                iButtonFlag2 = 1;
+                SetPicture(2, DISPLAY_FORMA_PROGRAMACION);
+                flowDisplay2 = 3;
+            }
+            //Touch for return to init display
+            if(Display2_GetRxBufferSize() == 8)
+            {
+                if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
+                {
+                    switch(Display2_rxBuffer[3])
+                    {                        
+                        case 0x7E:  //Init Screen                                                        
+                            SetPicture(2, DISPLAY_INICIO0);
+                            flowDisplay2 = 0;
+                            bufferDisplay2.flagPrint =  0;
+                            PresetFlag2 = 0;
+                            iButtonFlag2 = 0;
+                            AuthType2 = 0;
+                            Display2_ClearRxBuffer();
+                        break;
+                        
+                        case 0x94:  //Cancel Button                                                        
+                            SetPicture(2, DISPLAY_INICIO0);
+                            flowDisplay2 = 0;
+                            bufferDisplay2.flagPrint =  0;
+                            PresetFlag2 = 0;
+                            iButtonFlag2 = 0;
+                            AuthType2 = 0;
+                            Display2_ClearRxBuffer();
+                        break;
+                    }                    
+                }
+                
+                Display2_ClearRxBuffer();
+            } 
+        break;
     ///////////////FIN CASOS PARA CRÉDITO  /////////////////////  
     
     //////////// CASOS PARA CONFIGURACIONES  ///////////////////
@@ -3538,6 +3671,71 @@ void PollingDisplay3(void){
             }
           
                                     
+        break;    
+        
+        case 23:
+            for(x=0;x<=29;x++){
+                temporal[x]=0x00;
+            }
+            if(serial_codetag(1)==1){
+                for(x=0;x<=temporal[0];x++){
+                    bufferDisplay3.idSerial[x]=temporal[x];
+                }
+                bufferDisplay3.idSerial[0]=16;
+				y=16;
+				for(x=1;x<=8;x++){
+					if((temporal[x]&0x0F)>=10){
+						bufferDisplay3.idSerial[y]=(temporal[x]&0x0F)+55;
+					}else{
+						bufferDisplay3.idSerial[y]=(temporal[x]&0x0F)+48;				
+					}
+                    y--;
+					if(((temporal[x]>>4)&0x0F)>=10){
+						bufferDisplay3.idSerial[y]=((temporal[x]>>4)&0x0F)+55;
+					}else{
+						bufferDisplay3.idSerial[y]=((temporal[x]>>4)&0x0F)+48;				
+					}
+                    y--;
+				}
+                
+                // Authorization request
+                SetPicture(1,DISPLAY_ID_RECONOCIDO);                                                                 
+                vTaskDelay( 500 / portTICK_PERIOD_MS );                       
+                iButtonFlag3 = 1;
+                SetPicture(1, DISPLAY_FORMA_PROGRAMACION);
+                flowDisplay3 = 3;
+            }
+            //Touch for return to init display
+            if(Display1_GetRxBufferSize() == 8)
+            {
+                if((Display1_rxBuffer[0] == 0xAA) && (Display1_rxBuffer[6] == 0xC3) && (Display1_rxBuffer[7] == 0x3C))
+                {
+                    switch(Display1_rxBuffer[3])
+                    {                        
+                        case 0x7E:  //Init Screen                                                        
+                            SetPicture(1, DISPLAY_INICIO0);
+                            flowDisplay3 = 0;
+                            bufferDisplay3.flagPrint =  0;
+                            PresetFlag3 = 0;
+                            iButtonFlag3 = 0;
+                            AuthType3 = 0;
+                            Display1_ClearRxBuffer();
+                        break;
+                        
+                        case 0x94:  //Cancel Button                                                        
+                            SetPicture(1, DISPLAY_INICIO0);
+                            flowDisplay3 = 0;
+                            bufferDisplay3.flagPrint =  0;
+                            PresetFlag3 = 0;
+                            iButtonFlag3 = 0;
+                            AuthType3 = 0;
+                            Display1_ClearRxBuffer();
+                        break;
+                    }                    
+                }
+                
+                Display1_ClearRxBuffer();
+            } 
         break;    
     ///////////////FIN CASOS PARA CRÉDITO  /////////////////////  
     
@@ -4799,10 +4997,71 @@ void PollingDisplay4(void){
                 
                 //vTaskDelay( 10 / portTICK_PERIOD_MS );              //Freertos delay
                 Display2_ClearRxBuffer();
-            }
-           
-                                 
+            }                                            
         break;    
+            
+        case 23:
+            for(x=0;x<=29;x++){
+                temporal[x]=0x00;
+            }
+            if(serial_codetag(2)==1){
+                for(x=0;x<=temporal[0];x++){
+                    bufferDisplay4.idSerial[x]=temporal[x];
+                }
+                bufferDisplay4.idSerial[0]=16;
+				y=16;
+				for(x=1;x<=8;x++){
+					if((temporal[x]&0x0F)>=10){
+						bufferDisplay4.idSerial[y]=(temporal[x]&0x0F)+55;
+					}else{
+						bufferDisplay4.idSerial[y]=(temporal[x]&0x0F)+48;				
+					}
+                    y--;
+					if(((temporal[x]>>4)&0x0F)>=10){
+						bufferDisplay4.idSerial[y]=((temporal[x]>>4)&0x0F)+55;
+					}else{
+						bufferDisplay4.idSerial[y]=((temporal[x]>>4)&0x0F)+48;				
+					}
+                    y--;
+				}                
+                // Authorization request
+                SetPicture(2,DISPLAY_ID_RECONOCIDO);                                                                 
+                vTaskDelay( 500 / portTICK_PERIOD_MS );                       
+                iButtonFlag4 = 1;
+                SetPicture(2, DISPLAY_FORMA_PROGRAMACION);
+                flowDisplay4 = 3;
+            }
+            //Touch for return to init display
+            if(Display2_GetRxBufferSize() == 8)
+            {
+                if((Display2_rxBuffer[0] == 0xAA) && (Display2_rxBuffer[6] == 0xC3) && (Display2_rxBuffer[7] == 0x3C))
+                {
+                    switch(Display2_rxBuffer[3])
+                    {                        
+                        case 0x7E:  //Init Screen                                                        
+                            SetPicture(2, DISPLAY_INICIO0);
+                            flowDisplay4 = 0;
+                            bufferDisplay4.flagPrint =  0;
+                            PresetFlag4 = 0;
+                            iButtonFlag4 = 0;
+                            AuthType4 = 0;
+                            Display2_ClearRxBuffer();
+                        break;
+                        
+                        case 0x94:  //Cancel Button                                                        
+                            SetPicture(2, DISPLAY_INICIO0);
+                            flowDisplay4 = 0;
+                            bufferDisplay4.flagPrint =  0;
+                            PresetFlag4 = 0;
+                            iButtonFlag4 = 0;
+                            AuthType4 = 0;
+                            Display2_ClearRxBuffer();
+                        break;
+                    }                    
+                }                
+                Display2_ClearRxBuffer();
+            } 
+        break;
     ///////////////FIN CASOS PARA CRÉDITO  /////////////////////  
     
     //////////// CASOS PARA CONFIGURACIONES  ///////////////////
