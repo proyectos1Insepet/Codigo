@@ -2229,9 +2229,16 @@ void PollingDisplay2(void){
                             SetPicture(2,DISPLAY_ESPERANDO_ID);                            
                         break; 
                         case 0xB7:  //ID por número
-                            bufferDisplay2.flagKeyboard = 0;
-                            flowDisplay2 = 7;//Esperando estado del dispensador                                                          
-                            SetPicture(2,DISPLAY_SUBA_MANIJA);                            
+                            flowDisplay2 = 23;
+                            numberKeys2 = 0;                            
+                            bufferDisplay2.flagPrint =  1;
+                            Tag_ClearRxBuffer();
+                            Tag_ClearTxBuffer();
+                            Tag_PutChar('O');
+                            Tag_PutChar('K');
+                            Tag_PutChar(0x02);
+                            vTaskDelay( 100 / portTICK_PERIOD_MS );
+                            SetPicture(2, DISPLAY_ESPERANDO_ID);                            
                         break;
                         case 0x94:  //Pantalla Inicial 
                             bufferDisplay2.flagPrint =  0;
@@ -3552,9 +3559,16 @@ void PollingDisplay3(void){
                             SetPicture(1, DISPLAY_ESPERANDO_ID);                            
                         break; 
                         case 0xB7:  //ID Number
-                            bufferDisplay3.flagKeyboard = 0;
-                            flowDisplay3 = 7;                                                        
-                            SetPicture(1,DISPLAY_SUBA_MANIJA);                            
+                            flowDisplay3 = 23;
+                            numberKeys3 = 0;                            
+                            bufferDisplay3.flagPrint =  1;
+                            Tag_ClearRxBuffer();
+                            Tag_ClearTxBuffer();
+                            Tag_PutChar('O');
+                            Tag_PutChar('K');
+                            Tag_PutChar(0x01);
+                            vTaskDelay( 100 / portTICK_PERIOD_MS );
+                            SetPicture(1, DISPLAY_ESPERANDO_ID);                            
                         break;
                         case 0x94:  //Pantalla Inicial
                             bufferDisplay3.flagPrint =  0;
@@ -4877,9 +4891,16 @@ void PollingDisplay4(void){
                             SetPicture(2,DISPLAY_ESPERANDO_ID);                            
                         break; 
                         case 0xB7:  //ID por número
-                            bufferDisplay4.flagKeyboard = 0;
-                            flowDisplay4 = 7;//Esperando estado del dispensador                                                          
-                            SetPicture(2,DISPLAY_SUBA_MANIJA);                            
+                            flowDisplay4 = 23;
+                            numberKeys4 = 0;                            
+                            bufferDisplay4.flagPrint =  1;
+                            Tag_ClearRxBuffer();
+                            Tag_ClearTxBuffer();
+                            Tag_PutChar('O');
+                            Tag_PutChar('K');
+                            Tag_PutChar(0x02);
+                            vTaskDelay( 100 / portTICK_PERIOD_MS );
+                            SetPicture(2, DISPLAY_ESPERANDO_ID);                            
                         break;
                         case 0x94:  //Pantalla Inicial 
                             bufferDisplay4.flagPrint =  0;
