@@ -104,7 +104,7 @@
     uint8 lockTurn;                          //Bloquea temporalmente el turno 1=bloqueado o 0=desbloqueado
     uint8 digits;                            //Version de digitos del surtidor
     uint8 hiddenKeys;
-    uint8 PrinterType;
+    uint8 PrinterType[2];
     char8 VolUnit[6];
     uint8 dateDownHandle[3];                 //Fecha en la que se baja la manija
     uint8 timeDownHandle[2];                 //Hora en la que se baja la manija
@@ -127,18 +127,18 @@
     uint8 buffer_txEOT[60];
     uint8 buffer_txDisplay[60];
     uint16 intIDStation;
-    uint8 Encabezado1[30];
-    uint8 Encabezado2[30];
-    uint8 Encabezado3[30];
-    uint8 Encabezado4[30];
-    uint8 Encabezado5[30];
-    uint8 Pie1[30];
-    uint8 Pie2[30];
-    uint8 Pie3[30];
-    uint8 Product1[16];
-    uint8 Product2[16];
-    uint8 Product3[16];
-    uint8 Product4[16];
+    uint8 Encabezado1[31];
+    uint8 Encabezado2[31];
+    uint8 Encabezado3[31];
+    uint8 Encabezado4[31];
+    uint8 Encabezado5[31];
+    uint8 Pie1[31];
+    uint8 Pie2[31];
+    uint8 Pie3[31];
+    uint8 Product1[17];
+    uint8 Product2[17];
+    uint8 Product3[17];
+    uint8 Product4[17];
     uint8 CopiasCredito;        
     uint8 FlagTotal;
     uint8 FlagTotalB;
@@ -206,6 +206,7 @@
     uint8 IDPrintFlagC;
     uint8 IDPrintFlagD;
     uint8 ppux10;
+    uint8 logoPrint[2];
     
     
 /*

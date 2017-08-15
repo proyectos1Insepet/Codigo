@@ -343,14 +343,14 @@ void imprimir(uint8 val, uint8 pos){ //val, puerto de impresora
     uint8 x;        
     if(pos == side.a.dir || pos == side.c.dir)
     {
-        if(PrinterType == 1)
+        if(PrinterType[1] == 1)
         {
             printLogoP(printPortA,11);    
         }
     }
     if(pos == side.b.dir || pos == side.d.dir)
     {
-        if(PrinterType == 1)
+        if(PrinterType[1] == 1)
         {
             printLogoP(printPortB,11);    
         }

@@ -949,8 +949,7 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                                                        
                         }
                         else
-                        {
-                           
+                        {                           
                             PresetFlag4 = 0;
                             iButtonFlag4 = 0;                           
                             AckFlag2 = 1;
@@ -1764,26 +1763,22 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     CopiasCredito = PRF_rxBuffer[16];
                     write_hora();
                     write_fecha(); 
-//                    
-//                    for(x = 0 ; x < 30; x++)
-//                    {
-//                       // EEPROM_1_WriteByte(Encabezado1[x],16 + x);
-//                    }
-//                    for(x = 30 ; x < 60; x++)
-//                    {
-//                       // EEPROM_1_WriteByte(Encabezado2[x - 30], 16 + x);
-//                    }
-//                    for(x = 60 ; x < 90; x++){
-//                       // EEPROM_1_WriteByte(Encabezado3[x - 30], 16 + x);
-//                    }
-//                    for(x =90 ; x < 120; x++){
-//                       // EEPROM_1_WriteByte(Encabezado4[x-30],16+x);
-//                    }
-////                    side.a.dir = EEPROM_1_ReadByte(12);
-////                    side.b.dir = EEPROM_1_ReadByte(13);
-////                    side.c.dir = EEPROM_1_ReadByte(14);
-////                    side.d.dir = EEPROM_1_ReadByte(15);
-//                    //imprimir(printPortA,side.a.dir);
+                    logoPrint[0] = 0x01;
+                    logoPrint[1] = PRF_rxBuffer[15];
+                    WriteEeprom(0,logoPrint);
+                    WriteEeprom(30,Encabezado1);
+                    WriteEeprom(65,Encabezado2);
+                    WriteEeprom(100,Encabezado3);
+                    WriteEeprom(135,Encabezado4);
+                    WriteEeprom(170,Encabezado5);
+                    WriteEeprom(205,Pie1);
+                    WriteEeprom(240,Pie2);
+                    WriteEeprom(275,Pie3);
+                    WriteEeprom(305,Product1);
+                    WriteEeprom(325,Product2);
+                    WriteEeprom(345,Product3);
+                    WriteEeprom(365,Product4);
+                                        
                 break;
                
                 case 0xE2:               //Configuracion de la posicion                                                 
@@ -1791,51 +1786,42 @@ void pollingRF_Rx(uint8 PRF_rxBuffer[])
                     if(PRF_rxBuffer[5] == side.a.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.a.GradesHose[x-8] = PRF_rxBuffer[x];
+                            side.a.GradesHose[x-7] = PRF_rxBuffer[x];
                         }
                     }
                     if(PRF_rxBuffer[5] == side.b.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.b.GradesHose[x-8] = PRF_rxBuffer[x];
+                            side.b.GradesHose[x-7] = PRF_rxBuffer[x];
                         }
                     }
                     if(PRF_rxBuffer[5] == side.c.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.c.GradesHose[x-8] = PRF_rxBuffer[x];
+                            side.c.GradesHose[x-7] = PRF_rxBuffer[x];
                         }
                     }
                     if(PRF_rxBuffer[5] == side.d.dir)
                     {
                         for(x = 8; x < 12; x++){
-                            side.d.GradesHose[x-8] = PRF_rxBuffer[x];
+                            side.d.GradesHose[x-7] = PRF_rxBuffer[x];
                         }
                     }
+                    side.a.GradesHose[0] = 0x04;  //Recordar modificar donde aparezcan
+                    side.b.GradesHose[0] = 0x04;
+                    side.c.GradesHose[0] = 0x04;
+                    side.d.GradesHose[0] = 0x04;
+                    PrinterType[0]       = 0x01;
+                    
                     lockTurn = PRF_rxBuffer[12];
                     EEPROM_1_WriteByte(lockTurn,7);
-
-//                    y = 60;
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.a.GradesHose[x-60],x);
-//                        y++;
-//                    }
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.b.GradesHose[x-50],x);
-//                        y++;
-//                    }
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.c.GradesHose[x-50],x);
-//                        y++;
-//                    }
-//                    for(x = y; x< y+5; x++)
-//                    {
-//                        EEPROM_1_WriteByte(side.d.GradesHose[x-50],x);
-//                        y++;
-//                    }
+                    
+                    PrinterType[1] = PRF_rxBuffer[7];
+                    WriteEeprom(2,PrinterType);
+                    WriteEeprom(4,side.a.GradesHose);
+                    WriteEeprom(9,side.b.GradesHose);
+                    WriteEeprom(14,side.c.GradesHose);
+                    WriteEeprom(19,side.d.GradesHose);                    
                 break;
                 
                 case 0xE4:               //Turno  
